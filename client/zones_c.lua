@@ -156,7 +156,7 @@ function CreateGarage(data)
                 end
                 ZoneData[data.id].npcEntity = SetNPC(data)
                 if data.job == '' or 'false' or false then
-                   data.jop = false
+                   data.job = false
                 end
 
                 ZoneData[data.id].TargetId = Target:addBoxZone({
