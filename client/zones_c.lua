@@ -155,6 +155,9 @@ function CreateGarage(data)
                     data.npchash = 'csb_trafficwarden'
                 end
                 ZoneData[data.id].npcEntity = SetNPC(data)
+                if data.job == '' or 'false' or false then
+                   data.jop = false
+                end
 
                 ZoneData[data.id].TargetId = Target:addBoxZone({
                     coords = { data.actioncoords.x, data.actioncoords.y, data.actioncoords.z + 1 },
