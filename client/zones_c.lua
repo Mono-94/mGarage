@@ -188,9 +188,9 @@ function CreateGarage(data)
                             label = 'Save Car',
                             groups = data.job,
                             distance = 3.0,
-                            canInteract = function(entity, distance, coords, name, bone)
-                                return Entity(entity).state.Spawned
-                            end,
+                          --  canInteract = function(entity, distance, coords, name, bone)
+                         --       return Entity(entity).state.Spawned
+                         --   end,
                             onSelect = function(vehicle)
                                 data.entity = VehToNet(vehicle.entity)
                                 data.props = json.encode(lib.getVehicleProperties(vehicle.entity))
