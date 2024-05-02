@@ -4,7 +4,7 @@ Config.Lang = 'ES'  -- ES / EN
 
 Config.DefaultGarages = true
 
-Config.CarkeysItem = true
+Config.CarkeysItem = false
 
 Config.CarBlipTime = 1000 * 30 -- 30 Segs
 

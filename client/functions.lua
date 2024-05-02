@@ -6,7 +6,8 @@ local zoneHeight = 4
 local zonePoints = {}
 local currentZone, currentZoneName, currentZ = nil, nil, nil
 local NewZone = {}
-local TextUIZone = '[MB1] Set Point   \n  [MB2] Delete Last Point   \n  [SCROLL] Thickness  \n  [ENTER] Save points  \n  [BACKSPACE] Close '
+local TextUIZone =
+'[MB1] Set Point   \n  [MB2] Delete Last Point   \n  [SCROLL] Thickness  \n  [ENTER] Save points  \n  [BACKSPACE] Close '
 function CreateZone(polyzoneName, cb)
   local playerPed = cache.ped
   if not isOpenCretor then
@@ -71,8 +72,6 @@ function CreateZone(polyzoneName, cb)
             cb(NewZone)
 
             CreateZone()
-          else
-            print('No points avaible')
           end
         elseif IsControlPressed(0, 194) then
           cb(false)
@@ -257,7 +256,8 @@ function PlayCam(distance)
   return hit, coords, entity, a, d
 end
 
-local TextUI = '[E] Set Coords  \n  [SCROLL] Heading  \n  [BACKSPACE] Delete Last coords  \n  [G] None/Ped/Vehicle  \n  [ENTER] Save Coords'
+local TextUI =
+'[E] Set Coords  \n  [SCROLL] Heading  \n  [BACKSPACE] Delete Last coords  \n  [G] None/Ped/Vehicle  \n  [ENTER] Save Coords'
 function CopyCoords(action, cb)
   local viewEntity
   local CoordsTable = {}
@@ -371,17 +371,17 @@ function CopyCoords(action, cb)
       elseif IsControlJustReleased(0, 177) and action == 'multi' then -- BACKSPACE Delete Last Coords
         UndoLastCoord()
       elseif IsControlJustReleased(0, 47) then                        -- G Change Ped/Vehicle/None
-          if ActiveEntity then
-            DeleteEntity(ActiveEntity)
-            ActiveEntity = nil
-          end
-          if not esPedActivo then
-            ActiveEntity = Clone()
-            esPedActivo = true
-          else
-            ActiveEntity = Car()
-            esPedActivo = false
-          end
+        if ActiveEntity then
+          DeleteEntity(ActiveEntity)
+          ActiveEntity = nil
+        end
+        if not esPedActivo then
+          ActiveEntity = Clone()
+          esPedActivo = true
+        else
+          ActiveEntity = Car()
+          esPedActivo = false
+        end
       elseif IsControlJustReleased(0, 191) and action == 'multi' then -- ENTER Copy Coords And Close
         DeleteAllEntitys()
         cb(CoordsTable, toVector4Table())
@@ -394,13 +394,6 @@ function CopyCoords(action, cb)
     end
   end)
 end
-
-RegisterCommand('coords', function(source, args, raw)
-  CopyCoords(args[1], function(coordsTable, Vector4)
-    print(coordsTable, Vector4)
-  end)
-end)
-
 
 function VehicleLabel(model)
   local makeName = GetMakeNameFromVehicleModel(model)
