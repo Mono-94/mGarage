@@ -12,7 +12,7 @@ function OpenGarage(data)
             if #getVehicles <= 0 then
                 Notification({
                     title = data.name,
-                    description = 'No tienes ningun vehículo en el garaje.'
+                    description = Text[Config.Lang].noVehicles
 
                 })
                 return

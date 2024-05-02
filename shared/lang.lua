@@ -41,6 +41,7 @@ Text = {
         impound3 = '',
         noSpawnPos = 'No hay punto de aparición',
         setBlip = 'Vehículo marcado en el mapa',
+        noVehicles = 'No tienes ningun vehículo en el garaje.',
 
         --Target
         TargetSaveCar = 'Depositar vehículo',
@@ -93,7 +94,7 @@ Text = {
         impound3 = "",
         noSpawnPos = "No spawn point available",
         setBlip = "Vehicle marked on the map",
-
+        NoVehicles = "You don't have any vehicles in the garage.",
         -- Target
         TargetSaveCar = "Deposit vehicle",
         TargetImpound = "Send to Impound",
