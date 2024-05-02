@@ -8,6 +8,8 @@ Config.CarkeysItem = true
 
 Config.CarBlipTime = 1000 * 30 -- 30 Segs
 
+Config.TargetDistance = 3.0
+
 Config.GaragesDefault = {
     {
         name = 'Pillbox Hill',

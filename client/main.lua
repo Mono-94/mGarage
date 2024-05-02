@@ -7,7 +7,6 @@ function OpenGarage(data)
     if data.garagetype == 'impound' or data.garagetype == 'garage' then
         local getVehicles = ServerCallBack('get', data)
         local Vehicles = {}
-        print(#getVehicles)
         if getVehicles then
             if #getVehicles <= 0 then
                 Notification({
@@ -95,6 +94,30 @@ local blipcar = function(coords, plate)
     end)
 end
 
+
+
+function ImpoundVehicle(data)
+    if DoesEntityExist(data.vehicle) then
+        local input = lib.inputDialog(Text[Config.Lang].ImpoundOption1, {
+            { type = 'textarea', label = Text[Config.Lang].ImpoundOption2, required = true, },
+            { type = 'number',   label = Text[Config.Lang].ImpoundOption3, icon = 'dollar-sign', min = 1 },
+        })
+        local data = {
+            entity = VehToNet(data.vehicle),
+            price = input[2],
+            reason = input[1],
+            garage = data.impoundName
+        }
+
+        if not input then return end
+
+        ServerCallBack('setimpound', data)
+    end
+end
+
+exports('ImpoundVehicle', ImpoundVehicle)
+
+
 RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
     local retval = nil
 
@@ -104,7 +127,7 @@ RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
         blipcar(retval, data.data.plate)
     elseif data.action == 'keys' then
         ShowNui('setVisibleGarage', false)
-
+        
         Vehicles.VehickeKeysMenu(data.plate, function()
             ShowNui('setVisibleGarage', true)
         end)

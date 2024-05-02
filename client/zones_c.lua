@@ -28,13 +28,7 @@ local SetBlip = function(data)
 end
 
 local SetNPC = function(data)
-    local hashkey = GetHashKey(data.npchash)
-    RequestModel(hashkey)
-
-    while not HasModelLoaded(hashkey) do
-        Wait(1)
-    end
-
+   lib.requestModel(data.npchash)
     local entity = CreatePed(2, data.npchash, data.actioncoords.x, data.actioncoords.y, data.actioncoords.z,
         data.actioncoords.w, false, false)
     SetPedFleeAttributes(entity, 0, 0)
@@ -75,7 +69,6 @@ local DeleteZone = function(id)
 end
 
 
-
 lib.callback('mGarage:GarageZones', false, function(response)
     if response then
         for k, v in pairs(response) do
@@ -87,28 +80,6 @@ lib.callback('mGarage:GarageZones', false, function(response)
     end
 end, 'getZones')
 
-
-
-function ImpoundVehicle(data)
-    if DoesEntityExist(data.vehicle) then
-        local input = lib.inputDialog(Text[Config.Lang].ImpoundOption1, {
-            { type = 'textarea', label = Text[Config.Lang].ImpoundOption2, required = true, },
-            { type = 'number',   label = Text[Config.Lang].ImpoundOption3, icon = 'dollar-sign', min = 1 },
-        })
-        local data = {
-            entity = VehToNet(data.vehicle),
-            price = input[2],
-            reason = input[1],
-            garage = data.impoundName
-        }
-
-        if not input then return end
-
-        lib.callback.await('mGarage:Interact', false, 'setimpound', data)
-    end
-end
-
-exports('ImpoundVehicle', ImpoundVehicle)
 
 function CreateGarage(data)
     if not ZoneData[data.id] then ZoneData[data.id] = data end
@@ -148,7 +119,6 @@ function CreateGarage(data)
                     coords = { data.actioncoords.x, data.actioncoords.y, data.actioncoords.z + 1 },
                     size = vec3(1, 1, 1.5),
                     rotation = data.actioncoords.w,
-
                     debug = data.debug,
                     drawSprite = true,
                     options = {
@@ -156,9 +126,7 @@ function CreateGarage(data)
                             label = data.name,
                             icon = "fa-solid fa-warehouse",
                             groups = data.job,
-                            canInteract = function()
-                                return true
-                            end,
+                            distance = Config.TargetDistance,
                             onSelect = function()
                                 OpenGarage(data)
                             end
@@ -206,7 +174,6 @@ if Config.DefaultGarages then
         v.id = k + 42094
         v.default = true
         CreateGarage(v)
-        --   CreateTargetImpound(v)
     end
 end
 
@@ -270,7 +237,7 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
     elseif data.action == 'update' then
         retval = GarageAdmAction('update', data.data)
     elseif data.action == 'delete' then
-        retval = GarageAdmAction('delete', data.data)
+        retval = GarageAdmAction('delete', data.data, 1500)
     elseif data.action == 'teleport' then
         retval = true
         SetEntityCoords(PlayerPedId(), data.data.actioncoords.x, data.data.actioncoords.y, data.data.actioncoords.z)
