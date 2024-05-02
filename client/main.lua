@@ -7,8 +7,16 @@ function OpenGarage(data)
     if data.garagetype == 'impound' or data.garagetype == 'garage' then
         local getVehicles = ServerCallBack('get', data)
         local Vehicles = {}
+        print(#getVehicles)
         if getVehicles then
-            if #getVehicles <= 0 then return print('ninguno') end
+            if #getVehicles <= 0 then
+                Notification({
+                    title = data.name,
+                    description = 'No tienes ningun vehículo en el garaje.'
+
+                })
+                return
+            end
             for i = 1, #getVehicles do
                 local row = getVehicles[i]
                 local props = json.decode(row.vehicle)
@@ -50,14 +58,13 @@ end
 function SaveCar(data)
     if not data.entity then
         data.entity = cache.vehicle
-
     end
     if not DoesEntityExist(data.entity) then return end
     TaskLeaveVehicle(cache.ped, data.entity, 0)
     Citizen.Wait(1000)
     data.props = json.encode(lib.getVehicleProperties(data.entity))
     data.entity = VehToNet(data.entity)
-    lib.callback.await('mGarage:Interact', false, 'saveCar', data)
+    ServerCallBack('saveCar', data, 500)
 end
 
 exports('OpenGarage', OpenGarage)

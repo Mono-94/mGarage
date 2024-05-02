@@ -29,3 +29,22 @@ function Notification(data)
 end
 
 RegisterNetEvent('mGarage:notify', Notification)
+
+
+function TextUI(name)
+  lib.showTextUI('[ E ] ' .. name, {
+    position = "bottom-center",
+    icon = 'square-parking',
+    alignIcon = 'top',
+    iconColor = '#7acf3a',
+    style = {
+      borderRadius = 5,
+      backgroundColor = '#141414',
+      fontSize = '14px',
+    }
+  })
+end
+
+function HideTextUI()
+  lib.hideTextUI()
+end

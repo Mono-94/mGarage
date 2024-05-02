@@ -1,19 +1,19 @@
 Config = {}
 
-Config.Lang = 'ES'
+Config.Lang = 'ES'  -- ES / EN 
 
 Config.DefaultGarages = true
 
 Config.CarkeysItem = true
 
-Config.CarBlipTime = 1000 * 30 -- 30 s
+Config.CarBlipTime = 1000 * 30 -- 30 Segs
 
 Config.GaragesDefault = {
     {
         name = 'Pillbox Hill',
         garagetype = 'garage',                                       -- 'garage', 'impound'
         debug = false,                                               -- true/false Zone debug | boolean
-        zoneType = 'target',                                         -- 'target', 'textui', 'radial'
+        zoneType = 'textui',                                         -- 'target', 'textui', 'radial'
         job = nil,                                                   -- string/nil or false  | string / false
         blip = true,                                                 -- showBlip? | boolean
         intocar = false,                                             -- Player in to car? | boolean
@@ -102,7 +102,7 @@ Config.GaragesDefault = {
         garagetype = 'impound',             -- 'garage', 'impound'
         defaultGarage = 'Pillbox Hill',     -- Set default garage
         debug = false,                      -- true/false Zone debug | boolean
-        zoneType = 'target',                -- 'target', 'textui', 'radial'
+        zoneType = 'textui',                -- 'target', 'textui', 'radial'
         job = nil,                          -- string/nil or false  | string / false
         society = nil,                      --
         blip = true,                        -- showBlip? | boolean
@@ -111,7 +111,7 @@ Config.GaragesDefault = {
         carType = { 'automobile', 'bike' }, -- automobile, bike, boat, heli, plane, submarine, trailer, train | string
         priceImpound = 110,                 -- Price of impound | number
         defaultCars = false,
-        -- vector4
+        -- vector4 if Target
         actioncoords = vec4(409.2166, -1623.1970, 28.2919, 228.9087),
         npchash = 'csb_trafficwarden', -- string or false
         thickness = 4.0,
@@ -124,8 +124,21 @@ Config.GaragesDefault = {
         },
         -- Spawn Coords
         spawnpos = {
-            vec4(416.8503, -1628.1466, 29.2919, 137.8457),
-            vec4(410.9566, -1636.6571, 28.6357, 50.7975)
+            vec4(416.99752807617, -1627.75390625, 28.291940689087, 140.03999328613),
+            vec4(419.36386108398, -1629.7000732422, 28.291940689087, 140.03999328613),
+            vec4(420.62649536133, -1635.9697265625, 28.291940689087, 89.469985961914),
+            vec4(420.59329223633, -1638.7214355469, 28.291940689087, 89.46997833252),
+            vec4(420.28616333008, -1642.0139160156, 28.291940689087, 89.46997833252),
+            vec4(418.02328491211, -1645.8610839844, 28.291940689087, 50.569976806641),
+            vec4(410.69671630859, -1656.6166992188, 28.291896820068, 317.20999145508),
+            vec4(408.39721679688, -1654.0144042969, 28.291879653931, 317.20999145508),
+            vec4(406.32061767578, -1652.04296875, 28.292366027832, 317.20999145508),
+            vec4(403.51016235352, -1650.4951171875, 28.294010162354, 321.10000610352),
+            vec4(401.70568847656, -1647.8150634766, 28.292247772217, 321.10000610352),
+            vec4(399.13949584961, -1646.0712890625, 28.291940689087, 321.10000610352),
+            vec4(397.17230224609, -1643.4877929688, 28.291940689087, 321.10000610352),
+            vec4(410.6633605957, -1636.5804443359, 28.291940689087, 50.570003509521),
+            vec4(408.76055908203, -1639.0087890625, 28.291940689087, 50.569999694824)
         }
     },
 }

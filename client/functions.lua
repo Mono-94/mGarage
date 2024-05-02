@@ -10,7 +10,8 @@ local NewZone = {}
 function CreateZone(polyzoneName, cb)
   local playerPed = cache.ped
   if not isOpenCretor then
-    lib.showTextUI('[MB1] Set Point   \n  [MB2] Delete Last Point   \n  [SCROLL] Thickness  \n  [ENTER] Save points  \n  [BACKSPACE] Close ')
+    lib.showTextUI(
+      '[MB1] Set Point   \n  [MB2] Delete Last Point   \n  [SCROLL] Thickness  \n  [ENTER] Save points  \n  [BACKSPACE] Close ')
     currentZoneName = polyzoneName;
     local x, y, z = table.unpack(GetGameplayCamCoord())
     local pitch, roll, yaw = table.unpack(GetGameplayCamRot(2))
@@ -228,6 +229,7 @@ function DisabledControls()
   DisableControlAction(0, 143, true) -- Disable melee
 end
 
+-- Copy Coords
 function RotationToDirection(rotation)
   local adjustedRotation = {
     x = (math.pi / 180) * rotation.x,
@@ -256,69 +258,50 @@ function PlayCam(distance)
   return hit, coords, entity, a, d
 end
 
---- Copy Coords
----comment
----@param cb function
+local TextUI = '[E] Set Coords  \n  [SCROLL] Heading  \n  [BACKSPACE] Delete Last coords  \n  [G] None/Ped/Vehicle  \n  [ENTER] Save Coords'
 function CopyCoords(action, cb)
   local viewEntity
   local CoordsTable = {}
-  local ped = cache.ped
+  local ped = PlayerPedId()
   local plyCoords = GetEntityCoords(ped)
   local esPedActivo = false
   local hit, coords
   local close = false
-  local act = false
   local finalHeight
-  lib.showTextUI(
-    '[E] Set Coords  \n  [SCROLL] Heading  \n  [BACKSPACE] Delete Last coords  \n  [G] None/Ped/Vehicle  \n  [ENTER] Save Coords   \n  [X] Close ')
-  local function Clone()
-    viewEntity = ClonePed(ped, false, false, true)
-    RequestAnimDict("amb@code_human_in_bus_passenger_idles@male@sit@idle_a")
-    while (not HasAnimDictLoaded("amb@code_human_in_bus_passenger_idles@male@sit@idle_a")) do Citizen.Wait(0) end
-    SetEntityCollision(viewEntity, false, true)
+  local ActiveEntity = nil
+  local PedHed = 0.0
+  lib.showTextUI(TextUI)
 
+  local Clone = function()
+    viewEntity = ClonePed(ped, false, false, true)
+    SetEntityCollision(viewEntity, false, true)
+    FreezeEntityPosition(viewEntity, true)
     return viewEntity
   end
 
-  local function InCoords(coord, isped)
-    local InCoords = nil
+  local Car = function()
+    lib.requestModel('toros')
+    viewEntity = CreateVehicle('toros', coords.x, coords.y, finalHeight, coords.w, false, false)
+    SetEntityCollision(viewEntity, false, true)
+    return viewEntity
+  end
 
-    if not isped and action == 'multi' then
-      if not IsModelInCdimage('toros') then return end
-      RequestModel('toros')
-      while not HasModelLoaded('toros') do
-        Wait(0)
-      end
+  local InCoords = function(coord, isped)
+    local InCoords = nil
+    if not isped and action == 'multi' and ActiveEntity then
+      lib.requestModel('toros')
       InCoords = CreateVehicle('toros', coord.x, coord.y, coord.z, coord.w, false, false)
       FreezeEntityPosition(InCoords, true)
       SetEntityCollision(InCoords, false, true)
       SetEntityAlpha(InCoords, 0.8)
-      SetEntityDrawOutline(InCoords, true)
-      SetEntityDrawOutlineColor(23, 191, 54, 0.6)
-    elseif action == 'multi' then
-      InCoords = ClonePed(ped, false, false, true)
-      RequestAnimDict("amb@code_human_in_bus_passenger_idles@male@sit@idle_a")
-      while (not HasAnimDictLoaded("amb@code_human_in_bus_passenger_idles@male@sit@idle_a")) do Citizen.Wait(0) end
-      SetEntityAlpha(InCoords, 0.6)
-      SetEntityCoords(InCoords, coord.x, coord.y, coord.z)
-      SetEntityHeading(InCoords, coord.w)
+    elseif action == 'multi' and ActiveEntity then
+      InCoords = Clone()
+      FreezeEntityPosition(InCoords, true)
     end
     return InCoords
   end
 
-  local function Car()
-    if not IsModelInCdimage('toros') then return end
-    RequestModel('toros')
-    while not HasModelLoaded('toros') do
-      Wait(0)
-    end
-    viewEntity = CreateVehicle('toros', coords.x, coords.y, finalHeight, coords.w, false, false)
-    SetEntityCollision(viewEntity, false, true)
-    act = true
-    return viewEntity
-  end
-
-  local function UndoLastCoord()
+  local UndoLastCoord = function()
     if action == 'multi' and #CoordsTable > 0 then
       local lastCoord = CoordsTable[#CoordsTable]
       DeleteEntity(lastCoord.ent)
@@ -326,10 +309,26 @@ function CopyCoords(action, cb)
     end
   end
 
+  local DeleteAllEntitys = function()
+    if DoesEntityExist(ActiveEntity) then
+      DeleteEntity(ActiveEntity)
+    end
+    for k, v in pairs(CoordsTable) do
+      if DoesEntityExist(v.ent) then
+        DeleteEntity(v.ent)
+      end
+    end
+  end
 
-  local entidadActiva = nil
-
-  PedHed = GetEntityHeading(viewEntity)
+  local toVector4Table = function()
+    local toCopy = {}
+    for _, v in ipairs(CoordsTable) do
+      local vecStr = ("vec4(%s,%s,%s,%s)"):format(v.x, v.y, v.z, v.w)
+      table.insert(toCopy, vecStr)
+    end
+    local formattedStr = "{\n" .. table.concat(toCopy, ",\n") .. "\n}"
+    return formattedStr
+  end
 
 
   Citizen.CreateThread(function()
@@ -357,59 +356,38 @@ function CopyCoords(action, cb)
         PedHed = PedHed - 3.89
       elseif IsControlJustReleased(0, 38) then -- E Set Coords
         PedHed = GetEntityHeading(viewEntity)
-        local newCoords = { x = coords.x, y = coords.y, z = coords.z, w = PedHed }
-        local ent = InCoords(newCoords, false)
-        newCoords = { x = coords.x, y = coords.y, z = coords.z, w = PedHed, ent = ent }
         if action == 'multi' then
+          local newCoords = { x = coords.x, y = coords.y, z = coords.z, w = PedHed }
+          local ent = InCoords(newCoords, esPedActivo)
+          newCoords = { x = coords.x, y = coords.y, z = coords.z, w = PedHed, ent = ent }
           table.insert(CoordsTable, newCoords)
         else
-          cb(newCoords)
-          DeleteEntity(entidadActiva)
+          local newCoords = { x = coords.x, y = coords.y, z = coords.z, w = PedHed }
+          table.insert(CoordsTable, newCoords)
+          cb(CoordsTable, toVector4Table())
+          DeleteAllEntitys()
           lib.hideTextUI()
           break
         end
-      elseif IsControlJustReleased(0, 177) then
+      elseif IsControlJustReleased(0, 177) and action == 'multi' then -- BACKSPACE Delete Last Coords
         UndoLastCoord()
-      elseif IsControlJustReleased(0, 47) then
-        if not act then
-          if entidadActiva then
-            DeleteEntity(entidadActiva)
-            entidadActiva = nil
+      elseif IsControlJustReleased(0, 47) then                        -- G Change Ped/Vehicle/None
+          if ActiveEntity then
+            DeleteEntity(ActiveEntity)
+            ActiveEntity = nil
           end
-          if not esPedActivo and action == 'single' then
-            viewEntity = Clone()
-            entidadActiva = viewEntity
+          if not esPedActivo then
+            ActiveEntity = Clone()
             esPedActivo = true
-          elseif action == 'multi' then
-            viewEntity = Car()
-            entidadActiva = viewEntity
-            esPedActivo = false
           else
+            ActiveEntity = Car()
             esPedActivo = false
           end
-        else
-          act = false
-          DeleteEntity(entidadActiva)
-        end
-      elseif IsControlJustReleased(0, 191) and action == 'multi' then
-        DeleteEntity(entidadActiva)
-        for k, v in pairs(CoordsTable) do
-          if DoesEntityExist(v.ent) then
-            DeleteEntity(v.ent)
-          end
-        end
-        cb(CoordsTable)
+      elseif IsControlJustReleased(0, 191) and action == 'multi' then -- ENTER Copy Coords And Close
+        DeleteAllEntitys()
+        cb(CoordsTable, toVector4Table())
         lib.hideTextUI()
-        break
-      elseif IsControlJustReleased(0, 73) then
-        DeleteEntity(entidadActiva)
-        for k, v in pairs(CoordsTable) do
-          if DoesEntityExist(v.ent) then
-            DeleteEntity(v.ent)
-          end
-        end
-        cb(CoordsTable)
-        lib.hideTextUI()
+        toVector4Table()
         break
       end
 
@@ -419,8 +397,8 @@ function CopyCoords(action, cb)
 end
 
 RegisterCommand('coords', function(source, args, raw)
-  CopyCoords('multi', function(coords)
-    print(json.encode(coords, { indent = true }))
+  CopyCoords(args[1], function(coordsTable, Vector4)
+    print(coordsTable, Vector4)
   end)
 end)
 

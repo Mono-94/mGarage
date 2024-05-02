@@ -89,46 +89,26 @@ end, 'getZones')
 
 
 
-function CreateTargetImpound(data)
-    if data.garagetype == 'impound' --[[and data.job]] then
-        if data.society then
-            label = 'Impound' .. data.society
-        else
-            label = 'Impound'
-        end
-        exports.ox_target:addGlobalVehicle({
-            {
-                label = label,
-                onSelect = function(vehicle)
-                    local input = lib.inputDialog('Dialog title', {
-                        { type = 'textarea', label = 'Reason', description = 'Some input description',  required = true, },
-                        { type = 'number',   label = 'Price',  description = 'Some number description', icon = 'money',  min = 1, max = 100000 },
-                    })
-
-                    if not input then return end
-
-                    local State = Entity(vehicle.entity).state
-
-                    print(State.id, State.Owner, State.type, State.temporary)
-
-                    local data = {
-                        -- vehicle info
-                        owner = State.owner,
-                        plate = State.plate or GetVehicleNumberPlateText(vehicle.entity),
-                        entity = VehToNet(vehicle.entity),
-
-                        --  impound info
-                        price = input[2],
-                        reason = input[1],
-                        garage = data.name
-                    }
-
-                    lib.callback.await('mGarage:Interact', false, 'setimpound', data)
-                end
-            }
+function ImpoundVehicle(data)
+    if DoesEntityExist(data.vehicle) then
+        local input = lib.inputDialog(Text[Config.Lang].ImpoundOption1, {
+            { type = 'textarea', label = Text[Config.Lang].ImpoundOption2, required = true, },
+            { type = 'number',   label = Text[Config.Lang].ImpoundOption3, icon = 'dollar-sign', min = 1 },
         })
+        local data = {
+            entity = VehToNet(data.vehicle),
+            price = input[2],
+            reason = input[1],
+            garage = data.impoundName
+        }
+
+        if not input then return end
+
+        lib.callback.await('mGarage:Interact', false, 'setimpound', data)
     end
 end
+
+exports('ImpoundVehicle', ImpoundVehicle)
 
 function CreateGarage(data)
     if not ZoneData[data.id] then ZoneData[data.id] = data end
@@ -146,18 +126,23 @@ function CreateGarage(data)
         points = data.points,
         thickness = data.thickness,
         debug = data.debug,
-        -- inside = function()
-        --     print('inside')
-        -- end,
+        inside = function()
+            if data.zoneType == 'textui' then
+                if IsControlJustReleased(0, 38) then
+                    OpenGarage(data)
+                end
+            end
+        end,
         onEnter = function()
+            if data.job == '' or 'false' or false then
+                data.job = false
+            end
+
             if data.zoneType == 'target' then
                 if not data.npchash or data.npchash == '' then
                     data.npchash = 'csb_trafficwarden'
                 end
                 ZoneData[data.id].npcEntity = SetNPC(data)
-                if data.job == '' or 'false' or false then
-                   data.job = false
-                end
 
                 ZoneData[data.id].TargetId = Target:addBoxZone({
                     coords = { data.actioncoords.x, data.actioncoords.y, data.actioncoords.z + 1 },
@@ -180,40 +165,37 @@ function CreateGarage(data)
                         },
                     }
                 })
-                if data.garagetype == 'garage' then
-                    Target:addGlobalVehicle({
-                        {
-                            name = 'mGarage:SaveTarget',
-                            icon = 'fa-solid fa-road',
-                            label = 'Save Car',
-                            groups = data.job,
-                            distance = 3.0,
-                          --  canInteract = function(entity, distance, coords, name, bone)
-                         --       return Entity(entity).state.Spawned
-                         --   end,
-                            onSelect = function(vehicle)
-                                data.entity = VehToNet(vehicle.entity)
-                                data.props = json.encode(lib.getVehicleProperties(vehicle.entity))
-
-                                lib.callback.await('mGarage:Interact', false, 'saveCar', data)
-                            end
-                        },
-                    })
-                end
             elseif data.zoneType == 'textui' then
                 local zone = {}
                 TextuiZone[data.id] = zone
+                TextUI(data.name)
+            end
+            if data.garagetype == 'garage' then
+                Target:addGlobalVehicle({
+                    {
+                        name = 'mGarage:SaveTarget' .. data.name,
+                        icon = 'fa-solid fa-road',
+                        label = Text[Config.Lang].TargetSaveCar,
+                        groups = data.job,
+                        distance = 3.0,
+                        onSelect = function(vehicle)
+                            data.entity = VehToNet(vehicle.entity)
+                            data.props = json.encode(lib.getVehicleProperties(vehicle.entity))
+                            lib.callback.await('mGarage:Interact', false, 'saveCar', data)
+                        end
+                    },
+                })
             end
         end,
         onExit = function()
+            exports.ox_target:removeGlobalVehicle({ 'mGarage:SaveTarget' .. data.name })
             if ZoneData[data.id].zoneType == 'target' then
                 if DoesEntityExist(ZoneData[data.id].npcEntity) then
                     DeleteEntity(ZoneData[data.id].npcEntity)
                 end
                 Target:removeZone(ZoneData[data.id].TargetId)
-                exports.ox_target:removeGlobalVehicle({ 'mGarage:SaveTarget' })
             elseif ZoneData[data.id].zoneType == 'textui' then
-
+                HideTextUI()
             end
         end
     })
@@ -224,9 +206,11 @@ if Config.DefaultGarages then
         v.id = k + 42094
         v.default = true
         CreateGarage(v)
-        CreateTargetImpound(v)
+        --   CreateTargetImpound(v)
     end
 end
+
+
 
 
 RegisterNetEvent('mGarage:Zone', function(action, data)

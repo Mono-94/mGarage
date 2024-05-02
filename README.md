@@ -2,40 +2,100 @@
 
 
 
-# Functions 
+## Functions 
 
 
+### CarTypes
+1. 'automobile'
+2. 'bicycle'
+3. 'bike'
+4. 'blimp'
+5. 'boat'
+6. 'heli'
+7. 'plane'
+8. 'quadbike'
+9. 'submarine'
+10. 'submarinecar'
+11. 'trailer'
+12. 'train'
+13. 'amphibious_quadbike'
+14. 'amphibious_automobile'
 
-## OpenGarage
+### OpenGarage
 * **exports.mGarage:OpenGarage()**
 
 ```lua
-local ped = PlayerPedId()
-local coords, heading = GetEntityCoords(ped), GetEntityHeading(ped)
+
 exports.mGarage:OpenGarage({
-    name = 'Pillbox Hill',
+    name = 'GARAGE ID/NAME',
     garagetype = 'garage',              
     intocar = true,                     
     carType = { 'automobile', 'bike' }, 
-    spawnpos = {
-        vec4(coords.x, coords.y, coords.z, heading),
-    }
+    spawnpos = {  vec4(0, 0, 0, 0) }
 })
 ```
  
-## SaveCar 
+### SaveCar 
 * **exports.mGarage:SaveCar()**
 ```lua
-local ped = PlayerPedId()
-local vehicleEntity = GetVehiclePedIsIn(ped, false)
-if DoesEntityExist(vehicleEntity) then
     exports.mGarage:SaveCar({
-        name = 'Pillbox Hill',
+        name = 'GARAGE ID/NAME',
         garagetype = 'garage',              
-        entity = vehicleEntity,            
+        entity = vehicleEntity or false to getVehiclePedIsIn,            
         carType = { 'automobile', 'bike' }, 
     })
-else
-    print('No Vehicle')
-end
+```
+
+### impound Vehicle
+```lua
+    exports.mGarage:ImpoundVehicle({ 
+        vehicle = Vehicle entity, 
+        impoundName = 'Impound Name' 
+    })
+
+```
+
+### Example 
+```lua
+RegisterCommand('mGarage:opengarage', function(source, args, raw)
+    local ped = PlayerPedId()
+    local coords, heading = GetEntityCoords(ped), GetEntityHeading(ped)
+    exports.mGarage:OpenGarage({
+        name = 'Pillbox Hill',
+        garagetype = 'garage',              
+        intocar = true,                     
+        carType = { 'automobile', 'bike' }, 
+        spawnpos = {
+            vec4(coords.x, coords.y, coords.z, heading),
+        }
+    })
+end)
+
+RegisterCommand('mGarage:savecar', function(source, args, raw)
+    local ped = PlayerPedId()
+    local vehicleEntity = GetVehiclePedIsIn(ped, false)
+    if DoesEntityExist(vehicleEntity) then
+        exports.mGarage:SaveCar({
+            name = 'Pillbox Hill',
+            garagetype = 'garage',             
+            entity = vehicleEntity,             
+            carType = { 'automobile', 'bike' }, 
+        })
+    else
+        print('No Vehicle')
+    end
+end)
+
+RegisterCommand('mGarage:impound', function(source, args, raw)
+    local ped = PlayerPedId()
+    local vehicleEntity = GetVehiclePedIsIn(ped, false)
+    if DoesEntityExist(vehicleEntity) then
+     ImpoundVehicle({
+        vehicle = vehicleEntity,
+        impoundName = 'Impound'
+    })
+    else
+        print('No Vehicle')
+    end
+end)
 ```

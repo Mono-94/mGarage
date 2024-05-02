@@ -188,7 +188,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                     Player.removeAccountMoney(data.paymentMethod, infoimpound.price)
                     vehicle.vehicle = json.decode(vehicle.vehicle)
                     local entity, action = Vehicles.CreateVehicle(vehicle)
-                    action.RetryImpound(data.garage.name, vehicle.coords)
+                    action.RetryImpound(data.garage.defaultGarage, vehicle.coords)
 
                     if Config.CarkeysItem then
                         Vehicles.ItemCarKeys(source, 'add', vehicle.plate)
