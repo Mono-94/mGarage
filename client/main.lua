@@ -47,8 +47,21 @@ function OpenGarage(data)
     end
 end
 
-exports('OpenGarage', OpenGarage)
+function SaveCar(data)
+    if not data.entity then
+        data.entity = cache.vehicle
 
+    end
+    if not DoesEntityExist(data.entity) then return end
+    TaskLeaveVehicle(cache.ped, data.entity, 0)
+    Citizen.Wait(1000)
+    data.props = json.encode(lib.getVehicleProperties(data.entity))
+    data.entity = VehToNet(data.entity)
+    lib.callback.await('mGarage:Interact', false, 'saveCar', data)
+end
+
+exports('OpenGarage', OpenGarage)
+exports('SaveCar', SaveCar)
 
 local blipcar = function(coords, plate)
     local entity = AddBlipForCoord(coords.x, coords.y, coords.z)
@@ -92,5 +105,3 @@ RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
 
     cb(retval)
 end)
-
-
