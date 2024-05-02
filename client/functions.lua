@@ -6,12 +6,11 @@ local zoneHeight = 4
 local zonePoints = {}
 local currentZone, currentZoneName, currentZ = nil, nil, nil
 local NewZone = {}
-
+local TextUIZone = '[MB1] Set Point   \n  [MB2] Delete Last Point   \n  [SCROLL] Thickness  \n  [ENTER] Save points  \n  [BACKSPACE] Close '
 function CreateZone(polyzoneName, cb)
   local playerPed = cache.ped
   if not isOpenCretor then
-    lib.showTextUI(
-      '[MB1] Set Point   \n  [MB2] Delete Last Point   \n  [SCROLL] Thickness  \n  [ENTER] Save points  \n  [BACKSPACE] Close ')
+    lib.showTextUI(TextUIZone)
     currentZoneName = polyzoneName;
     local x, y, z = table.unpack(GetGameplayCamCoord())
     local pitch, roll, yaw = table.unpack(GetGameplayCamRot(2))
