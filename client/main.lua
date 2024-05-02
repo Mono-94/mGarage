@@ -16,8 +16,13 @@ function OpenGarage(data)
                 row.seats = GetVehicleModelNumberOfSeats(props.model)
                 row.metadata = json.decode(row.metadata)
                 row.fuelLevel = props.fuelLevel
-                row.engineHealth = props.bodyHealth / 10
-                row.bodyHealth = props.engineHealth / 10
+                if props.bodyHealth and props.engineHealth then
+                    row.engineHealth = props.bodyHealth / 10
+                    row.bodyHealth = props.engineHealth / 10
+                else
+                    row.engineHealth = 100
+                    row.bodyHealth = 100
+                end
                 row.mileage = row.mileage / 100
                 if data.garagetype == 'impound' then
                     if row.pound and row.stored == 0 then
@@ -41,6 +46,8 @@ function OpenGarage(data)
         ShowNui('setVisibleGarage', true)
     end
 end
+
+exports('OpenGarage', OpenGarage)
 
 
 local blipcar = function(coords, plate)
@@ -85,3 +92,5 @@ RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
 
     cb(retval)
 end)
+
+

@@ -122,7 +122,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
             if Vehicle.owner == Player.identifier or Vehicle.keys[Player.identifier] then
                 if Config.CarkeysItem then
-                    Vehicles.ItemCarKeys(source, 'remove', Vehicle.plate)
+                    Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
                 end
                 return Vehicle.StoreVehicle(data.name, data.props)
             else
@@ -180,7 +180,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         if vehicle then
             local metadata = json.decode(vehicle.metadata)
             local infoimpound = metadata.pound
-            local PlayerMoney = Player.getAccounts(data.paymentMethod)
+            local PlayerMoney = Player.getAccount(data.paymentMethod)
             if PlayerMoney.money >= infoimpound.price then
                
                 vehicle.coords = SpawnClearArea({  coords = data.garage.spawnpos, distance = 2.0, player = source })

@@ -10,8 +10,7 @@ local NewZone = {}
 function CreateZone(polyzoneName, cb)
   local playerPed = cache.ped
   if not isOpenCretor then
-    lib.showTextUI(
-      '[MB1] Set Point   \n  [MB2] Delete Last Point   \n  [SCROLL] Thickness  \n  [ENTER] Save points  \n  [BACKSPACE] Close ')
+    lib.showTextUI('[MB1] Set Point   \n  [MB2] Delete Last Point   \n  [SCROLL] Thickness  \n  [ENTER] Save points  \n  [BACKSPACE] Close ')
     currentZoneName = polyzoneName;
     local x, y, z = table.unpack(GetGameplayCamCoord())
     local pitch, roll, yaw = table.unpack(GetGameplayCamRot(2))
@@ -412,7 +411,6 @@ function CopyCoords(action, cb)
         cb(CoordsTable)
         lib.hideTextUI()
         break
-        cb(false)
       end
 
       Citizen.Wait(0)

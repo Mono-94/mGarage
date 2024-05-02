@@ -4,41 +4,33 @@ Config.Lang = 'ES'
 
 Config.DefaultGarages = true
 
-Config.CarkeysItem = false
+Config.CarkeysItem = true
 
 Config.CarBlipTime = 1000 * 30 -- 30 s
 
 Config.GaragesDefault = {
     {
         name = 'Pillbox Hill',
-        garagetype = 'garage',              -- 'garage', 'impound'
-        debug = false,                      -- true/false Zone debug | boolean
-        zoneType = 'target',                -- 'target', 'textui', 'radial'
-        job = nil,                          -- string/nil or false  | string / false
-        blip = true,                        -- showBlip? | boolean
-        intocar = false,                    -- Player in to car? | boolean
-        isShared = false,                   -- Take all vehicles from diferent garages.
-
-        carType = { 'automobile', 'bike' }, -- automobile, bike, boat, heli, plane, submarine, trailer, train | string
-        defaultImpound = 'Impound',         -- Name of impound  | string / false
-        priceImpound = 110,                 -- Price of impound | number
-
-        -- Table {model,plate,price?} | boolean
-        defaultCars = false,
-
-        -- vector4
-        actioncoords = vec4(214.6645, -807.0635, 29.8006, 338.9730),
-        npchash = 'csb_trafficwarden', -- string or false
-
+        garagetype = 'garage',                                       -- 'garage', 'impound'
+        debug = false,                                               -- true/false Zone debug | boolean
+        zoneType = 'target',                                         -- 'target', 'textui', 'radial'
+        job = nil,                                                   -- string/nil or false  | string / false
+        blip = true,                                                 -- showBlip? | boolean
+        intocar = false,                                             -- Player in to car? | boolean
+        isShared = false,                                            -- Take all vehicles from diferent garages.
+        carType = { 'automobile', 'bike' },                          -- automobile, bike, boat, heli, plane, submarine, trailer, train | string
+        defaultImpound = 'Impound',                                  -- Name of impound  | string / false
+        priceImpound = 110,                                          -- Price of impound | number
+        defaultCars = false,                                         -- Table {model,plate,price?} | boolean
+        actioncoords = vec4(214.6645, -807.0635, 29.8006, 338.9730), -- vector4
+        npchash = 'csb_trafficwarden',                               -- string or false
         thickness = 11.5,
-
-        points = { -- Poly Zone Coords
+        points = {                                                   -- Poly Zone Coords
             vec3(199.0, -806.0, 31.0),
             vec3(228.0, -723.0, 31.0),
             vec3(275.0, -739.5, 31.0),
             vec3(244.0, -823.5, 31.0),
         },
-
         -- Spawn Coords
         spawnpos = {
             vec4(220.2780456543, -809.17193603516, 30.056179046631, 249.62936401367),
@@ -107,28 +99,21 @@ Config.GaragesDefault = {
     },
     {
         name = "Impound",
-        garagetype = 'impound',         -- 'garage', 'impound'
-        defaultGarage = 'Pillbox Hill', -- Set default garage
-        debug = false,                  -- true/false Zone debug | boolean
-        zoneType = 'target',            -- 'target', 'textui', 'radial'
-        job = nil,                      -- string/nil or false  | string / false
-        society = nil,                  --
-        blip = true,                    -- showBlip? | boolean
-        intocar = false,                -- Player in to car? | boolean
-        isShared = false,               -- Take all vehicles from diferent garages.
-
-
-        carType = { 'automobile', 'bike' },  -- automobile, bike, boat, heli, plane, submarine, trailer, train | string
-        defaultImpound = { 'LSPD Impound' }, -- Name of impound  | string / false
-        priceImpound = 110,                  -- Price of impound | number
-
-
+        garagetype = 'impound',             -- 'garage', 'impound'
+        defaultGarage = 'Pillbox Hill',     -- Set default garage
+        debug = false,                      -- true/false Zone debug | boolean
+        zoneType = 'target',                -- 'target', 'textui', 'radial'
+        job = nil,                          -- string/nil or false  | string / false
+        society = nil,                      --
+        blip = true,                        -- showBlip? | boolean
+        intocar = false,                    -- Player in to car? | boolean
+        isShared = false,                   -- Take all vehicles from diferent garages.
+        carType = { 'automobile', 'bike' }, -- automobile, bike, boat, heli, plane, submarine, trailer, train | string
+        priceImpound = 110,                 -- Price of impound | number
         defaultCars = false,
-
         -- vector4
         actioncoords = vec4(409.2166, -1623.1970, 28.2919, 228.9087),
         npchash = 'csb_trafficwarden', -- string or false
-
         thickness = 4.0,
         points = {
             vec3(387.54998779297, -1642.0, 29.0),
@@ -137,13 +122,10 @@ Config.GaragesDefault = {
             vec3(423.79998779297, -1645.6500244141, 29.0),
             vec3(410.79998779297, -1661.5, 29.0),
         },
-
         -- Spawn Coords
         spawnpos = {
             vec4(416.8503, -1628.1466, 29.2919, 137.8457),
             vec4(410.9566, -1636.6571, 28.6357, 50.7975)
         }
     },
-
-
 }
