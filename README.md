@@ -1,5 +1,19 @@
 # mGarage
 
+* Create garages/impounds in-game or in the configuration
+* Garage action: Target/TextUI
+* Multilanguage
+* Garages for jobs
+* Vehicle search in the garage interface
+* Custom vehicle garages
+* Mark vehicles outside the garage
+* Share vehicles with companions
+* Save vehicles with fake license plates (using the 'fakeplate' item from mVehicle)
+* Impound with societies
+* Functions to integrate the garage into any housing system
+* Function to impound vehicles
+
+
 
 
 ## Functions 
