@@ -182,8 +182,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             local infoimpound = metadata.pound
             local PlayerMoney = Player.getAccount(data.paymentMethod)
             if PlayerMoney.money >= infoimpound.price then
-               
-                vehicle.coords = SpawnClearArea({  coords = data.garage.spawnpos, distance = 2.0, player = source })
+                vehicle.coords = SpawnClearArea({ coords = data.garage.spawnpos, distance = 2.0, player = source })
                 if vehicle.coords then
                     Player.removeAccountMoney(data.paymentMethod, infoimpound.price)
                     vehicle.vehicle = json.decode(vehicle.vehicle)
@@ -217,7 +216,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             else
                 TriggerClientEvent('mGarage:notify', source, {
                     title = data.garage.name,
-                    description =  Text[Config.Lang].impound2,
+                    description = Text[Config.Lang].impound2,
                     type = 'warning',
                 })
                 retval = false

@@ -13,6 +13,19 @@ RegisterNuiCallback('mGarage:Close', function(data, cb)
 end)
 
 
+-- Payer Dead
+AddEventHandler('gameEventTriggered', function(event, args)
+  if event == "CEventNetworkEntityDamage" and args[6] == 1 then
+    if not IsEntityAPed(args[1]) or not IsPedAPlayer(args[1]) then
+      return
+    end
+    if args[1] == cache.ped then
+      ShowNui('setVisibleGarage', false)
+      ShowNui('setVisibleMenu', false)
+    end
+  end
+end)
+
 RegisterNuiCallback('mGarage:Lang', function(data, cb)
   cb(Text[Config.Lang])
 end)

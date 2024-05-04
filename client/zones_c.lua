@@ -1,7 +1,6 @@
 local Target = exports.ox_target
 
 local ZoneData = {}
-local TextuiZone = {}
 local PolyZone = {}
 
 local SendZones = function()
@@ -45,10 +44,8 @@ end
 local DeleteZone = function(id)
     if ZoneData[id].zoneType == 'target' then
         Target:removeZone(ZoneData[id].TargetId)
-    elseif ZoneData[id].zoneType == 'textui' then
-        TextuiZone[id]:remove()
-    end
 
+    end
     if DoesEntityExist(ZoneData[id].npcEntity) then
         DeleteEntity(ZoneData[id].npcEntity)
     end
@@ -79,6 +76,7 @@ lib.callback('mGarage:GarageZones', false, function(response)
         end
     end
 end, 'getZones')
+
 
 
 function CreateGarage(data)
@@ -113,6 +111,7 @@ function CreateGarage(data)
                 if not data.npchash or data.npchash == '' then
                     data.npchash = 'csb_trafficwarden'
                 end
+
                 ZoneData[data.id].npcEntity = SetNPC(data)
 
                 ZoneData[data.id].TargetId = Target:addBoxZone({
@@ -134,8 +133,6 @@ function CreateGarage(data)
                     }
                 })
             elseif data.zoneType == 'textui' then
-                local zone = {}
-                TextuiZone[data.id] = zone
                 TextUI(data.name)
             end
             if data.garagetype == 'garage' then
@@ -176,7 +173,6 @@ if Config.DefaultGarages then
         CreateGarage(v)
     end
 end
-
 
 
 
@@ -237,6 +233,7 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
             end
         end)
     elseif data.action == 'update' then
+        print(data.data.debug)
         retval = GarageAdmAction('update', data.data)
     elseif data.action == 'delete' then
         retval = GarageAdmAction('delete', data.data, 1500)
