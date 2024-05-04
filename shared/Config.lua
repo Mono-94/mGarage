@@ -1,6 +1,6 @@
 Config = {}
 
-Config.Lang = 'ES'  -- ES / EN 
+Config.Lang = 'EN'  -- ES / EN 
 
 Config.DefaultGarages = true
 
