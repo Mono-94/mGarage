@@ -28,7 +28,7 @@ local SetBlip = function(data)
 end
 
 local SetNPC = function(data)
-   lib.requestModel(data.npchash)
+    lib.requestModel(data.npchash)
     local entity = CreatePed(2, data.npchash, data.actioncoords.x, data.actioncoords.y, data.actioncoords.z,
         data.actioncoords.w, false, false)
     SetPedFleeAttributes(entity, 0, 0)
@@ -205,6 +205,7 @@ end
 RegisterNuiCallback('mGarage:adm', function(data, cb)
     local retval
     if data.action == 'create' then
+        print(json.encode(data.data, { indent = true }))
         retval = GarageAdmAction('create', data.data)
     elseif data.action == 'zone' then
         ShowNui('setVisibleMenu', false)
@@ -220,6 +221,7 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
         CopyCoords('single', function(coords)
             if coords then
                 ShowNui('setVisibleMenu', true)
+                print(json.encode({ x = coords.x, y = coords.y, z = coords.z, w = coords.w }))
                 retval = { x = coords.x, y = coords.y, z = coords.z, w = coords.w }
                 promi:resolve()
             end

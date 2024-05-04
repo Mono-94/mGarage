@@ -9,12 +9,7 @@ function OpenGarage(data)
         local Vehicles = {}
         if getVehicles then
             if #getVehicles <= 0 then
-                Notification({
-                    title = data.name,
-                    description = Text[Config.Lang].noVehicles
-
-                })
-                return
+                return  Notification({ title = data.name, description = Text[Config.Lang].noVehicles })  
             end
             for i = 1, #getVehicles do
                 local row = getVehicles[i]
