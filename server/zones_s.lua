@@ -18,7 +18,12 @@ lib.callback.register('mGarage:GarageZones', function(source, action, data)
     if xPlayer and true or xPlayer.getGroup() == 'admin' then
         if action == 'create' then
             local zonaExist = MySQL.scalar.await('SELECT * FROM mgarages WHERE name = ?', { data.name })
-            if zonaExist then return false, lib.print.error('Nombre para garaje duplicado.') end
+            if zonaExist then return false, lib.print.error('Nombre para garaje duplicado.'), TriggerClientEvent('mGarage:notify', source, {
+                title = 'mGarage CREATE',
+                icon = 'database',
+                description = ('Nombre [ %s ] para garaje duplicado.'):format(data.name),
+                type = 'error',
+            }) end
 
             data.id = MySQL.insert.await('INSERT INTO mgarages (name, garage) VALUES (?,?)',
                 { data.name, json.encode(data) })

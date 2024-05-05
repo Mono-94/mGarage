@@ -15,10 +15,10 @@ end
 
 local SetBlip = function(data)
     local entity = AddBlipForCoord(data.actioncoords.x, data.actioncoords.y, data.actioncoords.z)
-    SetBlipSprite(entity, 50)
+    SetBlipSprite(entity, data.blipsprite or Config.BlipDefault.sprite)
     SetBlipDisplay(entity, 4)
-    SetBlipScale(entity, 0.5)
-    SetBlipColour(entity, 0)
+    SetBlipScale(entity, Config.BlipDefault.size)
+    SetBlipColour(entity, data.blipcolor or Config.BlipDefault.color)
     SetBlipAsShortRange(entity, true)
     BeginTextCommandSetBlipName("STRING")
     AddTextComponentString(data.name)

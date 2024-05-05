@@ -1,6 +1,6 @@
 Config = {}
 
-Config.Lang = 'EN'  -- ES / EN 
+Config.Lang = 'EN' -- ES / EN
 
 Config.DefaultGarages = true
 
@@ -10,15 +10,22 @@ Config.CarBlipTime = 1000 * 30 -- 30 Segs
 
 Config.TargetDistance = 3.0
 
+Config.BlipDefault = {
+    sprite = 50,
+    color = 0,
+    size = 0.5,
+
+}
+
 Config.GaragesDefault = {
     {
         name = 'Pillbox Hill',
         garagetype = 'garage',                                       -- 'garage', 'impound'
         debug = false,                                               -- true/false Zone debug | boolean
-        zoneType = 'textui',                                         -- 'target', 'textui', 'radial'
+        zoneType = 'target',                                         -- 'target', 'textui', 'radial'
         job = nil,                                                   -- string/nil or false  | string / false
         blip = true,                                                 -- showBlip? | boolean
-        intocar = false,                                             -- Player in to car? | boolean
+        intocar = false,                                              -- Player in to car? | boolean
         isShared = false,                                            -- Take all vehicles from diferent garages.
         carType = { 'automobile', 'bike' },                          -- automobile, bike, boat, heli, plane, submarine, trailer, train | string
         defaultImpound = 'Impound',                                  -- Name of impound  | string / false
@@ -104,7 +111,7 @@ Config.GaragesDefault = {
         garagetype = 'impound',             -- 'garage', 'impound'
         defaultGarage = 'Pillbox Hill',     -- Set default garage
         debug = false,                      -- true/false Zone debug | boolean
-        zoneType = 'textui',                -- 'target', 'textui', 'radial'
+        zoneType = 'target',                -- 'target', 'textui', 'radial'
         job = nil,                          -- string/nil or false  | string / false
         society = nil,                      --
         blip = true,                        -- showBlip? | boolean
