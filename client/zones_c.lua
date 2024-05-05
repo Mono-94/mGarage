@@ -1,5 +1,4 @@
 local Target = exports.ox_target
-local Admin = false
 local ZoneData = {}
 local PolyZone = {}
 
@@ -8,6 +7,7 @@ local SendZones = function()
     local filteredData = {}
     for _, v in pairs(ZoneData) do
         if v ~= nil then
+            v.props = nil -- ??????????? where the props come from ._.
             table.insert(filteredData, v)
         end
     end
@@ -97,7 +97,7 @@ function CreateGarage(data)
         debug = data.debug,
         inside = function()
             if data.zoneType == 'textui' then
-                if IsControlJustReleased(0, 38) and not EditGarage()then
+                if IsControlJustReleased(0, 38) and not EditGarage() then
                     data.entity = cache.vehicle
                     if data.entity then
                         SaveCar(data)
@@ -251,7 +251,6 @@ end)
 
 lib.callback.register('mGarage:OpenAdmins', function()
     SendZones()
-
     ShowNui('setVisibleMenu', true)
 end)
 

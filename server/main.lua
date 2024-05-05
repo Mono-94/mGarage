@@ -2,37 +2,38 @@ local SpawnClearArea = function(data)
     local player = GetPlayerPed(data.player)
     local playerpos = GetEntityCoords(player)
     local distancia, coords = math.huge, nil
-    local intentos = 0
 
-    repeat
-        for _, v in ipairs(data.coords) do
-            local spawnPos = vector3(v.x, v.y, v.z)
-            local distance = #(playerpos - spawnPos)
+    if #data.coords == 1 then
+        local v = data.coords[1]
+        local spawnPos = vector3(v.x, v.y, v.z)
+        distancia = #(playerpos - spawnPos)
+        coords = vec4(v.x, v.y, v.z, v.w)
+    else
+        local i = 0
+        repeat
+            for _, v in ipairs(data.coords) do
+                local spawnPos = vector3(v.x, v.y, v.z)
+                local distance = #(playerpos - spawnPos)
 
-            if distance < distancia then
-                local isClear = true
-                for k, vehicle in pairs(GetAllVehicles()) do
-                    local vehicleDistance = #(vector3(spawnPos.x, spawnPos.y, spawnPos.z) - GetEntityCoords(vehicle))
-                    if vehicleDistance <= data.distance then
-                        isClear = false
-                        break
+                if distance < distancia then
+                    local isClear = true
+                    for k, vehicle in pairs(GetAllVehicles()) do
+                        local vehicleDistance = #(spawnPos - GetEntityCoords(vehicle))
+                        if vehicleDistance <= data.distance then
+                            isClear = false
+                            break
+                        end
+                    end
+
+                    if isClear and distance > 2 then
+                        distancia, coords = distance, vec4(v.x, v.y, v.z, v.w)
                     end
                 end
-
-                if isClear and distance > data.distance then
-                    distancia, coords = distance, vec4(v.x, v.y, v.z, v.w)
-                end
             end
-        end
 
-        if coords == nil then
-            intentos = intentos + 1
-        end
-
-        if intentos > 5 then
-            break
-        end
-    until coords ~= nil
+            i = i + 1
+        until coords ~= nil or i > 5
+    end
 
     return coords, distancia
 end

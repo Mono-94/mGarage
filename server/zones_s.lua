@@ -2,6 +2,7 @@ MySQL.query([[
     CREATE TABLE IF NOT EXISTS `mgarages` (
         `id` int(11) NOT NULL AUTO_INCREMENT,
         `name` varchar(50) NOT NULL,
+        `owner` varchar(60) DEFAULT NULL,
         `garage` longtext DEFAULT NULL,
         PRIMARY KEY (`id`)
     )
