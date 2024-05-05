@@ -204,7 +204,6 @@ end
 RegisterNuiCallback('mGarage:adm', function(data, cb)
     local retval
     if data.action == 'create' then
-        print(json.encode(data.data, { indent = true }))
         retval = GarageAdmAction('create', data.data)
     elseif data.action == 'zone' then
         ShowNui('setVisibleMenu', false)
@@ -220,7 +219,6 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
         CopyCoords('single', function(coords)
             if coords then
                 ShowNui('setVisibleMenu', true)
-                print(json.encode({ x = coords.x, y = coords.y, z = coords.z, w = coords.w }))
                 retval = { x = coords.x, y = coords.y, z = coords.z, w = coords.w }
                 promi:resolve()
             end
@@ -236,7 +234,6 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
             end
         end)
     elseif data.action == 'update' then
-        print(data.data.debug)
         retval = GarageAdmAction('update', data.data)
     elseif data.action == 'delete' then
         retval = GarageAdmAction('delete', data.data, 1500)

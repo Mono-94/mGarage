@@ -14,7 +14,6 @@ Config.BlipDefault = {
     sprite = 50,
     color = 0,
     size = 0.5,
-
 }
 
 Config.GaragesDefault = {
