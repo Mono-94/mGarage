@@ -9,7 +9,7 @@ function OpenGarage(data)
         local Vehicles = {}
         if getVehicles then
             if #getVehicles <= 0 then
-                return  Notification({ title = data.name, description = Text[Config.Lang].noVehicles })  
+                return Notification({ title = data.name, description = Text[Config.Lang].noVehicles })
             end
             for i = 1, #getVehicles do
                 local row = getVehicles[i]
@@ -54,8 +54,10 @@ function SaveCar(data)
         data.entity = cache.vehicle
     end
     if not DoesEntityExist(data.entity) then return end
-    TaskLeaveVehicle(cache.ped, data.entity, 0)
-    Citizen.Wait(1000)
+    if IsPedSittingInAnyVehicle(cache.ped) then
+        TaskLeaveVehicle(cache.ped, data.entity, 0)
+        Citizen.Wait(1000)
+    end
     data.props = json.encode(lib.getVehicleProperties(data.entity))
     data.entity = VehToNet(data.entity)
     ServerCallBack('saveCar', data, 500)
@@ -122,7 +124,7 @@ RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
         blipcar(retval, data.data.plate)
     elseif data.action == 'keys' then
         ShowNui('setVisibleGarage', false)
-        
+
         Vehicles.VehickeKeysMenu(data.plate, function()
             ShowNui('setVisibleGarage', true)
         end)

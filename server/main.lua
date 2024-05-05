@@ -2,29 +2,41 @@ local SpawnClearArea = function(data)
     local player = GetPlayerPed(data.player)
     local playerpos = GetEntityCoords(player)
     local distancia, coords = math.huge, nil
+    local intentos = 0
 
-    for _, v in ipairs(data.coords) do
-        local spawnPos = vector3(v.x, v.y, v.z)
-        local distance = #(playerpos - spawnPos)
+    repeat
+        for _, v in ipairs(data.coords) do
+            local spawnPos = vector3(v.x, v.y, v.z)
+            local distance = #(playerpos - spawnPos)
 
-        if distance < distancia then
-            local isClear = true
-            for k, vehicle in pairs(GetAllVehicles()) do
-                local vehicleDistance = #(vector3(spawnPos.x, spawnPos.y, spawnPos.z) - GetEntityCoords(vehicle))
-                if vehicleDistance <= data.distance then
-                    isClear = false
-                    break
+            if distance < distancia then
+                local isClear = true
+                for k, vehicle in pairs(GetAllVehicles()) do
+                    local vehicleDistance = #(vector3(spawnPos.x, spawnPos.y, spawnPos.z) - GetEntityCoords(vehicle))
+                    if vehicleDistance <= data.distance then
+                        isClear = false
+                        break
+                    end
+                end
+
+                if isClear and distance > data.distance then
+                    distancia, coords = distance, vec4(v.x, v.y, v.z, v.w)
                 end
             end
-
-            if isClear then
-                distancia, coords = distance, vec4(v.x, v.y, v.z, v.w)
-            end
         end
-    end
+
+        if coords == nil then
+            intentos = intentos + 1
+        end
+
+        if intentos > 5 then
+            break
+        end
+    until coords ~= nil
 
     return coords, distancia
 end
+
 
 
 local queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1'

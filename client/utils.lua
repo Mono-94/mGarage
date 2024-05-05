@@ -1,6 +1,11 @@
+local EditGarageUI = false
+
 function ShowNui(action, shouldShow)
   SetNuiFocus(shouldShow, shouldShow)
   SendNUIMessage({ action = action, data = shouldShow })
+  if action == 'setVisibleMenu' then
+    EditGarageUI = true
+  end
 end
 
 function SendNUI(action, data)
@@ -9,13 +14,20 @@ end
 
 RegisterNuiCallback('mGarage:Close', function(data, cb)
   ShowNui(data.name, false)
+  if data.name == 'setVisibleMenu' then
+    EditGarageUI = false
+  end
   cb(true)
 end)
+
 
 RegisterNuiCallback('mGarage:Lang', function(data, cb)
   cb(Text[Config.Lang])
 end)
 
+function EditGarage()
+  return EditGarageUI
+end
 
 -- Payer Dead
 AddEventHandler('gameEventTriggered', function(event, args)
