@@ -44,7 +44,6 @@ end
 local DeleteZone = function(id)
     if ZoneData[id].zoneType == 'target' then
         Target:removeZone(ZoneData[id].TargetId)
-
     end
     if DoesEntityExist(ZoneData[id].npcEntity) then
         DeleteEntity(ZoneData[id].npcEntity)
@@ -98,7 +97,12 @@ function CreateGarage(data)
         inside = function()
             if data.zoneType == 'textui' then
                 if IsControlJustReleased(0, 38) then
-                    OpenGarage(data)
+                    data.entity = cache.vehicle
+                    if data.entity then
+                        SaveCar(data)
+                    else
+                        OpenGarage(data)
+                    end
                 end
             end
         end,
@@ -135,7 +139,7 @@ function CreateGarage(data)
             elseif data.zoneType == 'textui' then
                 TextUI(data.name)
             end
-            if data.garagetype == 'garage' then
+            if data.garagetype == 'garage' and data.zoneType == 'target' then
                 Target:addGlobalVehicle({
                     {
                         name = 'mGarage:SaveTarget' .. data.name,
@@ -144,9 +148,8 @@ function CreateGarage(data)
                         groups = data.job,
                         distance = 3.0,
                         onSelect = function(vehicle)
-                            data.entity = VehToNet(vehicle.entity)
-                            data.props = json.encode(lib.getVehicleProperties(vehicle.entity))
-                            lib.callback.await('mGarage:Interact', false, 'saveCar', data)
+                            data.entity = vehicle.entity
+                            SaveCar(data)
                         end
                     },
                 })
