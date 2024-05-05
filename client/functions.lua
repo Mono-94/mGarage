@@ -1,16 +1,17 @@
 local isOpenCretor, Cam = false, nil
 local MAX_CAM_DISTANCE = 100
 local MinY, MaxY = -90.0, 90.0
-local MoveSpeed = 0.15
+local MoveSpeed = 0.3
 local zoneHeight = 4
 local zonePoints = {}
 local currentZone, currentZoneName, currentZ = nil, nil, nil
 local NewZone = {}
-local TextUIZone = '[MB1] Set Point   \n  [MB2] Delete Last Point   \n  [SCROLL] Thickness  \n  [ENTER] Save points  \n  [BACKSPACE] Close '
+
+
 function CreateZone(polyzoneName, cb)
   local playerPed = cache.ped
   if not isOpenCretor then
-    lib.showTextUI(TextUIZone)
+    lib.showTextUI(Text[Config.Lang].TextUiCreateZone)
     currentZoneName = polyzoneName;
     local x, y, z = table.unpack(GetGameplayCamCoord())
     local pitch, roll, yaw = table.unpack(GetGameplayCamRot(2))
@@ -195,8 +196,6 @@ function moveCamInputs()
   end
 end
 
--- #endregion
-
 function DisabledControls()
   EnableControlAction(0, 32, true)
   EnableControlAction(0, 33, true)
@@ -228,6 +227,8 @@ function DisabledControls()
   DisableControlAction(0, 143, true) -- Disable melee
 end
 
+
+
 -- Copy Coords
 function RotationToDirection(rotation)
   local adjustedRotation = {
@@ -257,7 +258,8 @@ function PlayCam(distance)
   return hit, coords, entity, a, d
 end
 
-local TextUI = '[E] Set Coords  \n  [SCROLL] Heading  \n  [BACKSPACE] Delete Last coords  \n  [G] None/Ped/Vehicle  \n  [ENTER] Save Coords'
+
+
 function CopyCoords(action, cb)
   local viewEntity
   local CoordsTable = {}
@@ -269,7 +271,7 @@ function CopyCoords(action, cb)
   local finalHeight
   local ActiveEntity = nil
   local PedHed = 0.0
-  lib.showTextUI(TextUI)
+  lib.showTextUI(Text[Config.Lang].TextUiCoords)
 
   local Clone = function()
     viewEntity = ClonePed(ped, false, false, true)
@@ -394,12 +396,6 @@ function CopyCoords(action, cb)
     end
   end)
 end
-
-RegisterCommand('coords', function(source, args, raw)
-  CopyCoords(args[1], function(coordsTable, Vector4)
-    print(coordsTable, Vector4)
-  end)
-end)
 
 
 function VehicleLabel(model)

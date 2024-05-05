@@ -86,9 +86,18 @@ function CreateGarage(data)
         data.points = json.decode(data.points)
     end
 
+    if not data.points or #data.points == 1 then
+        return lib.print.error(('Garage [ ID %s - NAME %s ] - data points malformed | Set new Zoona'):format(data.id, data.name))
+    end
+  
+    if not data.actioncoords then
+        return lib.print.error(('Garage [ ID %s - NAME %s ] - no Action Coords | Set new Coords'):format(data.id, data.name))
+    end
+
     if data.blip then
         ZoneData[data.id].blipEntity = SetBlip(data)
     end
+
 
     PolyZone[data.id] = lib.zones.poly({
         name = data.name .. '-garage',

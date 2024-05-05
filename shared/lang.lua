@@ -28,12 +28,24 @@ Text = {
         GarageBlip = "Blip",
         GarageBlipSpan = "Ocultar / mostrar BLIP del garaje",
         GarageCustomCars = "Vehículos Personalizados",
-        GarageCustomCarsSpan =
-        "Establece una lista de vehículos predeterminados, solo los vehículos generados desde este garaje pueden ser guardados.",
+        GarageCustomCarsSpan =  "Establece una lista de vehículos predeterminados, solo los vehículos generados desde este garaje pueden ser guardados.",
         GarageRentACar = "Alquilar un Vehículo",
         GarageRentACarSpan = "Establecer precio para alquilar un vehículo",
         GarageSharedVehicles = "Garaje Mixto",
-        GarageSharedVehiclesSpan = "Ver todo los vehículos en propiedad del jugador. (No esta completo)",
+        GarageSharedVehiclesSpan = "Ver todo los vehículos en propiedad del jugador.",
+        GarageDefaultImpound = "Default impound",
+        GarageDefaultImpoundSpan = "Establecer un garage 'impound' para recuperar el vehiculo",
+        GaragePayMethod = "Metodo de pago",
+        GaragePayMethodMoney = "Efectivo",
+        GaragePayMethodBank = "Cuenta bancaria",
+        GarageButton1 = "Coords",
+        GarageButton2 = "Set Zone",
+        GarageButton3 = "Spawn Coords",
+        GarageButton4 = "Crear Garage",
+        GarageButton5 = "Teleport",
+        GarageButton6 = "Update",
+        GarageButton7 = "Borrar",
+        GarageButton8 = "Lista de garages",
         GarageMenu1 = "Precio:",
         GarageMenu2 = "Fecha:",
         GarageMenu3 = "Pagar y recuperar",
@@ -45,6 +57,8 @@ Text = {
         GarageMenu10 = "Motor",
         GarageMenu11 = "Carroceria",
         GarageMenu12 = "GPS",
+
+
         --Notifications
         notYourVehicle = 'Este vehículo no es tuyo...',
         impound1 = '¡Has pagado %s$ por tu vehículo!',
@@ -62,9 +76,20 @@ Text = {
         ImpoundOption1 = 'Incautar vehículo',
         ImpoundOption2 = 'Razon',
         ImpoundOption3 = 'Precio',
+
+        --Admin Zone
+        GarageCreate1 = 'mGarage CREATE',
+        GarageCreate2 = 'mGarage DELETE',
+        GarageCreate3 = 'mGarage UPDATE',
+        GarageCreate4 = 'Nombre [ %s ] para garaje duplicado.',
+        GarageCreate5 = 'Garaje %s Creado correctamente',
+        GarageCreate6 = 'Garaje eliminado correctamente',
+        GarageCreate7 = 'Garaje actualizado correctamente',
+        TextUiCreateZone = '[MB1] + Punto   \n  [MB2] Eliminar ultimo punto   \n  [SCROLL] Altura  \n  [ENTER] Guardar Zona  \n  [BACKSPACE] Cerrar ',
+        TextUiCoords = '[E] +Coords  \n  [SCROLL] Direccion  \n  [BACKSPACE] Eliminar ultima coord  \n  [G] Nada/Player/Vehículo  \n  [ENTER] Guardar Coords'
     },
     ['EN'] = {
-        -- User Interface
+        -- UI
         GarageName = "Garage Name",
         GarageCreateSpan = "Unique name per garage",
         GarageJob = "Job",
@@ -88,15 +113,28 @@ Text = {
         GarageDebug = "Debug",
         GarageDebugSpan = "Visualize the zone",
         GarageInTocar = "Inside the Vehicle",
-        GarageInVehicleSpan = "Place the player in the vehicle when spawning the vehicle",
+        GarageInTocarSpan = "Place the player in the vehicle when spawning the vehicle",
         GarageBlip = "Blip",
         GarageBlipSpan = "Hide / show garage BLIP",
         GarageCustomCars = "Custom Vehicles",
-        GarageCustomCarsSpan = "Set a list of default vehicles, only vehicles spawned from this garage can be saved.",
+        GarageCustomCarsSpan =  "Set a list of default vehicles, only vehicles spawned from this garage can be saved.",
         GarageRentACar = "Rent a Vehicle",
         GarageRentACarSpan = "Set price to rent a vehicle",
         GarageSharedVehicles = "Mixed Garage",
-        GarageSharedVehiclesSpan = "View all vehicles owned by the player. (Not complete)",
+        GarageSharedVehiclesSpan = "View all vehicles owned by the player.",
+        GarageDefaultImpound = "Default impound",
+        GarageDefaultImpoundSpan = "Set an 'impound' garage to retrieve the vehicle",
+        GaragePayMethod = "Payment Method",
+        GaragePayMethodMoney = "Cash",
+        GaragePayMethodBank = "Bank Account",
+        GarageButton1 = "Coords",
+        GarageButton2 = "Set Zone",
+        GarageButton3 = "Spawn Coords",
+        GarageButton4 = "Create Garage",
+        GarageButton5 = "Teleport",
+        GarageButton6 = "Update",
+        GarageButton7 = "Delete",
+        GarageButton8 = "Garages List",
         GarageMenu1 = "Price:",
         GarageMenu2 = "Date:",
         GarageMenu3 = "Pay and retrieve",
@@ -110,20 +148,32 @@ Text = {
         GarageMenu12 = "GPS",
 
         -- Notifications
-        notYourVehicle = "This vehicle is not yours...",
-        impound1 = "You've paid %s$ for your vehicle!",
-        impound2 = "You don't have enough money to retrieve your vehicle.",
-        impound3 = "",
-        noSpawnPos = "No spawn point available",
-        setBlip = "Vehicle marked on the map",
-        noVehicles = "You don't have any vehicles in the garage.",
-        -- Target
-        TargetSaveCar = "Deposit vehicle",
-        TargetImpound = "Send to Impound",
+        notYourVehicle = 'This vehicle is not yours...',
+        impound1 = 'You\'ve paid %s$ for your vehicle!',
+        impound2 = 'You don\'t have enough money to retrieve your vehicle.',
+        impound3 = '',
+        noSpawnPos = 'No spawn point available',
+        setBlip = 'Vehicle marked on the map',
+        noVehicles = 'You don\'t have any vehicles in the garage.',
+
+        --Target
+        TargetSaveCar = 'Deposit vehicle',
+        TargetImpound = 'Send to Impound',
 
         -- Impound
-        ImpoundOption1 = "Impound vehicle",
-        ImpoundOption2 = "Reason",
-        ImpoundOption3 = "Price",
+        ImpoundOption1 = 'Impound vehicle',
+        ImpoundOption2 = 'Reason',
+        ImpoundOption3 = 'Price',
+
+        --Admin Zone
+        GarageCreate1 = 'mGarage CREATE',
+        GarageCreate2 = 'mGarage DELETE',
+        GarageCreate3 = 'mGarage UPDATE',
+        GarageCreate4 = 'Name [ %s ] for duplicated garage.',
+        GarageCreate5 = 'Garage %s Created successfully',
+        GarageCreate6 = 'Garage deleted successfully',
+        GarageCreate7 = 'Garage updated successfully',
+        TextUiCreateZone = '[MB1] + Point   \n  [MB2] Delete last point   \n  [SCROLL] Height  \n  [ENTER] Save Zone  \n  [BACKSPACE] Close ',
+        TextUiCoords = '[E] +Coords  \n  [SCROLL] Direction  \n  [BACKSPACE] Delete last coord  \n  [G] None/Player/Vehicle  \n  [ENTER] Save Coords'
     }
 }

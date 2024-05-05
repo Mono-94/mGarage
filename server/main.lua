@@ -137,6 +137,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 if Config.CarkeysItem then
                     Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
                 end
+               
                 return Vehicle.StoreVehicle(data.name, data.props)
             else
                 TriggerClientEvent('mGarage:notify', source, {

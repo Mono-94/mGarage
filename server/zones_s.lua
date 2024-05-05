@@ -20,9 +20,9 @@ lib.callback.register('mGarage:GarageZones', function(source, action, data)
         if action == 'create' then
             local zonaExist = MySQL.scalar.await('SELECT * FROM mgarages WHERE name = ?', { data.name })
             if zonaExist then return false, lib.print.error('Nombre para garaje duplicado.'), TriggerClientEvent('mGarage:notify', source, {
-                title = 'mGarage CREATE',
+                title = Text[Config.Lang].GarageCreate1,
                 icon = 'database',
-                description = ('Nombre [ %s ] para garaje duplicado.'):format(data.name),
+                description = (Text[Config.Lang].GarageCreate4):format(data.name),
                 type = 'error',
             }) end
 
@@ -31,9 +31,9 @@ lib.callback.register('mGarage:GarageZones', function(source, action, data)
 
             if data.id then
                 TriggerClientEvent('mGarage:notify', source, {
-                    title = 'mGarage CREATE',
+                    title = Text[Config.Lang].GarageCreate1,
                     icon = 'database',
-                    description = ('Garaje %s Creado correctamente'):format(data.name),
+                    description = (Text[Config.Lang].GarageCreate5):format(data.name),
                     type = 'success',
                 })
                 TriggerClientEvent('mGarage:Zone', -1, 'add', data)
@@ -43,9 +43,9 @@ lib.callback.register('mGarage:GarageZones', function(source, action, data)
             local db = MySQL.update.await('DELETE FROM mgarages WHERE id = ?', { data.id })
             if db then
                 TriggerClientEvent('mGarage:notify', source, {
-                    title = 'mGarage DELETE',
+                    title = Text[Config.Lang].GarageCreate2,
                     icon = 'database',
-                    description = ('Garaje eliminado correctamente'):format(data.name),
+                    description = (Text[Config.Lang].GarageCreate6):format(data.name),
                     type = 'success',
                 })
                 TriggerClientEvent('mGarage:Zone', -1, 'delete', data.id)
@@ -55,9 +55,9 @@ lib.callback.register('mGarage:GarageZones', function(source, action, data)
             local db = MySQL.update.await('UPDATE mgarages SET garage = ? WHERE id = ?', { json.encode(data), data.id })
             if db then
                 TriggerClientEvent('mGarage:notify', source, {
-                    title = 'mGarage  UPDATE',
+                    title = Text[Config.Lang].GarageCreate3,
                     icon = 'database',
-                    description = ('Garaje actualizado correctamente'):format(data.name),
+                    description = (Text[Config.Lang].GarageCreate7):format(data.name),
                     type = 'success',
                 })
                 TriggerClientEvent('mGarage:Zone', -1, 'update', data)
@@ -71,7 +71,7 @@ end)
 
 
 lib.addCommand('mgarage', {
-    help = 'mGarage UI',
+    help = '[ mGarage ] Create | Edit  GARAGES',
     restricted = 'group.admin'
 }, function(source, args, raw)
     lib.callback('mGarage:OpenAdmins', source)
