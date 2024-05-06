@@ -108,7 +108,7 @@ function CreateGarage(data)
             if data.zoneType == 'textui' then
                 if IsControlJustReleased(0, 38) and not EditGarage() then
                     data.entity = cache.vehicle
-                    if data.entity then
+                    if GetPedInVehicleSeat(data.entity, -1) == cache.ped then
                         SaveCar(data)
                     else
                         OpenGarage(data)

@@ -102,6 +102,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 vehicle.intocar = source
             end
             local data, action = Vehicles.CreateVehicle(vehicle)
+            if not action then return false end
             action.RetryVehicle(vehicle.coords)
             if Config.CarkeysItem then
                 Vehicles.ItemCarKeys(source, 'add', vehicle.plate)
@@ -137,7 +138,6 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 if Config.CarkeysItem then
                     Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
                 end
-               
                 return Vehicle.StoreVehicle(data.name, data.props)
             else
                 TriggerClientEvent('mGarage:notify', source, {
@@ -243,4 +243,11 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         end
     end
     return retval
+end)
+
+
+RegisterServerEvent('mGarage:Server:TaskLeaveVehicle', function(peds)
+    for k, v in pairs(peds) do
+        TriggerClientEvent('mGarage:Client:TaskLeaveVehicle', v)
+    end
 end)

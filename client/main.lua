@@ -49,14 +49,28 @@ function OpenGarage(data)
     end
 end
 
+RegisterNetEvent('mGarage:Client:TaskLeaveVehicle', function()
+    TaskLeaveVehicle(cache.ped, cache.vehicle, 0)
+end)
+
 function SaveCar(data)
     if not data.entity then
         data.entity = cache.vehicle
     end
-    if not DoesEntityExist(data.entity) then return end
-    if IsPedSittingInAnyVehicle(cache.ped) then
-        TaskLeaveVehicle(cache.ped, data.entity, 0)
-        Citizen.Wait(1000)
+
+    local retval = GetVehicleMaxNumberOfPassengers(data.entity)
+
+    local peds = {}
+    for i = -1, retval do
+        local retval = GetPedInVehicleSeat(data.entity, i)
+        if retval > 0 then
+            local PlayerServerId = GetPlayerServerId(NetworkGetPlayerIndexFromPed(retval))
+            table.insert(peds, PlayerServerId)
+        end
+    end
+    if #peds > 0 then
+        TriggerServerEvent('mGarage:Server:TaskLeaveVehicle', peds)
+        Citizen.Wait(2000)
     end
     data.props = json.encode(lib.getVehicleProperties(data.entity))
     data.entity = VehToNet(data.entity)
