@@ -1,3 +1,14 @@
+
+local VehicleTypes = {
+    ['car'] = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
+    ['boat'] = { 'submarine', 'submarinecar', 'boat' },
+    ['air'] = { 'blimp', 'heli', 'plane' },
+}
+
+local queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1'
+local queryStore2 = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? '
+
+
 local SpawnClearArea = function(data)
     local player = GetPlayerPed(data.player)
     local playerpos = GetEntityCoords(player)
@@ -38,11 +49,6 @@ local SpawnClearArea = function(data)
     return coords, distancia
 end
 
-
-
-local queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1'
-local queryStore2 = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? '
-
 lib.callback.register('mGarage:Interact', function(source, action, data, vehicle)
     local retval = nil
     local Player = ESX.GetPlayerFromId(source)
@@ -56,16 +62,25 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             for i = 1, #PlyVehicles do
                 local row = PlyVehicles[i]
                 row.isOwner = row.owner == Player.identifier
-                if data.garagetype == 'garage' and not row.pound or row.pound == 0 then
+                if data.garagetype == 'garage' and not row.pound or not row.pound == 0 then
                     if data.isShared then
                         table.insert(vehicles, row)
                     else
                         if data.name == row.parking then
-                            if type(data.carType) == 'table' then
-                                if lib.table.contains(data.carType, row.type) then
-                                    table.insert(vehicles, row)
+                            if type(data.carType) == 'table' or VehicleTypes[row.type] then
+                                if VehicleTypes[row.type] then
+                                    for _, carType in ipairs(data.carType) do
+                                        if lib.table.contains(VehicleTypes[row.type], carType) then
+                                            table.insert(vehicles, row)
+                                            break
+                                        end
+                                    end
+                                else
+                                    if lib.table.contains(data.carType, row.type) then
+                                        table.insert(vehicles, row)
+                                    end
                                 end
-                            elseif data.carType == row.type then
+                            elseif data.carType == row.type or lib.table.contains(VehicleTypes[row.type], data.carType) then
                                 table.insert(vehicles, row)
                             end
                         end
@@ -75,11 +90,20 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                         table.insert(vehicles, row)
                     else
                         if data.name == row.parking then
-                            if type(data.carType) == 'table' then
-                                if lib.table.contains(data.carType, row.type) then
-                                    table.insert(vehicles, row)
+                            if type(data.carType) == 'table' or VehicleTypes[row.type] then
+                                if VehicleTypes[row.type] then
+                                    for _, carType in ipairs(data.carType) do
+                                        if lib.table.contains(VehicleTypes[row.type], carType) then
+                                            table.insert(vehicles, row)
+                                            break
+                                        end
+                                    end
+                                else
+                                    if lib.table.contains(data.carType, row.type) then
+                                        table.insert(vehicles, row)
+                                    end
                                 end
-                            elseif data.carType == row.type then
+                            elseif data.carType == row.type or lib.table.contains(VehicleTypes[row.type], data.carType) then
                                 table.insert(vehicles, row)
                             end
                         end

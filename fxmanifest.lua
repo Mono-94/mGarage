@@ -27,5 +27,4 @@ files {
 
 ui_page 'web/build/index.html'
 
-
 dependencies { 'mVehicle' }

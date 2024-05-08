@@ -1,37 +1,22 @@
 # mGarage
 
-* Create garages/impounds in-game or in the configuration
+* Create garages/impounds in-game or in the Config file
 * Garage action: Target/TextUI
 * Multilanguage
 * Garages for jobs
 * Vehicle search in the garage interface
 * Custom vehicle garages
+* Obtain an item key if necessary
 * Mark vehicles outside the garage
 * Share vehicles with companions
 * Save vehicles with fake license plates (using the 'fakeplate' item from mVehicle)
 * Impound with societies
 * Functions to integrate the garage into any housing system
 * Function to impound vehicles
+* The impound can establish a society account
 
 
 ## Functions 
-
-
-### CarTypes
-1. 'automobile'
-2. 'bicycle'
-3. 'bike'
-4. 'blimp'
-5. 'boat'
-6. 'heli'
-7. 'plane'
-8. 'quadbike'
-9. 'submarine'
-10. 'submarinecar'
-11. 'trailer'
-12. 'train'
-13. 'amphibious_quadbike'
-14. 'amphibious_automobile'
 
 ### OpenGarage
 * **exports.mGarage:OpenGarage()**

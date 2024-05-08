@@ -7,7 +7,11 @@ local SendZones = function()
     local filteredData = {}
     for _, v in pairs(ZoneData) do
         if v ~= nil then
-            v.props = nil -- ??????????? where the props come from ._.
+            if v.props then
+                -- ??????????? where the props come from ._. | I think  was repeating a State in react... | Solved :)
+                lib.print.error(('Found PROPS VALUE in SendZones, ID: %s, NANME: %s'):format(v.id, v.name))
+                v.props = nil
+            end
             table.insert(filteredData, v)
         end
     end
@@ -87,11 +91,13 @@ function CreateGarage(data)
     end
 
     if not data.points or #data.points == 1 then
-        return lib.print.error(('Garage [ ID %s - NAME %s ] - data points malformed | Set new Zoona'):format(data.id, data.name))
+        return lib.print.error(('Garage [ ID %s - NAME %s ] - data points malformed | Set new Zoona'):format(data.id,
+            data.name))
     end
-  
+
     if not data.actioncoords then
-        return lib.print.error(('Garage [ ID %s - NAME %s ] - no Action Coords | Set new Coords'):format(data.id, data.name))
+        return lib.print.error(('Garage [ ID %s - NAME %s ] - no Action Coords | Set new Coords'):format(data.id,
+            data.name))
     end
 
     if data.blip then

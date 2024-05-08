@@ -80,19 +80,24 @@ end
 exports('OpenGarage', OpenGarage)
 exports('SaveCar', SaveCar)
 
+local blip    = nil
 local blipcar = function(coords, plate)
-    local entity = AddBlipForCoord(coords.x, coords.y, coords.z)
+    if DoesBlipExist(blip) then
+        RemoveBlip(blip)
+    end
 
-    SetBlipSprite(entity, 523)
-    SetBlipDisplay(entity, 2)
-    SetBlipScale(entity, 1.0)
-    SetBlipColour(entity, 49)
-    SetBlipAsShortRange(entity, false)
+    blip = AddBlipForCoord(coords.x, coords.y, coords.z)
+
+    SetBlipSprite(blip, 523)
+    SetBlipDisplay(blip, 2)
+    SetBlipScale(blip, 1.0)
+    SetBlipColour(blip, 49)
+    SetBlipAsShortRange(blip, false)
     BeginTextCommandSetBlipName("STRING")
     AddTextComponentString('Vehicle - ' .. plate)
-    EndTextCommandSetBlipName(entity)
+    EndTextCommandSetBlipName(blip)
 
-    if entity then
+    if blip then
         Notification({
             title = 'Garage',
             description = Text[Config.Lang].setBlip,
@@ -100,8 +105,8 @@ local blipcar = function(coords, plate)
         })
     end
 
-    Citizen.SetTimeout(Config.CarBlipTime, function()
-        RemoveBlip(entity)
+    Citizen.SetTimeout(Config.CarBlipTimer, function()
+        RemoveBlip(blip)
     end)
 end
 
