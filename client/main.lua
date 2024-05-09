@@ -81,9 +81,11 @@ exports('OpenGarage', OpenGarage)
 exports('SaveCar', SaveCar)
 
 local blip    = nil
+local timer
 local blipcar = function(coords, plate)
     if DoesBlipExist(blip) then
         RemoveBlip(blip)
+        timer:forceEnd(false)
     end
 
     blip = AddBlipForCoord(coords.x, coords.y, coords.z)
@@ -97,17 +99,19 @@ local blipcar = function(coords, plate)
     AddTextComponentString('Vehicle - ' .. plate)
     EndTextCommandSetBlipName(blip)
 
+    timer = lib.timer(Config.CarBlipTime, function()
+        RemoveBlip(blip)
+        print("timer ended")
+    end, true)
+    
     if blip then
         Notification({
             title = 'Garage',
             description = Text[Config.Lang].setBlip,
             type = 'warning',
         })
+        return true
     end
-
-    Citizen.SetTimeout(Config.CarBlipTimer, function()
-        RemoveBlip(blip)
-    end)
 end
 
 
@@ -117,8 +121,8 @@ function ImpoundVehicle(data)
         local input = lib.inputDialog(Text[Config.Lang].ImpoundOption1, {
             { type = 'textarea', label = Text[Config.Lang].ImpoundOption2, required = true, },
             { type = 'number',   label = Text[Config.Lang].ImpoundOption3, icon = 'dollar-sign',         min = 1 },
-            { type = 'date',     label = Text[Config.Lang].ImpoundOption4,                    icon = { 'far', 'calendar' }, default=false, format = "DD/MM/YYYY" },
-            { type = 'time',     label = Text[Config.Lang].ImpoundOption5,                     icon = { 'far', 'clock' }, default=false,    format = '24' }
+            { type = 'date',     label = Text[Config.Lang].ImpoundOption4, icon = { 'far', 'calendar' }, default = false, format = "DD/MM/YYYY" },
+            { type = 'time',     label = Text[Config.Lang].ImpoundOption5, icon = { 'far', 'clock' },    default = false, format = '24' }
         })
         local data = {
             entity = VehToNet(data.vehicle),
@@ -149,7 +153,6 @@ function UnpoundVehicle(plate)
     ServerCallBack('changeimpound', plate)
 end
 
-
 exports('UnpoundVehicle', UnpoundVehicle)
 exports('ImpoundVehicle', ImpoundVehicle)
 
@@ -169,4 +172,23 @@ RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
     end
 
     cb(retval)
+end)
+
+
+RegisterCommand('mGarage:impound', function(source, args, raw)
+    local ped = PlayerPedId()
+    local vehicleEntity = GetVehiclePedIsIn(ped, false)
+    if DoesEntityExist(vehicleEntity) then
+        ImpoundVehicle({
+            vehicle = vehicleEntity,
+            impoundName = 'Impound Car'
+        })
+    else
+        print('No Vehicle')
+    end
+end)
+
+RegisterCommand('mGarage:unpound', function(source, args, raw)
+    UnpoundVehicle()
+    -- or UnpoundVehicle('MONO 420')
 end)
