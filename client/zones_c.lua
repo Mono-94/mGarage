@@ -81,7 +81,6 @@ end, 'getZones')
 
 
 function CreateGarage(data)
-    print(data.id)
     if not ZoneData[data.id] then ZoneData[data.id] = data end
 
     if type(data.points) ~= 'table' then
