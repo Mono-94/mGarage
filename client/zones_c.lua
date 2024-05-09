@@ -118,7 +118,6 @@ function CreateGarage(data)
                     end
                 end
             end
-            
         end,
         onEnter = function()
             if data.job == '' then
@@ -165,7 +164,7 @@ function CreateGarage(data)
                         name = 'mGarage:SaveTarget' .. data.name,
                         icon = 'fa-solid fa-road',
                         label = Text[Config.Lang].TargetSaveCar,
-                        groups = { data.job },
+                        groups = data.job,
                         distance = 3.0,
                         onSelect = function(vehicle)
                             data.entity = vehicle.entity
