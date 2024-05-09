@@ -13,8 +13,9 @@
 * Impound with societies
 * Functions to integrate the garage into any housing system
 * Function to impound vehicles
-* The impound can establish a society account
-
+* * The impound can establish a society account
+* * Set a recovery date
+* * Function to remove time from a plate vehicle
 
 ## Functions 
 
