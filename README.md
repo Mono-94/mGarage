@@ -1,3 +1,8 @@
+
+ [![discord](https://img.shields.io/badge/Join-Discord-blue?logo=discord&logoColor=white)](https://discord.gg/Vk7eY8xYV2)
+ ![Discord](https://img.shields.io/discord/1048630711881568267?style=flat&label=Online%20Users)
+
+
 # mGarage
 
 * Create garages/impounds in-game or in the Config file
