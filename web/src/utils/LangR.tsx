@@ -64,6 +64,7 @@ const defaultLangData: LangData = {
     GarageMenu10: "Motor",
     GarageMenu11: "Carroceria",
     GarageMenu12: "GPS",
+    ImpoundOption12: "You will be able to recover this vehicle",
 };
 
 const Lang = () => {

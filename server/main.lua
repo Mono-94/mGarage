@@ -1,4 +1,3 @@
-
 local VehicleTypes = {
     ['car'] = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
     ['boat'] = { 'submarine', 'submarinecar', 'boat' },
@@ -162,7 +161,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 if Config.CarkeysItem then
                     Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
                 end
-                return Vehicle.StoreVehicle(data.name, data.props)
+                return Vehicle.StoreVehicle(data.name)
             else
                 TriggerClientEvent('mGarage:notify', source, {
                     title = data.name,
@@ -199,15 +198,26 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             end
         end
     elseif action == 'setimpound' then
+        local composed = nil
+        if data.hourEndPound and data.dateEndPound then
+            local timestamphour = math.floor(data.hourEndPound / 1000)
+            local hour = os.date('%H:%M', timestamphour)
+            local timestamp = math.floor(data.dateEndPound / 1000)
+            local date = os.date('%Y/%m/%d', timestamp)
+            composed = ('%s %s'):format(date, hour)
+        end
         local infoimpound = {
             reason = data.reason,
             price = data.price,
-            date = os.date("%Y-%m-%d %H:%M:%S", os.time()),
+            impoundDate = os.date("%Y/%m/%d %H:%M:%S", os.time()),
+            endPound = composed
         }
+
         local entity = NetworkGetEntityFromNetworkId(data.entity)
         local Vehicle = Vehicles.GetVehicle(entity)
         if Vehicle then
-            Vehicle.ImpoundVehicle(data.garage, infoimpound.price, infoimpound.reason, infoimpound.time)
+            Vehicle.ImpoundVehicle(data.garage, infoimpound.price, infoimpound.reason, infoimpound.time,
+                infoimpound.endPound)
         else
             DeleteEntity(entity)
         end
@@ -219,6 +229,38 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             local metadata = json.decode(vehicle.metadata)
             local infoimpound = metadata.pound
             local PlayerMoney = Player.getAccount(data.paymentMethod)
+            if infoimpound.endPound then
+                local year, month, day, hour, min = infoimpound.endPound:match("(%d+)/(%d+)/(%d+) (%d+):(%d+)")
+
+                if year and month and day and hour and min then
+                    local endPoundDate = os.time({
+                        year = year,
+                        month = month,
+                        day = day,
+                        hour = hour,
+                        min = min
+                    })
+
+                    local currentDate = os.time()
+                    if currentDate < endPoundDate then
+
+                        local timeDifference = endPoundDate - currentDate
+                        local days = math.floor(timeDifference / (24 * 60 * 60))
+                        local hours = math.floor((timeDifference % (24 * 60 * 60)) / (60 * 60))
+                        local minutes = math.floor((timeDifference % (60 * 60)) / 60)
+            
+    
+                        TriggerClientEvent('mGarage:notify', source, {
+                            title = data.garage.name,
+                            description = (Text[Config.Lang].ImpoundOption13):format(days, hours, minutes),
+                            type = 'error',
+                        })
+                        return false
+                    end
+                end
+            end
+
+
             if PlayerMoney.money >= infoimpound.price then
                 vehicle.coords = SpawnClearArea({ coords = data.garage.spawnpos, distance = 2.0, player = source })
                 if vehicle.coords then
@@ -259,6 +301,46 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 })
                 retval = false
             end
+        end
+    elseif action == 'changeimpound' then
+        local vehicle = Vehicles.GetVehicleByPlateDB(data)
+        if vehicle then
+            local metadata = json.decode(vehicle.metadata)
+            if metadata.pound then
+                if metadata.pound.endPound then
+                    metadata.pound.endPound = nil
+                    MySQL.update('UPDATE owned_vehicles SET metadata = ? WHERE plate = ?', {
+                        json.encode(metadata), data
+                    })
+                    retval = true
+                    TriggerClientEvent('mGarage:notify', source, {
+                        title = data.garage.name,
+                        description = Text[Config.Lang].ImpoundOption11,
+                        type = 'success',
+                    })
+                else
+                    TriggerClientEvent('mGarage:notify', source, {
+                        title = data.garage.name,
+                        description = Text[Config.Lang].ImpoundOption8,
+                        type = 'error',
+                    })
+                    retval = false
+                end
+            else
+                TriggerClientEvent('mGarage:notify', source, {
+                    title = data.garage.name,
+                    description = Text[Config.Lang].ImpoundOption9,
+                    type = 'error',
+                })
+                retval = false
+            end
+        else
+            TriggerClientEvent('mGarage:notify', source, {
+                title = data.garage.name,
+                description = (Text[Config.Lang].ImpoundOption10):format(data),
+                type = 'error',
+            })
+            retval = false
         end
     elseif action == 'setBlip' then
         local vehicle = Vehicles.GetVehicleByPlate(data.plate)

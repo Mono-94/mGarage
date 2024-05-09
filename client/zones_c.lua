@@ -7,11 +7,6 @@ local SendZones = function()
     local filteredData = {}
     for _, v in pairs(ZoneData) do
         if v ~= nil then
-            if v.props then
-                -- ??????????? where the props come from ._. | I think  was repeating a State in react... | Solved :)
-                lib.print.error(('Found PROPS VALUE in SendZones, ID: %s, NANME: %s'):format(v.id, v.name))
-                v.props = nil
-            end
             table.insert(filteredData, v)
         end
     end

@@ -116,23 +116,42 @@ function ImpoundVehicle(data)
     if DoesEntityExist(data.vehicle) then
         local input = lib.inputDialog(Text[Config.Lang].ImpoundOption1, {
             { type = 'textarea', label = Text[Config.Lang].ImpoundOption2, required = true, },
-            { type = 'number',   label = Text[Config.Lang].ImpoundOption3, icon = 'dollar-sign', min = 1 },
+            { type = 'number',   label = Text[Config.Lang].ImpoundOption3, icon = 'dollar-sign',         min = 1 },
+            { type = 'date',     label = Text[Config.Lang].ImpoundOption4,                    icon = { 'far', 'calendar' }, default=false, format = "DD/MM/YYYY" },
+            { type = 'time',     label = Text[Config.Lang].ImpoundOption5,                     icon = { 'far', 'clock' }, default=false,    format = '24' }
         })
         local data = {
             entity = VehToNet(data.vehicle),
             price = input[2],
             reason = input[1],
+            dateEndPound = input[3],
+            hourEndPound = input[4],
             garage = data.impoundName
         }
-
+        print(json.encode(input, { indent = true }))
         if not input then return end
-
         ServerCallBack('setimpound', data)
     end
 end
 
-exports('ImpoundVehicle', ImpoundVehicle)
+function UnpoundVehicle(plate)
+    if not plate then
+        local input = lib.inputDialog(Text[Config.Lang].ImpoundOption1, {
+            { type = 'input', label = Text[Config.Lang].ImpoundOption6, description = Text[Config.Lang].ImpoundOption7, min = 1, max = 8, required = true, },
+        })
+        if not input then return end
+        plate = input[1]
+    end
+    if #plate > 8 then
+        return lib.error.warning('Plate Max 8 chars')
+    end
+    plate = plate:upper()
+    ServerCallBack('changeimpound', plate)
+end
 
+
+exports('UnpoundVehicle', UnpoundVehicle)
+exports('ImpoundVehicle', ImpoundVehicle)
 
 RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
     local retval = nil

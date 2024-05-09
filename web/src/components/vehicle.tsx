@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Accordion, Button, Badge, Group, Divider, SimpleGrid, Select, Stack, Text, Paper } from '@mantine/core';
+import { Accordion, Button, Badge, Group, Divider, SimpleGrid, Select, Stack, Text, Paper, Alert } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faKey, faMapLocationDot, faCarOn, faGasPump, faCarBurst, faGears } from '@fortawesome/free-solid-svg-icons';
 import { fetchNui } from "../utils/fetchNui";
 import ProgressBar from './lit/progress';
 import Lang from '../utils/LangR';
+import { IconAlertCircle, IconMoneybag } from '@tabler/icons-react';
 interface VehicleProps {
     vehicle: any;
     index: number;
@@ -88,15 +89,20 @@ const Vehicle: React.FC<VehicleProps> = ({ vehicle, index, garage }) => {
             </Accordion.Control>
             <Accordion.Panel>
                 {garage.garagetype === 'impound' && (
-                    <Paper p='xs' style={{ backgroundColor: '#373A40' }}>
+                    <Paper p='xs' >
                         {pound && (
                             <>
                                 <Stack>
-
                                     <Group position="apart">
-                                        <Badge color='green'>{lang.GarageMenu1} {pound.price}$</Badge> 
+                                        <Badge color='green'>{lang.GarageMenu1} {pound.price}$</Badge>
                                         <Badge color='yellow'>{lang.GarageMenu2} {pound.date}</Badge>
                                     </Group>
+                                    {pound.endPound && (
+                                        <Alert p={5} icon={<IconAlertCircle />} title={lang.ImpoundOption12} color="red" >
+                                             <Text size={20}>{pound.endPound}</Text>
+                                        </Alert>
+                                    )}
+
 
                                     <Paper p='xs'>
                                         <Text c="dimmed">{pound.reason}</Text>
@@ -107,13 +113,14 @@ const Vehicle: React.FC<VehicleProps> = ({ vehicle, index, garage }) => {
                                         label={lang.GaragePayMethod}
                                         value={paymentMethod}
                                         onChange={handleChangePaymentMethod}
+                                        
                                         data={[
                                             { value: 'money', label: lang.GaragePayMethodMoney },
                                             { value: 'bank', label: lang.GaragePayMethodBank },
                                         ]}
                                     />
-                                    <Button fullWidth onClick={Impound} variant="light" size='xs'>
-                                    {lang.GarageMenu3}
+                                    <Button onClick={Impound} variant="light" size='xs' leftIcon={<IconMoneybag size={15} />}>
+                                        {lang.GarageMenu3}
                                     </Button>
                                 </Stack>
 

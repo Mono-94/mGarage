@@ -67,12 +67,12 @@ export default Garage;
 debugData([
     {
         action: "setVisibleGarage",
-        data: false,
+        data: true,
     },
   
     {
         action: "setVisibleMenu",
-        data: true,
+        data: false,
     },
     {
         action: "GarageZones",
@@ -125,7 +125,7 @@ debugData([
                 "TargetId": 2,
                 "points": [{ "w": 0.0, "z": 0.0, "y": 0.0, "x": 0.0 } ],
                 "priceImpound": 232,
-                "garagetype": "garage",
+                "garagetype": "impound",
                 "intocar": false,
                 "npchash": "csb_trafficwarden",
                 "debug": false,
@@ -139,7 +139,7 @@ debugData([
             "vehicles": [
                 {
                     "isOwner": true,
-                    "infoimpound": "{\"date\":\"2024-04-11 21:03:45\",\"reason\":\"Lorem ipsum, dolor sit amet consectetur adipisicing elit. Modi ad similique incidunt praesentium voluptatem quam. Quae odit est perferendis soluta eum modi. In, corporis quod cum quis quaerat laborum quasi.\",\"price\":10}",
+                    "infoimpound": "{\"endPound\":\"2024-05-09 01:00\",\"date\":\"2024/05/09 00:24\",\"price\":1,\"reason\":\"asdasad asda sadasd \"}",
                     "pound": 1,
                     "seats": 4,
                     "stored": 0,

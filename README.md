@@ -49,10 +49,17 @@ exports.mGarage:OpenGarage({
         vehicle = Vehicle entity, 
         impoundName = 'Impound Name' 
     })
-
 ```
 
+### Remove time for recovery vehicle
+```lua
+  -- open input to set plate 
+    exports.mGarage:UnpoundVehicle()
+  -- or direct plate
+     exports.mGarage:UnpoundVehicle(plate)
+```
 ### Example 
+
 ```lua
 RegisterCommand('mGarage:opengarage', function(source, args, raw)
     local ped = PlayerPedId()
@@ -94,5 +101,10 @@ RegisterCommand('mGarage:impound', function(source, args, raw)
     else
         print('No Vehicle')
     end
+end)
+
+RegisterCommand('mGarage:unpound', function(source, args, raw)
+    UnpoundVehicle()
+    -- or UnpoundVehicle('MONO 420')
 end)
 ```

@@ -28,7 +28,8 @@ Text = {
         GarageBlip = "Blip",
         GarageBlipSpan = "Ocultar / mostrar BLIP del garaje",
         GarageCustomCars = "Vehículos Personalizados",
-        GarageCustomCarsSpan =  "Establece una lista de vehículos predeterminados, solo los vehículos generados desde este garaje pueden ser guardados.",
+        GarageCustomCarsSpan =
+        "Establece una lista de vehículos predeterminados, solo los vehículos generados desde este garaje pueden ser guardados.",
         GarageRentACar = "Alquilar un Vehículo",
         GarageRentACarSpan = "Establecer precio para alquilar un vehículo",
         GarageSharedVehicles = "Garaje Mixto",
@@ -74,8 +75,18 @@ Text = {
 
         -- Impound
         ImpoundOption1 = 'Incautar vehículo',
-        ImpoundOption2 = 'Razon',
+        ImpoundOption2 = 'Razón',
         ImpoundOption3 = 'Precio',
+        ImpoundOption4 = 'Establecer Fecha mínima',
+        ImpoundOption5 = 'Hora',
+        ImpoundOption6 = 'Matrícula',
+        ImpoundOption7 = 'Eliminar fecha de embargo de un vehículo',
+        ImpoundOption8 = 'Este vehículo no tiene fecha de embargo',
+        ImpoundOption9 = 'Este vehículo no está confiscado',
+        ImpoundOption10 = 'La matrícula %s no está registrada o no existe',
+        ImpoundOption11 = '¡Embargo anulado!',
+        ImpoundOption12 = "Podrás recuperar este vehículo",
+        ImpoundOption13 = "Tiempo restante de embargo \n %s días, %s horas, %s minutos",
 
         --Admin Zone
         GarageCreate1 = 'mGarage CREATE',
@@ -85,8 +96,14 @@ Text = {
         GarageCreate5 = 'Garaje %s Creado correctamente',
         GarageCreate6 = 'Garaje eliminado correctamente',
         GarageCreate7 = 'Garaje actualizado correctamente',
-        TextUiCreateZone = '[MB1] + Punto   \n  [MB2] Eliminar ultimo punto   \n  [SCROLL] Altura  \n  [ENTER] Guardar Zona  \n  [BACKSPACE] Cerrar ',
-        TextUiCoords = '[E] +Coords  \n  [SCROLL] Direccion  \n  [BACKSPACE] Eliminar ultima coord  \n  [G] Nada/Player/Vehículo  \n  [ENTER] Guardar Coords'
+
+        TextUiCreateZone =
+        '[MB1] + Punto   \n  [MB2] Eliminar ultimo punto   \n  [SCROLL] Altura  \n  [ENTER] Guardar Zona  \n  [BACKSPACE] Cerrar ',
+        TextUiCoords =
+        '[E] +Coords  \n  [SCROLL] Direccion  \n  [BACKSPACE] Eliminar ultima coord  \n  [G] Nada/Player/Vehículo  \n  [ENTER] Guardar Coords'
+
+
+
     },
     ['EN'] = {
         -- UI
@@ -117,7 +134,7 @@ Text = {
         GarageBlip = "Blip",
         GarageBlipSpan = "Hide / show garage BLIP",
         GarageCustomCars = "Custom Vehicles",
-        GarageCustomCarsSpan =  "Set a list of default vehicles, only vehicles spawned from this garage can be saved.",
+        GarageCustomCarsSpan = "Set a list of default vehicles, only vehicles spawned from this garage can be saved.",
         GarageRentACar = "Rent a Vehicle",
         GarageRentACarSpan = "Set price to rent a vehicle",
         GarageSharedVehicles = "Mixed Garage",
@@ -164,7 +181,17 @@ Text = {
         ImpoundOption1 = 'Impound vehicle',
         ImpoundOption2 = 'Reason',
         ImpoundOption3 = 'Price',
-
+        ImpoundOption4 = 'Set Minimum Date',
+        ImpoundOption5 = 'Time',
+        ImpoundOption6 = 'License Plate',
+        ImpoundOption7 = 'Remove vehicle embargo date',
+        ImpoundOption8 = 'This vehicle has no embargo date',
+        ImpoundOption9 = 'This vehicle is not impounded',
+        ImpoundOption10 = 'License plate %s is not registered or does not exist',
+        ImpoundOption11 = 'Embargo canceled!',
+        ImpoundOption12 = "You will be able to recover this vehicle",
+        ImpoundOption13 = "Remaining impound time  \n  **%s days, %s hours, %s minutes**",
+        
         --Admin Zone
         GarageCreate1 = 'mGarage CREATE',
         GarageCreate2 = 'mGarage DELETE',
@@ -173,7 +200,9 @@ Text = {
         GarageCreate5 = 'Garage %s Created successfully',
         GarageCreate6 = 'Garage deleted successfully',
         GarageCreate7 = 'Garage updated successfully',
-        TextUiCreateZone = '[MB1] + Point   \n  [MB2] Delete last point   \n  [SCROLL] Height  \n  [ENTER] Save Zone  \n  [BACKSPACE] Close ',
-        TextUiCoords = '[E] +Coords  \n  [SCROLL] Direction  \n  [BACKSPACE] Delete last coord  \n  [G] None/Player/Vehicle  \n  [ENTER] Save Coords'
+        TextUiCreateZone =
+        '[MB1] + Point   \n  [MB2] Delete last point   \n  [SCROLL] Height  \n  [ENTER] Save Zone  \n  [BACKSPACE] Close ',
+        TextUiCoords =
+        '[E] +Coords  \n  [SCROLL] Direction  \n  [BACKSPACE] Delete last coord  \n  [G] None/Player/Vehicle  \n  [ENTER] Save Coords'
     }
 }
