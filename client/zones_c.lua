@@ -3,6 +3,8 @@ local ZoneData = {}
 local PolyZone = {}
 
 
+
+
 local SendZones = function()
     local filteredData = {}
     for _, v in pairs(ZoneData) do
@@ -79,6 +81,7 @@ end, 'getZones')
 
 
 function CreateGarage(data)
+    print(data.id)
     if not ZoneData[data.id] then ZoneData[data.id] = data end
 
     if type(data.points) ~= 'table' then
@@ -106,7 +109,7 @@ function CreateGarage(data)
         thickness = data.thickness,
         debug = data.debug,
         inside = function()
-            if data.zoneType == 'textui' then
+            if data.zoneType == 'textui' and (not data.job or GetJob().name == data.job) then
                 if IsControlJustReleased(0, 38) and not EditGarage() then
                     data.entity = cache.vehicle
                     if GetPedInVehicleSeat(data.entity, -1) == cache.ped then
@@ -116,9 +119,10 @@ function CreateGarage(data)
                     end
                 end
             end
+            
         end,
         onEnter = function()
-            if data.job == '' or 'false' or false then
+            if data.job == '' then
                 data.job = false
             end
 
@@ -137,9 +141,9 @@ function CreateGarage(data)
                     drawSprite = true,
                     options = {
                         {
+                            groups = data.job,
                             label = data.name,
                             icon = "fa-solid fa-warehouse",
-                            groups = data.job,
                             distance = Config.TargetDistance,
                             onSelect = function()
                                 OpenGarage(data)
@@ -147,16 +151,22 @@ function CreateGarage(data)
                         },
                     }
                 })
-            elseif data.zoneType == 'textui' then
-                TextUI(data.name)
+            elseif data.zoneType == 'textui' or Config.Debug then
+                if data.job then
+                    if GetJob().name == data.job then
+                        TextUI(data.name)
+                    end
+                else
+                    TextUI(data.name)
+                end
             end
-            if data.garagetype == 'garage' and data.zoneType == 'target' then
+            if data.garagetype == 'garage' and data.zoneType == 'target' or Config.Debug then
                 Target:addGlobalVehicle({
                     {
                         name = 'mGarage:SaveTarget' .. data.name,
                         icon = 'fa-solid fa-road',
                         label = Text[Config.Lang].TargetSaveCar,
-                        groups = data.job,
+                        groups = { data.job },
                         distance = 3.0,
                         onSelect = function(vehicle)
                             data.entity = vehicle.entity

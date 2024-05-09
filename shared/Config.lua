@@ -1,10 +1,14 @@
 Config = {}
 
-Config.Lang = 'EN' -- ES / EN
+Config.Debug = true
+
+Config.Lang = 'EN'       -- ES / EN
+
+Config.Framework = 'esx' -- esx/ox/standalone
 
 Config.DefaultGarages = true
 
-Config.CarkeysItem = false
+Config.CarkeysItem = true
 
 Config.CarBlipTime = 1000 * 30 -- 30 Segs
 
@@ -22,8 +26,8 @@ Config.GaragesDefault = {
         name = 'Pillbox Hill',
         garagetype = 'garage',                                                                                                -- 'garage', 'impound'
         debug = false,                                                                                                        -- true/false Zone debug | boolean
-        zoneType = 'target',                                                                                                  -- 'target', 'textui', 'radial'
-        job = nil,                                                                                                            -- string/nil or false  | string / false
+        zoneType = 'textui',                                                                                                  -- 'target', 'textui', 'radial'
+        job = "police",                                                                                                            -- string/nil or false  | string / false
         blip = true,                                                                                                          -- showBlip? | boolean
         intocar = false,                                                                                                      -- Player in to car? | boolean
         isShared = false,                                                                                                     -- Take all vehicles from diferent garages.
