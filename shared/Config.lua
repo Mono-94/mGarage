@@ -1,6 +1,6 @@
 Config = {}
 
-Config.Debug = true
+Config.Debug = false
 
 Config.Lang = 'EN'       -- ES / EN
 
