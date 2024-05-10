@@ -7,7 +7,7 @@ elseif Config.Framework == "ox" then
 elseif Config.FrameWork == "qb" then
     Core = exports['qb-core']:GetCoreObject()
 elseif Config.Framework == "LG" then
-    Core = exports.LegacyFramework:ReturnFramework()
+    Core = exports['LegacyFramework']:ReturnFramework()
 end
 
 
@@ -22,6 +22,14 @@ function GetJob()
     elseif Config.Framework == "ox" then
 
     elseif Config.Framework == "LG" then
+        local PlayerData = Core.PlayerFunctions.GetClientData()[1]
+        local Job = PlayerData?.nameJob
+        local Grade = PlayerData?.gradeJob
+        if not Job or not Grade then
+            warn("[^3WARNING^7] Player data not available.")
+        end
+
+        return { Job = Job, Grade = Grade }
     end
     return false
 end
