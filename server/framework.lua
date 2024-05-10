@@ -1,13 +1,13 @@
 Core = {}
 
 if Config.Framework == "esx" then
-    Core.shared= exports["es_extended"]:getSharedObject()
+    Core.shared = exports["es_extended"]:getSharedObject()
 elseif Config.Framework == "ox" then
-    Core.shared= require '@ox_core.lib.init'
+    Core.shared = require '@ox_core.lib.init'
 elseif Config.FrameWork == "qb" then
     Core.shared = exports['qb-core']:GetCoreObject()
 elseif Config.Framework == "LG" then
-    Core.shared = exports.LegacyFramework:ReturnFramework()
+    Core.shared = exports['LegacyFramework']:ReturnFramework()
 end
 
 function Core.Player(src)
@@ -32,7 +32,7 @@ function Core.Player(src)
                 return player.charId
             end
         elseif Config.Framework == "LG" then
-            local playerData = LegacyFramework.SvPlayerFunctions.GetPlayerData(src)[1]
+            local playerData = Core.shared.SvPlayerFunctions.GetPlayerData(src)[1]
             return playerData?.charName
         end
         return false
@@ -59,7 +59,10 @@ function Core.Player(src)
                 return Player.get('name')
             end
         elseif Config.Framework == "LG" then
-            return GetPlayerName(src)
+            local playerData = Core.shared.SvPlayerFunctions.GetPlayerData(src)[1]
+            if playerData then
+                return playerData.firstName .. '' .. playerData.lastName
+            end
         end
         return false
     end
@@ -76,7 +79,9 @@ function Core.Player(src)
         elseif Config.Framework == "ox" then
 
         elseif Config.Framework == "LG" then
-
+            local playerData = Core.shared.SvPlayerFunctions.GetPlayerData(src)[1]
+            local moneyAccounts = json.decode(playerData.moneyAccounts)
+            return { money = moneyAccounts.money }
         end
     end
 
@@ -91,7 +96,7 @@ function Core.Player(src)
         elseif Config.Framework == "ox" then
 
         elseif Config.Framework == "LG" then
-
+            return Core.shared.SvPlayerFunctions.RemovePlayerMoneyCash(account, ammount)
         end
     end
 
@@ -106,7 +111,7 @@ function Core.Player(src)
         elseif Config.Framework == "ox" then
 
         elseif Config.Framework == "LG" then
-
+            return Core.shared.SvPlayerFunctions.GetPlayerGroup(src)
         end
     end
 
@@ -132,7 +137,7 @@ function Core.SetSotcietyMoney(society, ammount)
     elseif Config.Framework == "ox" then
 
     elseif Config.Framework == "LG" then
-
+        return exports.LGF_Society:UpdateSocietyFounds(society, ammount)
     end
 end
 
@@ -140,7 +145,8 @@ end
 local query = {
     ['esx'] = {
         queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1',
-        queryStore2 = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
+        queryStore2 =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
     },
 
     ['ox'] = {
