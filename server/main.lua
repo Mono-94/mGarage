@@ -57,7 +57,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         if PlyVehicles then
             for i = 1, #PlyVehicles do
                 local row = PlyVehicles[i]
-                row.isOwner = row.owner == Player.identifier
+                row.isOwner = row.owner == Player.identifier()
                 if data.garagetype == 'garage' and not row.pound or not row.pound == 0 then
                     if data.isShared then
                         table.insert(vehicles, row)
@@ -176,7 +176,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 end
             end
 
-            if row and row.owner == Player.identifier or row.keys and row.keys[Player.identifier] then
+            if row and row.owner == Player.identifier() or row.keys and row.keys[Player.identifier()] then
                 MySQL.update(Querys.queryStore2, { data.name, json.encode(data.props), VehicleType, data.plate },
                     function(affectedRows)
                         if affectedRows then
