@@ -6,7 +6,6 @@ lua54 'yes'
 
 shared_scripts {
   'shared/*.lua',
-  '@es_extended/imports.lua',
   '@ox_lib/init.lua',
 	'@mVehicle/import.lua'
 }
