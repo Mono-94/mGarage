@@ -154,7 +154,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 end
             end
 
-            if Vehicle.owner == Player.identifier or Vehicle.keys[Player.identifier] then
+            if Vehicle.owner == Player.identifier() or Vehicle.keys[Player.identifier()] then
                 if Config.CarkeysItem then
                     Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
                 end
