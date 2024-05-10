@@ -1,14 +1,14 @@
 Config = {}
 
-Config.Debug = true
+Config.Debug = false
 
 Config.Lang = 'EN'       -- ES / EN
 
-Config.Framework = 'esx' -- esx/ox/standalone
+Config.Framework = 'esx' -- esx/ox/standalone/qb
 
-Config.DefaultGarages = true
+Config.DefaultGarages = true -- Config Garages ???
 
-Config.CarkeysItem = true
+Config.CarkeysItem = false  
 
 Config.CarBlipTime = 1000 * 30 -- 30 Segs
 

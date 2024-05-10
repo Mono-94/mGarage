@@ -73,6 +73,7 @@ function TextUI(name)
   })
 end
 
+
 function HideTextUI()
   lib.hideTextUI()
 end

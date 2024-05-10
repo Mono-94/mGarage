@@ -1,19 +1,19 @@
-ESX, Ox, QBCore = nil, nil, nil
+Core = {}
 
 if Config.Framework == "esx" then
-    ESX = exports["es_extended"]:getSharedObject()
+    Core = exports["es_extended"]:getSharedObject()
 elseif Config.Framework == "ox" then
-    Ox = require '@ox_core.lib.init'
+    Core = require '@ox_core.lib.init'
 elseif Config.FrameWork == "qb" then
-    QBCore = exports['qb-core']:GetCoreObject()
+    Core = exports['qb-core']:GetCoreObject()
 elseif Config.Framework == "LG" then
-    LegacyFramework = exports.LegacyFramework:ReturnFramework()
+    Core = exports.LegacyFramework:ReturnFramework()
 end
 
 
 function GetJob()
     if Config.Framework == "esx" then
-        local job = ESX.PlayerData.job
+        local job = Core.PlayerData.job
         return { name = job.name, grade = job.grade }
     elseif Config.Framework == "qb" then
 
@@ -25,4 +25,3 @@ function GetJob()
     end
     return false
 end
-

@@ -13,18 +13,21 @@ lib.callback.register('mGarage:GarageZones', function(source, action, data)
     if action == 'getZones' then
         return MySQL.query.await('SELECT * FROM mgarages')
     end
+    
+    local player = Core.Player(source)
 
-    local xPlayer = ESX.GetPlayerFromId(source)
-
-    if xPlayer and true or xPlayer.getGroup() == 'admin' then
+    if player.isAdmin then
         if action == 'create' then
             local zonaExist = MySQL.scalar.await('SELECT * FROM mgarages WHERE name = ?', { data.name })
-            if zonaExist then return false, lib.print.error('Nombre para garaje duplicado.'), TriggerClientEvent('mGarage:notify', source, {
-                title = Text[Config.Lang].GarageCreate1,
-                icon = 'database',
-                description = (Text[Config.Lang].GarageCreate4):format(data.name),
-                type = 'error',
-            }) end
+            if zonaExist then
+                return false, lib.print.error('Duplicated Garage name'),
+                    TriggerClientEvent('mGarage:notify', source, {
+                        title = Text[Config.Lang].GarageCreate1,
+                        icon = 'database',
+                        description = (Text[Config.Lang].GarageCreate4):format(data.name),
+                        type = 'error',
+                    })
+            end
 
             data.id = MySQL.insert.await('INSERT INTO mgarages (name, garage) VALUES (?,?)',
                 { data.name, json.encode(data) })
@@ -74,5 +77,7 @@ lib.addCommand('mgarage', {
     help = '[ mGarage ] Create | Edit  GARAGES',
     restricted = 'group.admin'
 }, function(source, args, raw)
+    local Player = Core.Player(source)
+    if not Player.isAdmin then return end
     lib.callback('mGarage:OpenAdmins', source)
 end)

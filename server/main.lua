@@ -4,10 +4,6 @@ local VehicleTypes = {
     ['air'] = { 'blimp', 'heli', 'plane' },
 }
 
-local queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1'
-local queryStore2 = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? '
-
-
 local SpawnClearArea = function(data)
     local player = GetPlayerPed(data.player)
     local playerpos = GetEntityCoords(player)
@@ -50,7 +46,8 @@ end
 
 lib.callback.register('mGarage:Interact', function(source, action, data, vehicle)
     local retval = nil
-    local Player = ESX.GetPlayerFromId(source)
+
+    local Player = Core.Player(source)
 
     if action == 'get' then
         local vehicles = {}
@@ -170,7 +167,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 })
             end
         else
-            local row = MySQL.single.await(queryStore1, { data.plate })
+            local row = MySQL.single.await(Querys.queryStore1, { data.plate })
 
             if not row then return false end
             if data.job then
@@ -180,7 +177,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             end
 
             if row and row.owner == Player.identifier or row.keys and row.keys[Player.identifier] then
-                MySQL.update(queryStore2, { data.name, json.encode(data.props), VehicleType, data.plate },
+                MySQL.update(Querys.queryStore2, { data.name, json.encode(data.props), VehicleType, data.plate },
                     function(affectedRows)
                         if affectedRows then
                             DeleteEntity(entity)
@@ -222,13 +219,11 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             DeleteEntity(entity)
         end
     elseif action == 'impound' then
-        local Player = ESX.GetPlayerFromId(source)
-
         local vehicle = Vehicles.GetVehicleId(data.vehicleid)
         if vehicle then
             local metadata = json.decode(vehicle.metadata)
             local infoimpound = metadata.pound
-            local PlayerMoney = Player.getAccount(data.paymentMethod)
+            local PlayerMoney = Player.getMoney(data.paymentMethod)
             if infoimpound.endPound then
                 local year, month, day, hour, min = infoimpound.endPound:match("(%d+)/(%d+)/(%d+) (%d+):(%d+)")
 
@@ -243,13 +238,12 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
                     local currentDate = os.time()
                     if currentDate < endPoundDate then
-
                         local timeDifference = endPoundDate - currentDate
                         local days = math.floor(timeDifference / (24 * 60 * 60))
                         local hours = math.floor((timeDifference % (24 * 60 * 60)) / (60 * 60))
                         local minutes = math.floor((timeDifference % (60 * 60)) / 60)
-            
-    
+
+
                         TriggerClientEvent('mGarage:notify', source, {
                             title = data.garage.name,
                             description = (Text[Config.Lang].ImpoundOption13):format(days, hours, minutes),
@@ -264,7 +258,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             if PlayerMoney.money >= infoimpound.price then
                 vehicle.coords = SpawnClearArea({ coords = data.garage.spawnpos, distance = 2.0, player = source })
                 if vehicle.coords then
-                    Player.removeAccountMoney(data.paymentMethod, infoimpound.price)
+                    Player.RemoveMoney(data.paymentMethod, infoimpound.price)
                     vehicle.vehicle = json.decode(vehicle.vehicle)
                     local entity, action = Vehicles.CreateVehicle(vehicle)
                     action.RetryImpound(data.garage.defaultGarage, vehicle.coords)
@@ -274,9 +268,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                     end
 
                     if data.garage.society then
-                        TriggerEvent('esx_addonaccount:getSharedAccount', data.garage.society, function(account)
-                            account.addMoney(infoimpound.price)
-                        end)
+                        Core.SetSotcietyMoney(data.garage.society, infoimpound.price)
                     end
 
                     TriggerClientEvent('mGarage:notify', source, {
