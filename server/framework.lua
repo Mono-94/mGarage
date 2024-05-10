@@ -158,4 +158,4 @@ local query = {
     }
 }
 
-Querys = query[Config.Framework] == 'standalone' and query['esx'] or query[Config.Framework]
+Querys = Config.Framework == 'standalone' or 'LG' and query['esx'] or query[Config.Framework]
