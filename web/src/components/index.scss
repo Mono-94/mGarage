@@ -1,170 +1,50 @@
-$color1: #141414;
+$color1: #1A1B1E;
 $color2: #2e3036;
 $Border: 5px;
 
 body {
     user-select: none;
     color: #ccc;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-        sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',  sans-serif;
 }
 
-.menu {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    top: 0;
-    gap: 10px;
-    padding: 5px;
-    margin: 10px;
-    height: auto;
-    max-height: 100%;
-    width: 500px;
-    background-color: $color2;
-    right: 0;
-    border-radius: $Border;
-
-    .nav {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        background-color: $color1;
-        border-radius: $Border;
-        padding: 5px;
-
-        .button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            text-transform: uppercase;
-            padding: 5px;
-            width: 100%;
-            border-radius: $Border;
-            transition: background-color 0.3s ease-in-out;
-
-            &:hover {
-                background-color: #383838;
-            }
-
-            &:active {
-                background-color: #494949;
-            }
-        }
-    }
-
-    .content {
-        overflow-y: scroll;
-        border-radius: $Border;
-
-        &::-webkit-scrollbar {
-            width: 0px;
-        }
-
-        &::-webkit-scrollbar-track {
-            background: transparent;
-        }
-    }
-
-
-}
-
-.bttons {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-.createGarage {
-    display: flex;
-    overflow-y: scroll;
-    margin-bottom: 10px;
-
-    &::-webkit-scrollbar {
-        width: 5px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: $color1;
-        border-radius: 5px;
-    }
-
-
-
-    .inputs {
-        display: grid;
-        grid-template-columns: repeat(2, 2fr);
-        gap: 5px;
-        width: max-content;
-
-        .input {
-            display: flex;
-            flex-direction: column;
-            background-color: $color1;
-            border-radius: $Border;
-            padding: 5px;
-
-
-            .lbl {
-                border-radius: $Border;
-                font-weight: bold;
-                padding: 5px;
-                font-size: 14px;
-                display: flex;
-                flex-direction: column;
-
-                span {
-                    font-size: 11px;
-                    font-weight: normal;
-                }
-            }
-
-            .MuiFormControl-root {
-                margin-top: 5px;
-            }
-        }
-
-    }
-
-}
 
 .Garage {
-    position: fixed; 
+    position: fixed;
     display: flex;
     flex-direction: column;
-    top: 50%; 
-    transform: translateY(-50%); 
-    right: 5px; 
+    right: 10%;
+    top: 20px;
     gap: 5px;
     width: 400px;
-    height: 80%;
+    height: 100%;
+    max-height: 80%;
     max-height: 80%;
     padding: 5px;
     border-radius: $Border;
 
     .Garage-head {
         display: flex;
-        align-items: center;
         justify-content: space-between;
-        padding: 10px 5px;
-        gap: 10px;
-        background-color: $color1;
+        gap: 5px;
 
-        span {
-            flex: 1;
-            margin-left: 10px;
-            font-size: 20px;
+        div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 7px;
+            height: 30px;
+            width: 100%;
+            border-radius: $Border;
+            background-color: $color1;
         }
-
-
     }
 
     .content {
         border-radius: $Border;
         overflow-y: auto;
+        background-color: $color1;
+        padding: 10px;
 
         &::-webkit-scrollbar {
             width: 0px;
@@ -173,158 +53,16 @@ body {
     }
 
 
-
-    .veh-head {
-        display: flex;
-        justify-content: space-between;
-        flex: 1;
-        text-align: center;
-        gap: 5px;
-        margin-right: 5px;
-
-        div {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            font-size: 15px;
-            background-color: $color2;
-            border-radius: $Border;
-            text-align: center;
-
-            &:first-child {
-                flex: 1;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-        }
-
-    }
-
-    .veh-info {
-        display: flex;
-        gap: 5px;
-        margin-bottom: 5px;
-
-        div {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            background-color: $color2;
-            border-radius: $Border;
-            padding: 5px;
-            gap: 5px;
-            flex: 1;
-
-            span {
-                display: flex;
-                justify-content: center;
-                gap: 10px;
-            }
-        }
-    }
-
-    .veh-info-pound {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-        margin-bottom: 5px;
-
-        .option {
-            display: flex;
-            flex-direction: column;
-            background-color: $color2;
-            border-radius: $Border;
-            padding: 10px;
-            gap: 10px;
-
-            div {
-                display: flex;
-                justify-content: space-between;
-
-                span {
-                    background-color: $color1;
-                    border-radius: $Border;
-                    padding: 5px;
-                    font-weight: bold;
-                }
-            }
-
-
-            .reason {
-                display: flex;
-                flex-direction: column;
-                margin-bottom: 10px;
-                background-color: $color1;
-                border-radius: $Border;
-                padding: 10px;
-
-                span {
-                    font-size: 19px;
-                    font-weight: bold;
-                }
-
-
-            }
-        }
-
-        .price {
-            display: flex;
-            flex-direction: column;
-            background-color: $color2;
-            border-radius: $Border;
-            padding: 5px 10px;
-            gap: 5px;
-        }
-    }
-
-    .veh-info-progress {
-        display: flex;
-        justify-content: space-between;
-        gap: 5px;
-        margin-bottom: 5px;
-
-        div {
-            display: flex;
-            flex-direction: column;
-            background-color: $color2;
-            border-radius: $Border;
-            padding: 5px;
-            gap: 5px;
-            flex: 1;
-
-            span {
-                display: flex;
-                justify-content: space-between;
-            }
-
-        }
-    }
-
-    .veh-buttons {
-        display: flex;
-        gap: 5px;
-    }
-
-    .vehicle-details {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.5s ease-in-out;
-    }
-
-    .vehicle-details.show {
-        max-height: 600px;
-    }
-
 }
 
+.overflow-ellipsis {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 .search {
     display: flex;
-    background: $color2;
-    height: 30px;
-    width: fit-content;
-    border-radius: 40px;
     padding: 5px;
     color: #ccc;
 
@@ -337,67 +75,36 @@ body {
         }
 
         .search-btn {
-            background: white;
-            color: $color1;
+            font-size: 10px;
+            color: #ccc;
         }
     }
 
-}
-
-.search-btn {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background: $color1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #ccc;
-}
-
-
-.search-txt {
-    border: none;
-    background: none;
-    outline: none;
-    padding: 0;
-    font-size: 16px;
-    transition: ease-in 0.4s;
-    background-color: $color1;
-    border-radius: 50px;
-    width: 0;
-    color: #ccc;
-}
-
-.search-txt.has-text {
-    width: 100px;
-    margin-left: 5px;
-    padding: 0 10px;
-    color: #ccc;
-}
-
-
-.garagesZone {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    border-radius: $Border;
-
-    .card {
-        padding: 10px;
-        background-color: #141414;
-
+    .search-btn {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #ccc;
     }
 
-    .zonebuttons {
-        display: flex;
-        gap: 10px;
-        justify-content: space-between;
+    .search-txt {
+        border: none;
+        background: none;
+        outline: none;
+        padding: 0;
+        font-size: 16px;
+        transition: ease-in 0.4s;
+        width: 0;
+        color: #ccc;
     }
 
-    .zoneinfo {
-        display: flex;
-        justify-content: space-between;
+    .search-txt.has-text {
+        width: 100px;
+        margin-left: 5px;
+        padding: 0 10px;
+        color: #ccc;
     }
 
 }

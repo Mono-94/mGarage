@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { SimpleGrid, TextInput, Checkbox, Button, Select, MultiSelect, Stack, NumberInput } from '@mantine/core';
+import { SimpleGrid, TextInput, Checkbox, Button, Select, MultiSelect, Stack, NumberInput, Paper, Group, ScrollArea, ActionIcon, Divider, Space, Header, Badge } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { fetchNui } from "../utils/fetchNui";
 import Lang from "../utils/LangR";
-import { IconCarCrash, IconDatabase, IconMapPin } from "@tabler/icons-react";
+import { IconCarCrash, IconDatabase, IconMapPin, IconPlus, IconTrash } from "@tabler/icons-react";
 
 const Create: React.FC = () => {
    const lang = Lang()
@@ -26,6 +26,8 @@ const Create: React.FC = () => {
          points: [],
          thickness: 0,
          actioncoords: [],
+         defaultCars: [] as { model: string; grades?: string[] }[],
+         platePrefix: '',
          spawnpos: [],
          debug: false,
          defaultGarage: "",
@@ -40,6 +42,47 @@ const Create: React.FC = () => {
       },
    });
 
+
+   const [newVehicle, setNewVehicle] = useState<any>({});
+
+   const handleAddVehicle = () => {
+      const { model, price, grades } = newVehicle;
+      if (!model) {
+         return;
+     }
+      if (price === 0 && grades.length === 0) {
+         form.setFieldValue('defaultCars', [
+            ...form.values.defaultCars,
+            {
+               model: model
+            }
+         ]);
+
+      } else {
+         form.setFieldValue('defaultCars', [
+            ...form.values.defaultCars,
+            {
+               model: model,
+               grades: grades,
+            }
+         ]);
+      }
+
+      setNewVehicle({
+         model: '',
+         grades: [],
+      });
+   };
+
+   const handleDeleteVehicle = (index: number) => {
+      const updatedCars = form.values.defaultCars.filter((_, i) => i !== index);
+      form.setFieldValue('defaultCars', updatedCars);
+   };
+
+   const Grades = Array(51).fill(0).map((_, index) => ({
+      label: `Grade ${index}`,
+      value: (index).toString()
+   }));
 
 
    const handleCreateGarage = async () => {
@@ -70,23 +113,19 @@ const Create: React.FC = () => {
    };
 
 
-   return (<>
-      <>
-         <form
-            onSubmit={(e) => {
-               e.preventDefault();
-               form.onSubmit(async (values) => {
-
-                  if (form.isValid()) {
-                     const success = await handleCreateGarage();
-                     if (success) {
-                        form.reset();
-                     }
+   return (
+      <Paper p="xs" style={{ backgroundColor: '#2e3036', margin: '5px 0' }}>
+         <form onSubmit={(e) => {
+            e.preventDefault();
+            form.onSubmit(async (values) => {
+               if (form.isValid()) {
+                  const success = await handleCreateGarage();
+                  if (success) {
+                     form.reset();
                   }
-               })(e);
-            }}
-         >
-
+               }
+            })(e);
+         }}>
 
             <Stack>
                <TextInput
@@ -103,6 +142,7 @@ const Create: React.FC = () => {
                   data={[
                      { value: 'garage', label: lang.GarageType1 },
                      { value: 'impound', label: lang.GarageType2 },
+                     { value: 'custom', label: lang.GarageType3 },
 
                   ]}
                   {...form.getInputProps('garagetype')}
@@ -127,6 +167,7 @@ const Create: React.FC = () => {
                   data={[
                      { value: 'target', label: lang.GarageActionType1 },
                      { value: 'textui', label: lang.GarageActionType2 },
+                     { value: 'radial', label: lang.GarageActionType3 },
 
                   ]}
                   {...form.getInputProps('zoneType')}
@@ -141,38 +182,39 @@ const Create: React.FC = () => {
                      {...form.getInputProps('npchash')}
                   />
                )}
+               {form.values.garagetype !== 'custom' && (
+                  <MultiSelect
+                     label={lang.GarageVehicleType}
+                     description={lang.GarageVehicleTypeSpan}
+                     placeholder={lang.GarageVehicleType}
+                     dropdownPosition="bottom"
+                     data={[
+                        { value: 'automobile', label: 'Automobile' },
+                        { value: 'bicycle', label: 'Bicycle' },
+                        { value: 'bike', label: 'Bike' },
+                        { value: 'blimp', label: 'Blimp' },
+                        { value: 'boat', label: 'Boat' },
+                        { value: 'heli', label: 'Heli' },
+                        { value: 'plane', label: 'Plane' },
+                        { value: 'quadbike', label: 'Quadbike' },
+                        { value: 'submarine', label: 'Submarine' },
+                        { value: 'submarinecar', label: 'Submarinecar' },
+                        { value: 'trailer', label: 'Trailer' },
+                        { value: 'train', label: 'Train' },
+                        { value: 'amphibious_quadbike', label: 'Amphibious Quadbike' },
+                        { value: 'amphibious_automobile', label: 'Amphibious Automobile' },
+                     ]}
+                     {...form.getInputProps('carType')}
+                  />
 
-               <MultiSelect
-                  label={lang.GarageVehicleType}
-                  description={lang.GarageVehicleTypeSpan}
-                  placeholder={lang.GarageVehicleType}
-                  dropdownPosition="bottom"
-                  data={[
-                     { value: 'automobile', label: 'Automobile' },
-                     { value: 'bicycle', label: 'Bicycle' },
-                     { value: 'bike', label: 'Bike' },
-                     { value: 'blimp', label: 'Blimp' },
-                     { value: 'boat', label: 'Boat' },
-                     { value: 'heli', label: 'Heli' },
-                     { value: 'plane', label: 'Plane' },
-                     { value: 'quadbike', label: 'Quadbike' },
-                     { value: 'submarine', label: 'Submarine' },
-                     { value: 'submarinecar', label: 'Submarinecar' },
-                     { value: 'trailer', label: 'Trailer' },
-                     { value: 'train', label: 'Train' },
-                     { value: 'amphibious_quadbike', label: 'Amphibious Quadbike' },
-                     { value: 'amphibious_automobile', label: 'Amphibious Automobile' },
-                  ]}
-                  {...form.getInputProps('carType')}
-               />
-
-
+               )}
                <TextInput
                   label={lang.GarageJob}
                   placeholder={lang.GarageJob}
                   description={lang.GarageJobSpan}
                   {...form.getInputProps('job')}
                />
+
 
                {form.values.garagetype === 'impound' && (
                   <>
@@ -197,11 +239,13 @@ const Create: React.FC = () => {
                      description={lang.GarageSocietySpan}
                      {...form.getInputProps('debug')}
                   />
-                  <Checkbox
-                     label={lang.GarageSharedVehicles}
-                     description={lang.GarageSharedVehiclesSpan}
-                     {...form.getInputProps('isShared')}
-                  />
+                  {form.values.garagetype === 'garage' && (
+                     <Checkbox
+                        label={lang.GarageSharedVehicles}
+                        description={lang.GarageSharedVehiclesSpan}
+                        {...form.getInputProps('isShared')}
+                     />
+                  )}
                   <Checkbox
                      label={lang.GarageInTocar}
                      description={lang.GarageInTocarSpan}
@@ -215,7 +259,7 @@ const Create: React.FC = () => {
                   />
                </SimpleGrid>
                {form.values.blip && (
-                  <SimpleGrid cols={2}>
+                  <Group grow>
                      <NumberInput
                         defaultValue={form.values.blipsprite}
                         label={'Blip Sprite'}
@@ -226,8 +270,62 @@ const Create: React.FC = () => {
                         label={'Blip Color'}
                         {...form.getInputProps('blipcolor')}
                      />
-                  </SimpleGrid>
+                  </Group>
                )}
+               {form.values.garagetype === 'custom' && (
+                  <Paper p={10}>
+                     <TextInput
+                        label={lang.GarageMenu13}
+                        description={lang.GarageMenu14}
+                        value={newVehicle.model}
+                        maxLength={4}
+                        {...form.getInputProps('platePrefix')}
+                     />
+                     <Space h="md" />
+                     <SimpleGrid cols={2}  >
+                        <Stack justify="space-around">
+                           <TextInput
+                              label={lang.GarageMenu15}
+                              value={newVehicle.model}
+                              onChange={(e) => setNewVehicle({ ...newVehicle, model: e.target.value })}
+                           />
+                           {form.values.job !== '' && (
+                              <MultiSelect
+                                 data={Grades}
+                                 label={lang.GarageMenu17}
+                                 maxDropdownHeight={200}
+                                 value={newVehicle.grades}
+                                 onChange={(value) => setNewVehicle({ ...newVehicle, grades: value })}
+                              />
+                           )}
+                           <Button variant="light" size='xs' leftIcon={<IconPlus size="1rem" />} onClick={handleAddVehicle}>Add Vehicle</Button>
+                        </Stack>
+                        <ScrollArea.Autosize mah={260} placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }}>
+                           <Stack spacing={5}>
+                              {form.values.defaultCars.map((vehicle: any, index: number) => (
+                                 <Paper key={`vehicle-${index}`} p={4} style={{ backgroundColor: '#2e3036' }}>
+                                    <Header style={{ display: 'flex', justifyContent: 'space-between' }} height={"auto"} p={5}>
+                                       {vehicle.model}
+                                       <ActionIcon variant="default">
+                                          <IconTrash size="1rem" color={'red'} onClick={() => handleDeleteVehicle(index)} />
+                                       </ActionIcon>
+                                    </Header>
+                                    <Group spacing="xs">
+                                       {vehicle.grades && <div style={{ padding: 4 }}>Grades  <Badge>  {vehicle.grades.join(', ')}  </Badge></div>}
+                                    </Group>
+
+                                 </Paper>
+                              ))}
+                           </Stack>
+                        </ScrollArea.Autosize>
+
+
+                     </SimpleGrid>
+                  </Paper>
+               )}
+
+
+
                <Button.Group>
                   <Button fullWidth onClick={() => handleCoordsGarage()} variant="light" size='xs' leftIcon={<IconMapPin size="1rem" />}>
                      {lang.GarageButton1}
@@ -242,10 +340,10 @@ const Create: React.FC = () => {
 
                <Button type="submit" variant="light" size='xs' color="teal" leftIcon={<IconDatabase size="1rem" />}>{lang.GarageButton4}</Button>
             </Stack>
-         </form>
 
-      </>
-   </>)
+         </form>
+      </Paper>
+   )
 
 };
 export default Create;

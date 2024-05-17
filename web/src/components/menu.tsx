@@ -21,9 +21,8 @@ const Menu: React.FC = () => {
 
     return (
         <Paper p='xs'   style={{
-            width: 'auto',
+            width: '600px',
             height: 'auto',
-            maxHeight: '100vh',
             position: 'fixed',
             top: '50%',
             right: '10px',
@@ -33,19 +32,28 @@ const Menu: React.FC = () => {
                 <Tabs.List >
                     <Tabs.Tab value="create" icon={<IconPlus size="0.8rem" />}>{lang.GarageButton4}</Tabs.Tab>
                     <Tabs.Tab value="garages" icon={<IconList size="0.8rem" />}>{lang.GarageButton8}</Tabs.Tab>
+                    <Tabs.Tab value="impounds" icon={<IconList size="0.8rem" />}>{'Impound List'}</Tabs.Tab>
+                    <Tabs.Tab value="customs" icon={<IconList size="0.8rem" />}>{'Customs List'}</Tabs.Tab>
                     <CloseButton size="md" onClick={handleClose} color="red" ml='auto' />
                 </Tabs.List>
-                <ScrollArea h={'90vh'} w={'400px'} type="scroll" scrollHideDelay={2000} >
+                <ScrollArea.Autosize mih={800} mah={800} placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }}>
 
-                    <Tabs.Panel value="create" >
+                    <Tabs.Panel value="create" sx={{ padding: 5 }}>
                         <Create />
                     </Tabs.Panel>
 
                     <Tabs.Panel value="garages" sx={{ padding: 5 }}>
-                        <Garage />
+                        <Garage zone='garage' />
                     </Tabs.Panel>
 
-                </ScrollArea>
+                    <Tabs.Panel value="impounds" sx={{ padding: 5 }}>
+                        <Garage zone='impound' />
+                    </Tabs.Panel>
+
+                    <Tabs.Panel value="customs" sx={{ padding: 5 }}>
+                        <Garage zone='custom' />
+                    </Tabs.Panel>
+                </ScrollArea.Autosize>
             </Tabs>
         </Paper>
     )

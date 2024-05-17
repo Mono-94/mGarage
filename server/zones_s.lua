@@ -1,3 +1,4 @@
+
 MySQL.query([[
     CREATE TABLE IF NOT EXISTS `mgarages` (
         `id` int(11) NOT NULL AUTO_INCREMENT,

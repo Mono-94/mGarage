@@ -2,15 +2,15 @@ Config = {}
 
 Config.Debug = false
 
-Config.Lang = 'EN'       -- ES / EN
+Config.Lang = 'EN'           -- ES / EN
 
-Config.Framework = 'esx' -- esx/ox/standalone/qb
+Config.Framework = 'esx'     -- esx/ox/standalone/qbox/qb
 
 Config.DefaultGarages = true -- Config Garages ???
 
-Config.CarkeysItem = false  
+Config.CarkeysItem = true
 
-Config.CarBlipTime = 1000 * 30 -- 30 Segs
+Config.ClearTimeBlip = 1000 * 120 -- 2 mins
 
 Config.TargetDistance = 3.0
 
@@ -20,6 +20,28 @@ Config.BlipDefault = {
     size = 0.5,
 }
 
+--  👍 
+Config.PedAnims = {
+    anims = true,
+    list = {
+        "WORLD_HUMAN_AA_SMOKE",
+        "WORLD_HUMAN_AA_COFFEE",
+        "WORLD_HUMAN_CLIPBOARD",
+        "WORLD_HUMAN_MUSICIAN",
+        "WORLD_HUMAN_STUPOR",
+    }
+}
+
+-- ox Target Based job and grade min grade
+Config.TargetImpound = {
+
+    ['police'] = {                  -- jobName
+        minGrades = 0,              -- Min Grade to use
+        impoundName = "Impound Car" -- Impound to send vehicle
+    },
+
+}
+
 Config.GaragesDefault = {
     --cars
     {
@@ -27,7 +49,7 @@ Config.GaragesDefault = {
         garagetype = 'garage',                                                                                                -- 'garage', 'impound'
         debug = false,                                                                                                        -- true/false Zone debug | boolean
         zoneType = 'target',                                                                                                  -- 'target', 'textui', 'radial'
-        job = false,                                                                                                            -- string/nil or false  | string / false
+        job = false,                                                                                                          -- string/nil or false  | string / false
         blip = true,                                                                                                          -- showBlip? | boolean
         intocar = false,                                                                                                      -- Player in to car? | boolean
         isShared = false,                                                                                                     -- Take all vehicles from diferent garages.
@@ -264,6 +286,40 @@ Config.GaragesDefault = {
         spawnpos = {
             vec4(-792.7961, -1502.4591, -0.0936, 108.3073),
 
+        }
+    },
+
+
+
+    --- Custom
+    {
+        name = "LSPD",
+        garagetype = 'custom',
+        debug = false,
+        zoneType = 'target',
+        job = 'police',
+        society = nil,
+        blip = false,
+        intocar = true,
+        isShared = false,
+        carType = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
+        priceImpound = 110,
+        platePrefix = 'LSPD',
+        defaultCars = {
+            { model = 'police',  grades = { 1, 2, 3, 4 } }, -- Grandes for jobs
+            { model = 'police2', grades = { 'boss' } },         -- Grandes for jobs
+        },
+        actioncoords = vec4(457.27026367188, -1007.4309082031, 27.297456741333, 195.85415649414),
+        npchash = 'csb_trafficwarden',
+        points = {
+            vec3(411.0, -1002.0, 29.0),
+            vec3(411.0, -1035.0, 29.0),
+            vec3(492.0, -1028.0, 29.0),
+            vec3(492.0, -1002.0, 29.0),
+        },
+        thickness = 6.0,
+        spawnpos = {
+            vec4(449.81292724609, -1018.3796386719, 27.528268814087, 330.99160766602)
         }
     },
 

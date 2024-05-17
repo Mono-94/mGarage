@@ -1,6 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { IconSearch, IconX } from '@tabler/icons-react';
 
 
 interface SearchBoxProps {
@@ -24,7 +25,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ searchTerm, setSearchTerm }) => {
     return (
         <div className="search">
             <a className="search-btn" href="#" onClick={handleSearchClick}>
-                {isSearchEmpty ? <FontAwesomeIcon icon={faSearch} /> : <FontAwesomeIcon icon={faTimes} />}
+                {isSearchEmpty ? <IconSearch  size={20}/> : <IconX  size={20}/>}
             </a>
             <input
                 type="text"

@@ -2,9 +2,6 @@ local Target = exports.ox_target
 local ZoneData = {}
 local PolyZone = {}
 
-
-
-
 local SendZones = function()
     local filteredData = {}
     for _, v in pairs(ZoneData) do
@@ -29,19 +26,18 @@ local SetBlip = function(data)
 end
 
 local SetNPC = function(data)
-    lib.requestModel(data.npchash)
-    local entity = CreatePed(2, data.npchash, data.actioncoords.x, data.actioncoords.y, data.actioncoords.z,
-        data.actioncoords.w, false, false)
-    SetPedFleeAttributes(entity, 0, 0)
-    SetPedDiesWhenInjured(entity, false)
-    TaskStartScenarioInPlace(entity, "missheistdockssetup1clipboard@base", 0, true)
-    SetPedKeepTask(entity, true)
+    lib.requestModel(data.npchash, 5000)
+    local entity = CreatePed(2, data.npchash, data.actioncoords.x, data.actioncoords.y, data.actioncoords.z, false, false)
+    SetEntityHeading(entity, data.actioncoords.w)
+    if Config.PedAnims.anims then
+        local RandomAnim = Config.PedAnims.list[math.random(1, #Config.PedAnims.list)]
+        TaskStartScenarioInPlace(entity, RandomAnim, 0, true)
+    end
     SetBlockingOfNonTemporaryEvents(entity, true)
     SetEntityInvincible(entity, true)
     FreezeEntityPosition(entity, true)
     return entity
 end
-
 
 local DeleteZone = function(id)
     if ZoneData[id].zoneType == 'target' then
@@ -66,7 +62,6 @@ local DeleteZone = function(id)
     end
 end
 
-
 lib.callback('mGarage:GarageZones', false, function(response)
     if response then
         for k, v in pairs(response) do
@@ -77,8 +72,6 @@ lib.callback('mGarage:GarageZones', false, function(response)
         end
     end
 end, 'getZones')
-
-
 
 function CreateGarage(data)
     if not ZoneData[data.id] then ZoneData[data.id] = data end
@@ -101,10 +94,10 @@ function CreateGarage(data)
         ZoneData[data.id].blipEntity = SetBlip(data)
     end
 
-
     PolyZone[data.id] = lib.zones.poly({
         name = data.name .. '-garage',
         points = data.points,
+        debugColour = vec4(51, 54, 92, 50.0),
         thickness = data.thickness,
         debug = data.debug,
         inside = function()
@@ -131,34 +124,61 @@ function CreateGarage(data)
 
                 ZoneData[data.id].npcEntity = SetNPC(data)
 
-                ZoneData[data.id].TargetId = Target:addBoxZone({
-                    coords = { data.actioncoords.x, data.actioncoords.y, data.actioncoords.z + 1 },
-                    size = vec3(1, 1, 1.5),
-                    rotation = data.actioncoords.w,
-                    debug = data.debug,
-                    drawSprite = true,
-                    options = {
-                        {
-                            groups = data.job,
-                            label = data.name,
-                            icon = "fa-solid fa-warehouse",
-                            distance = Config.TargetDistance,
-                            onSelect = function()
-                                OpenGarage(data)
-                            end
-                        },
-                    }
+                ZoneData[data.id].TargetId = Target:addLocalEntity(ZoneData[data.id].npcEntity, {
+                    {
+                        debug = true,
+                        drawSprite = true,
+                        groups = data.job,
+                        label = data.name,
+                        icon = "fa-solid fa-warehouse",
+                        distance = Config.TargetDistance,
+                        onSelect = function()
+                            OpenGarage(data)
+                        end
+                    },
                 })
             elseif data.zoneType == 'textui' or Config.Debug then
+                local Action = function()
+                    TextUI(data.name)
+                end
                 if data.job then
                     if GetJob().name == data.job then
-                        TextUI(data.name)
+                        Action()
                     end
                 else
                     TextUI(data.name)
                 end
+            elseif data.zoneType == 'radial' or Config.Debug then
+                local Action = function()
+                    lib.addRadialItem({
+                        {
+                            id = 'garage_access',
+                            icon = 'warehouse',
+                            label = data.name,
+                            onSelect = function()
+                                OpenGarage(data)
+                            end
+                        },
+                        {
+                            id = 'garage_save',
+                            icon = 'warehouse',
+                            label = Text[Config.Lang].TargetSaveCar,
+                            onSelect = function()
+                                SaveCar(data)
+                            end
+                        }
+                    })
+                end
+                if data.job then
+                    if GetJob().name == data.job then
+                        Action()
+                    end
+                else
+                    Action()
+                end
             end
-            if data.garagetype == 'garage' and data.zoneType == 'target' or Config.Debug then
+
+            if data.garagetype ~= 'impound' and data.zoneType == 'target' then
                 Target:addGlobalVehicle({
                     {
                         name = 'mGarage:SaveTarget' .. data.name,
@@ -179,10 +199,13 @@ function CreateGarage(data)
             if ZoneData[data.id].zoneType == 'target' then
                 if DoesEntityExist(ZoneData[data.id].npcEntity) then
                     DeleteEntity(ZoneData[data.id].npcEntity)
+                    Target:removeLocalEntity(ZoneData[data.id].npcEntity)
                 end
-                Target:removeZone(ZoneData[data.id].TargetId)
             elseif ZoneData[data.id].zoneType == 'textui' then
                 HideTextUI()
+            elseif ZoneData[data.id].zoneType == 'radial' then
+                lib.removeRadialItem('garage_save')
+                lib.removeRadialItem('garage_access')
             end
         end
     })
@@ -258,7 +281,8 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
         retval = GarageAdmAction('delete', data.data, 1500)
     elseif data.action == 'teleport' then
         retval = true
-        SetEntityCoords(PlayerPedId(), data.data.actioncoords.x, data.data.actioncoords.y, data.data.actioncoords.z)
+        SetEntityCoords(PlayerPedId(), data.data.actioncoords.x + 1.0, data.data.actioncoords.y, data.data.actioncoords
+            .z)
     end
     if promi then
         Citizen.Await(promi)

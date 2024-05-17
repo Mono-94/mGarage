@@ -8,40 +8,32 @@ local SpawnClearArea = function(data)
     local player = GetPlayerPed(data.player)
     local playerpos = GetEntityCoords(player)
     local distancia, coords = math.huge, nil
+    local isClear
+    local i = 0
+    repeat
+        for _, v in ipairs(data.coords) do
+            local spawnPos = vector3(v.x, v.y, v.z)
+            local distance = #(playerpos - spawnPos)
 
-    if #data.coords == 1 then
-        local v = data.coords[1]
-        local spawnPos = vector3(v.x, v.y, v.z)
-        distancia = #(playerpos - spawnPos)
-        coords = vec4(v.x, v.y, v.z, v.w)
-    else
-        local i = 0
-        repeat
-            for _, v in ipairs(data.coords) do
-                local spawnPos = vector3(v.x, v.y, v.z)
-                local distance = #(playerpos - spawnPos)
-
-                if distance < distancia then
-                    local isClear = true
-                    for k, vehicle in pairs(GetAllVehicles()) do
-                        local vehicleDistance = #(spawnPos - GetEntityCoords(vehicle))
-                        if vehicleDistance <= data.distance then
-                            isClear = false
-                            break
-                        end
-                    end
-
-                    if isClear and distance > 2 then
-                        distancia, coords = distance, vec4(v.x, v.y, v.z, v.w)
+            if distance < distancia then
+                for k, vehicle in pairs(GetAllVehicles()) do
+                    isClear = true
+                    local vehicleDistance = #(spawnPos - GetEntityCoords(vehicle))
+                    if vehicleDistance <= data.distance then
+                        isClear = false
                     end
                 end
+
+                if distance > 2 then
+                    distancia, coords = distance, vec4(v.x, v.y, v.z, v.w)
+                end
             end
+        end
 
-            i = i + 1
-        until coords ~= nil or i > 5
-    end
+        i = i + 1
+    until coords ~= nil or i > 5
 
-    return coords, distancia
+    return { coords = coords, clear = isClear }
 end
 
 lib.callback.register('mGarage:Interact', function(source, action, data, vehicle)
@@ -57,8 +49,11 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         if PlyVehicles then
             for i = 1, #PlyVehicles do
                 local row = PlyVehicles[i]
-                row.isOwner = row.owner == Player.identifier()
+                row.isOwner = row.owner == Player.identifier() or row.license == Player.identifier()
                 if data.garagetype == 'garage' and not row.pound or not row.pound == 0 then
+                    if not row.job == data.job then
+                        break
+                    end
                     if data.isShared then
                         table.insert(vehicles, row)
                     else
@@ -107,27 +102,45 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 end
             end
         end
-        retval = vehicles
+
+        retval = { vehicles = vehicles, job = Player.GetJob() }
     elseif action == 'spawn' then
         local vehicle = Vehicles.GetVehicleId(data.vehicleid)
 
         if vehicle then
-            vehicle.coords = SpawnClearArea({
+            local coords = SpawnClearArea({
                 coords = data.garage.spawnpos,
                 distance = 2.0,
                 player = source
             })
+
+            if not coords.clear then
+                Player.Notify({
+                    title = data.name,
+                    description = 'No Spawn Point',
+                    type = 'error',
+                })
+                return false
+            end
+
+            vehicle.coords = coords.coords
+
             vehicle.vehicle = json.decode(vehicle.vehicle)
             if data.garage.intocar then
                 vehicle.intocar = source
             end
+
             local data, action = Vehicles.CreateVehicle(vehicle)
+
+
             if not action then return false end
-            action.RetryVehicle(vehicle.coords)
+
+            action.RetryVehicle(coords.coords)
             if Config.CarkeysItem then
                 Vehicles.ItemCarKeys(source, 'add', vehicle.plate)
             end
             retval = true
+            print('adios')
         end
     elseif action == 'saveCar' then
         local entity = NetworkGetEntityFromNetworkId(data.entity)
@@ -142,8 +155,14 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             return false
         end
 
-
         if Vehicle then
+            local metadata = Vehicle.GetMetadata('customGarage')
+            if metadata then
+                if Config.CarkeysItem then
+                    Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
+                end
+                return Vehicle.DeleteVehicle(false)
+            end
             if type(Vehicle.keys) == 'string' then
                 Vehicle.keys = json.decode(Vehicle.keys)
             end
@@ -153,14 +172,13 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                     return false
                 end
             end
-
             if Vehicle.owner == Player.identifier() or Vehicle.keys[Player.identifier()] then
                 if Config.CarkeysItem then
                     Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
                 end
                 return Vehicle.StoreVehicle(data.name)
             else
-                TriggerClientEvent('mGarage:notify', source, {
+                Player.Notify({
                     title = data.name,
                     description = Text[Config.Lang].notYourVehicle,
                     type = 'error',
@@ -169,7 +187,16 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         else
             local row = MySQL.single.await(Querys.queryStore1, { data.plate })
 
-            if not row then return false end
+            if not row then
+                return false,
+
+                    Player.Notify({
+                        title = data.name,
+                        description = Text[Config.Lang].notYourVehicle,
+                        type = 'error',
+                    })
+            end
+
             if data.job then
                 if not (data.job == row.job) then
                     return false
@@ -187,7 +214,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                         end
                     end)
             else
-                TriggerClientEvent('mGarage:notify', source, {
+                Player.Notify({
                     title = data.name,
                     description = Text[Config.Lang].notYourVehicle,
                     type = 'error',
@@ -242,9 +269,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                         local days = math.floor(timeDifference / (24 * 60 * 60))
                         local hours = math.floor((timeDifference % (24 * 60 * 60)) / (60 * 60))
                         local minutes = math.floor((timeDifference % (60 * 60)) / 60)
-
-
-                        TriggerClientEvent('mGarage:notify', source, {
+                        Player.Notify({
                             title = data.garage.name,
                             description = (Text[Config.Lang].ImpoundOption13):format(days, hours, minutes),
                             type = 'error',
@@ -256,8 +281,10 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
 
             if PlayerMoney.money >= infoimpound.price then
-                vehicle.coords = SpawnClearArea({ coords = data.garage.spawnpos, distance = 2.0, player = source })
-                if vehicle.coords then
+                local coords = SpawnClearArea({ coords = data.garage.spawnpos, distance = 2.0, player = source })
+
+                if coords.clear then
+                    vehicle.coords = coords.coords
                     Player.RemoveMoney(data.paymentMethod, infoimpound.price)
                     vehicle.vehicle = json.decode(vehicle.vehicle)
                     local entity, action = Vehicles.CreateVehicle(vehicle)
@@ -270,15 +297,14 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                     if data.garage.society then
                         Core.SetSotcietyMoney(data.garage.society, infoimpound.price)
                     end
-
-                    TriggerClientEvent('mGarage:notify', source, {
+                    Player.Notify({
                         title = data.garage.name,
                         description = (Text[Config.Lang].impound1):format(infoimpound.price),
                         type = 'success',
                     })
                     retval = true
                 else
-                    TriggerClientEvent('mGarage:notify', source, {
+                    Player.Notify({
                         title = data.garage.name,
                         description = Text[Config.Lang].noSpawnPos,
                         type = 'warning',
@@ -286,7 +312,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                     retval = false
                 end
             else
-                TriggerClientEvent('mGarage:notify', source, {
+                Player.Notify({
                     title = data.garage.name,
                     description = Text[Config.Lang].impound2,
                     type = 'warning',
@@ -305,30 +331,30 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                         json.encode(metadata), data
                     })
                     retval = true
-                    TriggerClientEvent('mGarage:notify', source, {
-                        title = data.garage.name,
+                    Player.Notify({
+                        title = 'Garage Unpound',
                         description = Text[Config.Lang].ImpoundOption11,
                         type = 'success',
                     })
                 else
-                    TriggerClientEvent('mGarage:notify', source, {
-                        title = data.garage.name,
+                    Player.Notify({
+                        title = 'Garage Unpound',
                         description = Text[Config.Lang].ImpoundOption8,
                         type = 'error',
                     })
                     retval = false
                 end
             else
-                TriggerClientEvent('mGarage:notify', source, {
-                    title = data.garage.name,
+                Player.Notify({
+                    title = 'Garage Unpound',
                     description = Text[Config.Lang].ImpoundOption9,
                     type = 'error',
                 })
                 retval = false
             end
         else
-            TriggerClientEvent('mGarage:notify', source, {
-                title = data.garage.name,
+            Player.Notify({
+                title = 'Garage Unpound',
                 description = (Text[Config.Lang].ImpoundOption10):format(data),
                 type = 'error',
             })
@@ -339,9 +365,88 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         if vehicle then
             retval = GetEntityCoords(vehicle.entity)
         end
+    elseif action == 'spawncustom' then
+        local model = data.vehicle.model
+        local garageName = data.garage.name
+
+        local job = (data.garage.job == false) and nil or data.garage.job
+
+        local plate = Vehicles.GeneratePlate()
+
+        local platePrefix = data.garage.platePrefix
+
+        if platePrefix and #platePrefix > 0 then
+            if #platePrefix < 4 then
+                platePrefix = string.format("%-4s", platePrefix)
+            end
+            plate = platePrefix:upper() .. string.sub(plate, 5)
+        end
+
+
+
+        local coords = SpawnClearArea({
+            coords = data.garage.spawnpos,
+            distance = 2.0,
+            player = source
+        })
+
+        if not coords.clear then
+            Player.Notify({
+                title = data.name,
+                description = 'No Spawn Point',
+                type = 'error',
+            })
+            return false
+        end
+
+        local CreateVehicleData = {
+            temporary = false,
+            job = job,
+            setOwner = false,
+            intocar = data.garage.intocar and source,
+            owner = Player.identifier(),
+            coords = coords.coords,
+            vehicle = {
+                model = model,
+                plate = plate,
+                fuelLevel = 100,
+            },
+        }
+
+        Vehicles.CreateVehicle(CreateVehicleData, function(data, Vehicle)
+            if Config.CarkeysItem then
+                Vehicles.ItemCarKeys(source, 'add', Vehicle.plate)
+            else
+                Vehicle.AddKey(source)
+            end
+            Vehicle.SetMetadata('customGarage', garageName)
+        end)
+
+        return true
+    elseif action == 'saveCustomCar' then
+        local entity = NetworkGetEntityFromNetworkId(data.entity)
+        local Vehicle = Vehicles.GetVehicle(entity)
+        if Vehicle then
+            local metadata = Vehicle.GetMetadata('customGarage')
+            local job = Player.GetJob()
+
+            if metadata == data.name and Vehicle.owner == Player.identifier() or job.name == Vehicle.job then
+                Vehicle.DeleteVehicle(false)
+                if Config.CarkeysItem then
+                    Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
+                end
+                retval = true
+            else
+                retval = false
+            end
+        else
+            retval = false
+        end
     end
     return retval
 end)
+
+
 
 
 RegisterServerEvent('mGarage:Server:TaskLeaveVehicle', function(peds)
