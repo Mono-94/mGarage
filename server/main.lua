@@ -7,34 +7,41 @@ local VehicleTypes = {
 local SpawnClearArea = function(data)
     local player = GetPlayerPed(data.player)
     local playerpos = GetEntityCoords(player)
-    local distancia, coords = math.huge, nil
-    local isClear
-    local i = 0
-    repeat
+    local selectedCoords, isClear = nil, false
+
+    if #data.coords == 1 then
+        local v = data.coords[1]
+        return { coords = vec4(v.x, v.y, v.z, v.w), clear = true }
+    end
+
+    for attempt = 1, 5 do
         for _, v in ipairs(data.coords) do
             local spawnPos = vector3(v.x, v.y, v.z)
-            local distance = #(playerpos - spawnPos)
+            local distanceToPlayer = #(playerpos - spawnPos)
 
-            if distance < distancia then
-                for k, vehicle in pairs(GetAllVehicles()) do
-                    isClear = true
-                    local vehicleDistance = #(spawnPos - GetEntityCoords(vehicle))
-                    if vehicleDistance <= data.distance then
-                        isClear = false
+            if distanceToPlayer < (selectedCoords and #(playerpos - vector3(selectedCoords.x, selectedCoords.y, selectedCoords.z)) or math.huge) then
+                local clearOfVehicles = true
+                for _, vehicle in pairs(GetAllVehicles()) do
+                    if #(spawnPos - GetEntityCoords(vehicle)) <= data.distance then
+                        clearOfVehicles = false
+                        break
                     end
                 end
 
-                if distance > 2 then
-                    distancia, coords = distance, vec4(v.x, v.y, v.z, v.w)
+                if clearOfVehicles and distanceToPlayer > 2 then
+                    selectedCoords, isClear = vec4(v.x, v.y, v.z, v.w), true
                 end
             end
         end
 
-        i = i + 1
-    until coords ~= nil or i > 5
+        if selectedCoords then break end
+    end
 
-    return { coords = coords, clear = isClear }
+    return { coords = selectedCoords, clear = isClear }
 end
+
+
+
 
 lib.callback.register('mGarage:Interact', function(source, action, data, vehicle)
     local retval = nil
@@ -132,15 +139,14 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
             local data, action = Vehicles.CreateVehicle(vehicle)
 
-
             if not action then return false end
 
             action.RetryVehicle(coords.coords)
+
             if Config.CarkeysItem then
                 Vehicles.ItemCarKeys(source, 'add', vehicle.plate)
             end
             retval = true
-            print('adios')
         end
     elseif action == 'saveCar' then
         local entity = NetworkGetEntityFromNetworkId(data.entity)
