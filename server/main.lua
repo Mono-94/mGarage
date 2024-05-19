@@ -137,7 +137,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 vehicle.intocar = source
             end
 
-            local data, action = Vehicles.CreateVehicle(vehicle)
+            local vehicledata, action = Vehicles.CreateVehicle(vehicle)
 
             if not action then return false end
 

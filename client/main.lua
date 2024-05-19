@@ -152,9 +152,6 @@ function SaveCar(data)
     end
 end
 
-exports('OpenGarage', OpenGarage)
-exports('SaveCar', SaveCar)
-
 local blip    = nil
 local timer
 
@@ -230,9 +227,6 @@ function UnpoundVehicle(plate)
     ServerCallBack('changeimpound', plate)
 end
 
-exports('UnpoundVehicle', UnpoundVehicle)
-exports('ImpoundVehicle', ImpoundVehicle)
-
 RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
     local retval = nil
 
@@ -275,6 +269,8 @@ exports.ox_target:addGlobalVehicle({
     },
 })
 
-RegisterCommand('unpound', function(source, args, raw)
-    UnpoundVehicle()
-end)
+
+exports('UnpoundVehicle', UnpoundVehicle)
+exports('ImpoundVehicle', ImpoundVehicle)
+exports('OpenGarage', OpenGarage)
+exports('SaveCar', SaveCar)
