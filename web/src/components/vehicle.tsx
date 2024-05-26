@@ -152,11 +152,11 @@ const Vehicle: React.FC<VehicleProps> = ({ vehicle, index, garage }) => {
                                 </Paper>
                             </SimpleGrid>
                             <Button.Group >
-                                <Button fullWidth onClick={SpawnVehicle} disabled={!vehicle.stored} leftIcon={<IconCarGarage size={17} />} variant="light" size='xs' >{lang.GarageMenu5}</Button>
+                                <Button fullWidth onClick={SpawnVehicle} disabled={vehicle.stored == 0} leftIcon={<IconCarGarage size={17} />} variant="light" size='xs' >{lang.GarageMenu5}</Button>
                                 {vehicle.isOwner && (
                                     <>
-                                        <Button fullWidth onClick={ShowMenuKeys} variant="light" size='xs' leftIcon={<IconKey size={17} />}>{lang.GarageMenu6}</Button>
-                                        <Button fullWidth onClick={SetBlip} variant="light" size='xs' leftIcon={<IconMapSearch size={17} />} disabled={vehicle.stored}>{lang.GarageMenu7}</Button>
+                                        <Button fullWidth onClick={ShowMenuKeys} variant="light" size='xs' leftIcon={<IconKey size={17} />} disabled={vehicle.stored == 1}>{lang.GarageMenu6}</Button>
+                                        <Button fullWidth onClick={SetBlip} variant="light" size='xs' leftIcon={<IconMapSearch size={17} />} disabled={vehicle.stored == 1}>{lang.GarageMenu7}</Button>
                                     </>
                                 )}
 
