@@ -124,4 +124,4 @@ RegisterCommand('mGarage:unpound', function(source, args, raw)
 end)
 ```
 
-![image](https://cdn.discordapp.com/attachments/1234840062181769378/1238255435358666884/307592b7-b7d1-40b4-b615-a1ac0d26c385.jpg?ex=663e9ebd&is=663d4d3d&hm=133b443e1a18490a0ef8669650068d0c546149d9bda930140539665202112e27&)
+![image](https://i.imgur.com/Y9RXYBH.png)
