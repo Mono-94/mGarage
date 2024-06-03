@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { fetchNui } from "../utils/fetchNui";
 import ProgressBar from './lit/progress';
 import Lang from '../utils/LangR';
-import { IconAlertCircle, IconCarCrash, IconCarGarage, IconEngine, IconGasStation, IconKey, IconMapSearch, IconMoneybag } from '@tabler/icons-react';
-import { Accordion, Button, Badge, Group, SimpleGrid, Select, Stack, Text, Paper, Alert } from '@mantine/core';
+import { IconAlertCircle, IconCarCrash, IconCarGarage, IconEngine, IconGasStation, IconKey, IconMapSearch, IconMoneybag, IconSettings, IconTrash } from '@tabler/icons-react';
+import { Accordion, Button, Badge, Group, SimpleGrid, Select, Stack, Text, Paper, Alert, ActionIcon } from '@mantine/core';
 
 interface VehicleProps {
     vehicle: any;
@@ -93,6 +93,7 @@ const Vehicle: React.FC<VehicleProps> = ({ vehicle, index, garage }) => {
                             >
                                 {vehicle.vehlabel}
                             </Badge>
+
                             <Badge radius={5} >{vehicle.plate}</Badge>
                         </>
                     )}
@@ -150,13 +151,21 @@ const Vehicle: React.FC<VehicleProps> = ({ vehicle, index, garage }) => {
                                     <Text fz="md">{lang.GarageMenu4}</Text>
                                     <Text fz="xs" fw={700} c="teal.4">{vehicle.mileage}</Text>
                                 </Paper>
+
+                                {vehicle.fakeplate && (
+                                    <Paper style={{ backgroundColor: '#373A40', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                                          <Text fz="xs">Fake Plate</Text>
+                                        <Badge radius={5} color='yellow' >{vehicle.fakeplate}</Badge>
+                                    </Paper>
+                                )}
                             </SimpleGrid>
+
                             <Button.Group >
-                                <Button fullWidth onClick={SpawnVehicle} disabled={!vehicle.stored} leftIcon={<IconCarGarage size={17} />} variant="light" size='xs' >{lang.GarageMenu5}</Button>
+                                <Button fullWidth onClick={SpawnVehicle} disabled={vehicle.stored == 0} leftIcon={<IconCarGarage size={17} />} variant="light" size='xs' >{lang.GarageMenu5}</Button>
                                 {vehicle.isOwner && (
                                     <>
                                         <Button fullWidth onClick={ShowMenuKeys} variant="light" size='xs' leftIcon={<IconKey size={17} />}>{lang.GarageMenu6}</Button>
-                                        <Button fullWidth onClick={SetBlip} variant="light" size='xs' leftIcon={<IconMapSearch size={17} />} disabled={vehicle.stored}>{lang.GarageMenu7}</Button>
+                                        <Button fullWidth onClick={SetBlip} variant="light" size='xs' leftIcon={<IconMapSearch size={17} />} disabled={vehicle.stored == 1}>{lang.GarageMenu7}</Button>
                                     </>
                                 )}
 

@@ -18,11 +18,15 @@ RegisterNuiCallback('mGarage:Close', function(data, cb)
     EditGarageUI = false
   end
   cb(true)
+
 end)
 
+AddEventHandler('ox_lib:setLocale',function (locale)
+  SendNUIMessage({ action = 'mGarage:Lang', data = lib.getLocales() })
+end)
 
 RegisterNuiCallback('mGarage:Lang', function(data, cb)
-  cb(Text[Config.Lang])
+  cb(lib.getLocales())
 end)
 
 function EditGarage()
@@ -56,7 +60,6 @@ function Notification(data)
 end
 
 RegisterNetEvent('mGarage:notify', Notification)
-
 
 --Textui
 function TextUI(name)

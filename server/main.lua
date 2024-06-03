@@ -1,3 +1,4 @@
+
 local VehicleTypes = {
     ['car'] = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
     ['boat'] = { 'submarine', 'submarinecar', 'boat' },
@@ -14,7 +15,7 @@ local SpawnClearArea = function(data)
         return { coords = vec4(v.x, v.y, v.z, v.w), clear = true }
     end
 
-    for attempt = 1, 5 do
+    for attempt = 1, #data.coords do
         for _, v in ipairs(data.coords) do
             local spawnPos = vector3(v.x, v.y, v.z)
             local distanceToPlayer = #(playerpos - spawnPos)
@@ -41,12 +42,12 @@ local SpawnClearArea = function(data)
 end
 
 
-
-
 lib.callback.register('mGarage:Interact', function(source, action, data, vehicle)
     local retval = nil
 
     local Player = Core.Player(source)
+
+    local identifier = Player.identifier()
 
     if action == 'get' then
         local vehicles = {}
@@ -56,7 +57,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         if PlyVehicles then
             for i = 1, #PlyVehicles do
                 local row = PlyVehicles[i]
-                row.isOwner = row.owner == Player.identifier() or row.license == Player.identifier()
+                row.isOwner = row.owner == identifier or row.license == identifier
                 if data.garagetype == 'garage' and not row.pound or not row.pound == 0 then
                     if not row.job == data.job then
                         break
@@ -124,7 +125,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             if not coords.clear then
                 Player.Notify({
                     title = data.name,
-                    description = 'No Spawn Point',
+                    description = locale('noSpawnPos'),
                     type = 'error',
                 })
                 return false
@@ -173,24 +174,27 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 Vehicle.keys = json.decode(Vehicle.keys)
             end
 
+
             if data.job then
                 if not (data.job == Vehicle.job) then
                     return false
                 end
             end
-            if Vehicle.owner == Player.identifier() or Vehicle.keys[Player.identifier()] then
+            if Vehicle.owner == identifier or Vehicle.keys[identifier] then
                 if Config.CarkeysItem then
                     Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
                 end
-                return Vehicle.StoreVehicle(data.name, data.props)
+                return Vehicle.StoreVehicle(data.name)
             else
                 Player.Notify({
                     title = data.name,
-                    description = Text[Config.Lang].notYourVehicle,
+                    description = locale('notYourVehicle'),
                     type = 'error',
                 })
             end
         else
+            data.plate = GetVehicleNumberPlateText(entity)
+
             local row = MySQL.single.await(Querys.queryStore1, { data.plate })
 
             if not row then
@@ -198,7 +202,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
                     Player.Notify({
                         title = data.name,
-                        description = Text[Config.Lang].notYourVehicle,
+                        description = locale('notYourVehicle'),
                         type = 'error',
                     })
             end
@@ -209,20 +213,21 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 end
             end
 
-            if row and row.owner == Player.identifier() or row.keys and row.keys[Player.identifier()] then
-                MySQL.update(Querys.queryStore2, { data.name, json.encode(data.props), VehicleType, data.plate },
+            if row and row.owner == identifier or row.keys and row.keys[identifier] then
+                MySQL.update(Querys.queryStore2, { data.name, data.props, VehicleType, data.plate },
                     function(affectedRows)
                         if affectedRows then
-                            DeleteEntity(entity)
+                           
                             if Config.CarkeysItem then
                                 Vehicles.ItemCarKeys(source, 'remove', data.plate)
                             end
+                            DeleteEntity(entity)
                         end
                     end)
             else
                 Player.Notify({
                     title = data.name,
-                    description = Text[Config.Lang].notYourVehicle,
+                    description = locale('notYourVehicle'),
                     type = 'error',
                 })
             end
@@ -246,10 +251,26 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         local entity = NetworkGetEntityFromNetworkId(data.entity)
         local Vehicle = Vehicles.GetVehicle(entity)
         if Vehicle then
-            Vehicle.ImpoundVehicle(data.garage, infoimpound.price, infoimpound.reason, infoimpound.time,
-                infoimpound.endPound)
+            Vehicle.ImpoundVehicle(data.garage, infoimpound.price, infoimpound.reason, infoimpound.time, infoimpound.endPound)
         else
-            DeleteEntity(entity)
+            local plate = GetVehicleNumberPlateText(entity)
+            local row = Vehicles.GetVehicleByPlateDB(plate)
+
+            if row then
+                local metadata = row.metadata
+                if not metadata then
+                    metadata = {}
+                else
+                    metadata = json.decode(metadata)
+                end
+
+                metadata['pound'] = infoimpound
+
+                MySQL.update(Querys.queryImpound, { data.garage, json.encode(metadata), plate })
+                DeleteEntity(entity)
+            else
+                DeleteEntity(entity)
+            end
         end
     elseif action == 'impound' then
         local vehicle = Vehicles.GetVehicleId(data.vehicleid)
@@ -277,7 +298,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                         local minutes = math.floor((timeDifference % (60 * 60)) / 60)
                         Player.Notify({
                             title = data.garage.name,
-                            description = (Text[Config.Lang].ImpoundOption13):format(days, hours, minutes),
+                            description = locale('ImpoundOption13', days, hours, minutes),
                             type = 'error',
                         })
                         return false
@@ -291,9 +312,13 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
                 if coords.clear then
                     vehicle.coords = coords.coords
+
                     Player.RemoveMoney(data.paymentMethod, infoimpound.price)
+
                     vehicle.vehicle = json.decode(vehicle.vehicle)
+
                     local entity, action = Vehicles.CreateVehicle(vehicle)
+
                     action.RetryImpound(data.garage.defaultGarage, vehicle.coords)
 
                     if Config.CarkeysItem then
@@ -305,14 +330,14 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                     end
                     Player.Notify({
                         title = data.garage.name,
-                        description = (Text[Config.Lang].impound1):format(infoimpound.price),
+                        description = locale('impound1', infoimpound.price),
                         type = 'success',
                     })
                     retval = true
                 else
                     Player.Notify({
                         title = data.garage.name,
-                        description = Text[Config.Lang].noSpawnPos,
+                        description = locale('noSpawnPos'),
                         type = 'warning',
                     })
                     retval = false
@@ -320,7 +345,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             else
                 Player.Notify({
                     title = data.garage.name,
-                    description = Text[Config.Lang].impound2,
+                    description = locale('impound2'),
                     type = 'warning',
                 })
                 retval = false
@@ -339,13 +364,13 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                     retval = true
                     Player.Notify({
                         title = 'Garage Unpound',
-                        description = Text[Config.Lang].ImpoundOption11,
+                        description = locale('ImpoundOption11'),
                         type = 'success',
                     })
                 else
                     Player.Notify({
                         title = 'Garage Unpound',
-                        description = Text[Config.Lang].ImpoundOption8,
+                        description = locale('ImpoundOption8'),
                         type = 'error',
                     })
                     retval = false
@@ -353,7 +378,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             else
                 Player.Notify({
                     title = 'Garage Unpound',
-                    description = Text[Config.Lang].ImpoundOption9,
+                    description = locale('ImpoundOption9'),
                     type = 'error',
                 })
                 retval = false
@@ -361,7 +386,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         else
             Player.Notify({
                 title = 'Garage Unpound',
-                description = (Text[Config.Lang].ImpoundOption10):format(data),
+                description = locale('ImpoundOption10', data),
                 type = 'error',
             })
             retval = false
@@ -372,14 +397,12 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             retval = GetEntityCoords(vehicle.entity)
         end
     elseif action == 'spawncustom' then
-        local model = data.vehicle.model
         local garageName = data.garage.name
-
+        local model = data.vehicle.model
         local job = (data.garage.job == false) and nil or data.garage.job
-
         local plate = Vehicles.GeneratePlate()
-
         local platePrefix = data.garage.platePrefix
+
 
         if platePrefix and #platePrefix > 0 then
             if #platePrefix < 4 then
@@ -389,12 +412,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         end
 
 
-
-        local coords = SpawnClearArea({
-            coords = data.garage.spawnpos,
-            distance = 2.0,
-            player = source
-        })
+        local coords = SpawnClearArea({ coords = data.garage.spawnpos, distance = 2.0, player = source })
 
         if not coords.clear then
             Player.Notify({
@@ -410,7 +428,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             job = job,
             setOwner = false,
             intocar = data.garage.intocar and source,
-            owner = Player.identifier(),
+            owner = identifier,
             coords = coords.coords,
             vehicle = {
                 model = model,
@@ -436,7 +454,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             local metadata = Vehicle.GetMetadata('customGarage')
             local job = Player.GetJob()
 
-            if metadata == data.name and Vehicle.owner == Player.identifier() or job.name == Vehicle.job then
+            if metadata == data.name and Vehicle.owner == identifier or job.name == Vehicle.job then
                 Vehicle.DeleteVehicle(false)
                 if Config.CarkeysItem then
                     Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)

@@ -1,19 +1,20 @@
 local ServerCallBack = function(action, data, delay)
     return lib.callback.await('mGarage:Interact', delay or false, action, data)
 end
+
 --Vehicle Label
 
 local VehicleLabel = function(model)
-    local makeName = GetMakeNameFromVehicleModel(model)
-    if makeName == nil or not makeName then
-        return 'Vehicle MakeName NIL' .. model, lib.print.error(('Vehicle Model [%s] no MakeNanme '):format(model))
+    if not IsModelValid(model) then
+        lib.print.error(model .. ' - Model invalid')
+        return model
     end
+    local makeName = GetMakeNameFromVehicleModel(model)
     makeName = makeName:sub(1, 1):upper() .. makeName:sub(2):lower()
     local displayName = GetDisplayNameFromVehicleModel(model)
     displayName = displayName:sub(1, 1):upper() .. displayName:sub(2):lower()
     return makeName .. ' ' .. displayName
 end
-
 
 
 function OpenGarage(data)
@@ -23,24 +24,19 @@ function OpenGarage(data)
     if data.garagetype == 'impound' or data.garagetype == 'garage' then
         if getVehicles.vehicles then
             if #getVehicles.vehicles <= 0 then
-                return Notification({ title = data.name, description = Text[Config.Lang].noVehicles })
+                return Notification({ title = data.name, description = locale('noVehicles') })
             end
 
             for i = 1, #getVehicles.vehicles do
                 local row = getVehicles.vehicles[i]
                 local props = json.decode(row.vehicle)
-                if props == 0 or props == nil or not props then
-                    lib.print.warn(('fail to load vehicle, [ PROPS NIL OR 0 ] Plate: %s, Vehicle ID: %s | Contact an administrator.')
-                        :format(row.plate, row.id))
-                    break
-                end
-
-                row.model2 = GetDisplayNameFromVehicleModel(props.model) -- image from fivem docs?
                 row.vehlabel = VehicleLabel(props.model)
                 row.seats = GetVehicleModelNumberOfSeats(props.model)
                 row.metadata = json.decode(row.metadata)
                 row.fuelLevel = props.fuelLevel
-
+                if row.metadata and row.metadata.fakeplate then
+                    row.fakeplate = row.metadata.fakeplate
+                end
                 if props.bodyHealth and props.engineHealth then
                     row.engineHealth = props.bodyHealth / 10
                     row.bodyHealth = props.engineHealth / 10
@@ -63,6 +59,7 @@ function OpenGarage(data)
                 end
             end
             SendNUI('garage', { vehicles = Vehicles, garage = data })
+
             ShowNui('setVisibleGarage', true)
         end
     else
@@ -96,7 +93,7 @@ function OpenGarage(data)
         end
 
         if #Vehicles <= 0 then
-            return Notification({ title = data.name, description = Text[Config.Lang].noVehicles })
+            return Notification({ title = data.name, description = locale('noVehicles') })
         end
 
         SendNUI('garage', { vehicles = Vehicles, garage = data })
@@ -107,6 +104,7 @@ end
 RegisterNetEvent('mGarage:Client:TaskLeaveVehicle', function()
     TaskLeaveVehicle(cache.ped, cache.vehicle, 0)
 end)
+
 
 function SaveCar(data)
     local vehiclePed = GetVehiclePedIsUsing(cache.ped)
@@ -138,12 +136,14 @@ function SaveCar(data)
     end
 
     data.props = json.encode(lib.getVehicleProperties(data.entity))
-
+    data.vehmodel = GetDisplayNameFromVehicleModel(GetEntityModel(data.entity))
     data.entity = VehToNet(data.entity)
 
     if not NetworkDoesNetworkIdExist(data.entity) then
         return false
     end
+
+
 
     if data.garagetype == 'custom' then
         ServerCallBack('saveCustomCar', data, 500)
@@ -173,6 +173,7 @@ local blipcar = function(coords, plate)
     AddTextComponentString('Vehicle - ' .. plate)
     EndTextCommandSetBlipName(blip)
     SetBlipRoute(blip, true)
+
     timer = lib.timer(Config.ClearTimeBlip, function()
         SetBlipRoute(blip, false)
         RemoveBlip(blip)
@@ -181,7 +182,7 @@ local blipcar = function(coords, plate)
     if blip then
         Notification({
             title = 'Garage',
-            description = Text[Config.Lang].setBlip,
+            description = locale('setBlip'),
             type = 'warning',
         })
         return true
@@ -192,11 +193,11 @@ end
 
 function ImpoundVehicle(data)
     if DoesEntityExist(data.vehicle) then
-        local input = lib.inputDialog(Text[Config.Lang].ImpoundOption1, {
-            { type = 'textarea', label = Text[Config.Lang].ImpoundOption2, required = true, },
-            { type = 'number',   label = Text[Config.Lang].ImpoundOption3, icon = 'dollar-sign',         min = 1 },
-            { type = 'date',     label = Text[Config.Lang].ImpoundOption4, icon = { 'far', 'calendar' }, default = false, format = "DD/MM/YYYY" },
-            { type = 'time',     label = Text[Config.Lang].ImpoundOption5, icon = { 'far', 'clock' },    default = false, format = '24' }
+        local input = lib.inputDialog(locale('ImpoundOption1'), {
+            { type = 'textarea', label = locale('ImpoundOption2'), required = true, },
+            { type = 'number',   label = locale('ImpoundOption3'), icon = 'dollar-sign',         min = 1 },
+            { type = 'date',     label = locale('ImpoundOption4'), icon = { 'far', 'calendar' }, default = false, format = "DD/MM/YYYY" },
+            { type = 'time',     label = locale('ImpoundOption5'), icon = { 'far', 'clock' },    default = false, format = '24' }
         })
         if not input then return end
         local data = {
@@ -214,8 +215,8 @@ end
 
 function UnpoundVehicle(plate)
     if not plate then
-        local input = lib.inputDialog(Text[Config.Lang].ImpoundOption1, {
-            { type = 'input', label = Text[Config.Lang].ImpoundOption6, description = Text[Config.Lang].ImpoundOption7, min = 1, max = 8, required = true, },
+        local input = lib.inputDialog(locale('ImpoundOption1'), {
+            { type = 'input', label = locale('ImpoundOption6'), description = locale('ImpoundOption7'), min = 1, max = 8, required = true, },
         })
         if not input then return end
         plate = input[1]
@@ -224,6 +225,7 @@ function UnpoundVehicle(plate)
         return lib.error.warning('Plate Max 8 chars')
     end
     plate = plate:upper()
+    
     ServerCallBack('changeimpound', plate)
 end
 
@@ -257,7 +259,7 @@ exports.ox_target:addGlobalVehicle({
     {
         name = 'Impound_Car',
         icon = 'fa-solid fa-warehouse',
-        label = Text[Config.Lang].ImpoundOption14,
+        label = locale('ImpoundOption14'),
         groups = impoundGroups,
         distance = 5.0,
         onSelect = function(vehicle)

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { fetchNui } from "./fetchNui";
+import { useNuiEvent } from "../hooks/useNuiEvent";
 
 interface LangData {
     [key: string]: string;
@@ -72,13 +73,18 @@ const defaultLangData: LangData = {
     GarageMenu16 : "Price per Hour",
     GarageMenu17 : "Select Grades for the Vehicle",
     
-
-
     ImpoundOption12: "You will be able to recover this vehicle",
 };
 
+
+
 const Lang = () => {
     const [lang, setLang] = useState<LangData>(defaultLangData);
+
+    useNuiEvent<LangData>('mGarage:Lang', (data) => {
+        setLang(data);
+    });
+
     useEffect(() => {
         fetchNui<LangData>('mGarage:Lang')
             .then(data => {

@@ -89,7 +89,6 @@ function Core.Player(src)
             local money = Player.getAccount(account)
             return { money = money.money }
         elseif Config.Framework == "qb" then
-            -- You Logic
             return true
         elseif Config.Framework == "qbox" then
             local Player = exports.qbx_core:GetPlayer(src)
@@ -99,10 +98,8 @@ function Core.Player(src)
                 return { money = money }
             end
         elseif Config.Framework == "standalone" then
-            -- You Logic
             return true
         elseif Config.Framework == "ox" then
-            -- You Logic
             return true
         elseif Config.Framework == "LG" then
             local playerData = Core.shared.SvPlayerFunctions.GetPlayerData(src)[1]
@@ -116,7 +113,6 @@ function Core.Player(src)
             local Player = Core.shared.GetPlayerFromId(src)
             return Player.removeAccountMoney(account, amount)
         elseif Config.Framework == "qb" then
-            -- You Logic
             return true
         elseif Config.Framework == "qbox" then
             local Player = exports.qbx_core:GetPlayer(src)
@@ -125,10 +121,8 @@ function Core.Player(src)
                 return Player.Functions.RemoveMoney(account, amount, 'Garage')
             end
         elseif Config.Framework == "standalone" then
-            -- You Logic
             return true
         elseif Config.Framework == "ox" then
-            -- You Logic
             return true
         elseif Config.Framework == "LG" then
             return Core.shared.SvPlayerFunctions.RemovePlayerMoneyCash(account, amount)
@@ -140,22 +134,19 @@ function Core.Player(src)
             local Player = Core.shared.GetPlayerFromId(src)
             return (Player.getGroup() == 'admin')
         elseif Config.Framework == "qb" then
-            -- You Logic
             return true
         elseif Config.Framework == "qbox" then
-         --  local Player = exports.qbx_core:GetPlayer(src)
-         --  if Player then
-         --      if account == 'money' then
-         --          account = 'cash'
-         --      end
-         --      return Player.Functions.RemoveMoney(account, amount, 'Garage')
-         --  end
-         return true
+            --  local Player = exports.qbx_core:GetPlayer(src)
+            --  if Player then
+            --      if account == 'money' then
+            --          account = 'cash'
+            --      end
+            --      return Player.Functions.RemoveMoney(account, amount, 'Garage')
+            --  end
+            return true
         elseif Config.Framework == "standalone" then
-            -- You Logic
             return true
         elseif Config.Framework == "ox" then
-            -- You Logic
             return true
         elseif Config.Framework == "LG" then
             return Core.shared.SvPlayerFunctions.GetPlayerGroup(src)
@@ -187,13 +178,10 @@ function Core.Player(src)
                 return { name = job, grade = tonumber(grade), gradeName = grade_name }
             end
         elseif Config.Framework == "qb" then
-            -- You Logic
             return true
         elseif Config.Framework == "standalone" then
-            -- You Logic
             return true
         elseif Config.Framework == "ox" then
-            -- You Logic
             return true
         elseif Config.Framework == "LG" then
             local PlayerData = Core.SvPlayerFunctions.GetPlayerData(src)[1]
@@ -211,7 +199,7 @@ function Core.SetSotcietyMoney(society, ammount)
             account.addMoney(ammount)
         end)
     elseif Config.Framework == "qbox" then
-     
+
     elseif Config.Framework == "qb" then
 
     elseif Config.Framework == "standalone" then
@@ -224,17 +212,21 @@ function Core.SetSotcietyMoney(society, ammount)
 end
 
 -- StandAlone uses the same table as ESX
--- Qbox add stored, type, keys
 
 local query = {
     ['esx'] = {
         queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1',
-        queryStore2 = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
+        queryStore2 =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
+        queryImpound =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `coords` = NULL, metadata = ? WHERE `plate` = ?'
     },
 
     ['qbox'] = {
         queryStore1 = 'SELECT `license`, `keys` FROM `player_vehicles` WHERE `plate` = ? LIMIT 1',
         queryStore2 = 'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 1, `mods` = ?, type = ? WHERE `plate` = ? ',
+        queryImpound =
+        'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, `coords` = NULL, metadata = ? WHERE `plate` = ?'
     },
 
     ['ox'] = {
@@ -243,7 +235,23 @@ local query = {
 
     ['qb'] = {
 
-    }
+    },
+
+    ['standalone'] = {
+        queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1',
+        queryStore2 =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
+        queryImpound =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `coords` = NULL, metadata = ? WHERE `plate` = ?'
+    },
+
+    ['LG'] = {
+        queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1',
+        queryStore2 =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
+        queryImpound =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `coords` = NULL, metadata = ? WHERE `plate` = ?'
+    },
 }
 
-Querys = Config.Framework == 'standalone' or 'LG' and query['esx'] or query[Config.Framework]
+Querys = query[Config.Framework]

@@ -11,7 +11,7 @@ local NewZone = {}
 function CreateZone(polyzoneName, cb)
   local playerPed = cache.ped
   if not isOpenCretor then
-    lib.showTextUI(Text[Config.Lang].TextUiCreateZone)
+    lib.showTextUI(locale('TextUiCreateZone'))
     currentZoneName = polyzoneName;
     local x, y, z = table.unpack(GetGameplayCamCoord())
     local pitch, roll, yaw = table.unpack(GetGameplayCamRot(2))
@@ -272,7 +272,7 @@ function CopyCoords(action, cb)
   local finalHeight
   local ActiveEntity = nil
   local PedHed = 0.0
-  lib.showTextUI(Text[Config.Lang].TextUiCoords)
+  lib.showTextUI(locale('TextUiCoords'))
 
   local Clone = function()
     viewEntity = ClonePed(ped, false, false, true)

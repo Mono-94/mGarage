@@ -1,5 +1,7 @@
 Core = nil
 
+
+
 function LoadCore()
     if Config.Framework == "esx" then
         Core = exports["es_extended"]:getSharedObject()

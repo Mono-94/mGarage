@@ -22,9 +22,12 @@ server_scripts {
 }
 
 files {
+  'locales/*.json',
   'web/build/index.html',
   'web/build/**/*',
 }
+
+ox_libs { 'locale' }
 
 ui_page 'web/build/index.html'
 

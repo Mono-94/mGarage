@@ -1,7 +1,15 @@
-
  [![discord](https://img.shields.io/badge/Join-Discord-blue?logo=discord&logoColor=white)](https://discord.gg/Vk7eY8xYV2)
  ![Discord](https://img.shields.io/discord/1048630711881568267?style=flat&label=Online%20Users)
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FMono-94%2FmGarage&count_bg=%23E9A711&title_bg=%23232323&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
+![License](https://img.shields.io/github/license/Mono-94/mGarage)
+![Open Issues](https://img.shields.io/github/issues-raw/Mono-94/mGarage?label=open%20issues)
+![Closed Issues](https://img.shields.io/github/issues-closed-raw/Mono-94/mGarage?color=success&amp;label=closed%20issues)
+![Open PRs](https://img.shields.io/github/issues-pr-raw/Mono-94/mGarage?label=open%20PRs)
+![Closed PRs](https://img.shields.io/github/issues-pr-closed-raw/Mono-94/mGarage?color=success&amp;label=closed%20PRs)
+![Stars](https://img.shields.io/github/stars/Mono-94/mGarage?style=social)
+![Forks](https://img.shields.io/github/forks/Mono-94/mGarage?style=social)
+![Repo Size](https://img.shields.io/github/repo-size/Mono-94/mGarage)
+
 
 # mGarage
 

@@ -2,13 +2,11 @@ Config = {}
 
 Config.Debug = false
 
-Config.Lang = 'EN'           -- ES / EN
-
 Config.Framework = 'esx'     -- esx/ox/standalone/qbox/qb
 
 Config.DefaultGarages = true -- Config Garages ???
 
-Config.CarkeysItem = true
+Config.CarkeysItem = false
 
 Config.ClearTimeBlip = 1000 * 120 -- 2 mins
 
@@ -20,7 +18,7 @@ Config.BlipDefault = {
     size = 0.5,
 }
 
---  👍 
+--  👍 🕺
 Config.PedAnims = {
     anims = true,
     list = {
@@ -175,7 +173,6 @@ Config.GaragesDefault = {
         }
     },
 
-
     --Air
     {
         name = "Los Santos Airport Garage",
@@ -307,7 +304,7 @@ Config.GaragesDefault = {
         platePrefix = 'LSPD',
         defaultCars = {
             { model = 'police',  grades = { 1, 2, 3, 4 } }, -- Grandes for jobs
-            { model = 'police2', grades = { 'boss' } },         -- Grandes for jobs
+            { model = 'police2', grades = { 'boss' } },     -- Grandes for jobs
         },
         actioncoords = vec4(457.27026367188, -1007.4309082031, 27.297456741333, 195.85415649414),
         npchash = 'csb_trafficwarden',

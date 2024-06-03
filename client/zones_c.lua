@@ -162,7 +162,7 @@ function CreateGarage(data)
                         {
                             id = 'garage_save',
                             icon = 'warehouse',
-                            label = Text[Config.Lang].TargetSaveCar,
+                            label = locale('TargetSaveCar'),
                             onSelect = function()
                                 SaveCar(data)
                             end
@@ -183,7 +183,7 @@ function CreateGarage(data)
                     {
                         name = 'mGarage:SaveTarget' .. data.name,
                         icon = 'fa-solid fa-road',
-                        label = Text[Config.Lang].TargetSaveCar,
+                        label = locale('TargetSaveCar'),
                         groups = data.job,
                         distance = 3.0,
                         onSelect = function(vehicle)

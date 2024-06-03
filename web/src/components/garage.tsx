@@ -3,7 +3,7 @@ import { useNuiEvent } from "../hooks/useNuiEvent";
 import { fetchNui } from "../utils/fetchNui";
 import { debugData } from "../utils/debugData";
 import SearchBox from "./lit/search";
-import { Accordion, CloseButton } from '@mantine/core';
+import { Accordion, Center, CloseButton } from '@mantine/core';
 import Vehicles from "./vehicle";
 import './index.scss'
 
@@ -39,24 +39,31 @@ const Garage: React.FC = () => {
 
 
             <div className="content">
-                <Accordion variant="separated" transitionDuration={700}
-                    styles={{
-                        item: {
-                            backgroundColor: '#2e3036',
-                            padding: 5,
-                        },
-                    }}
-                >
-                    {filteredVehicles.map((vehicle, index) => (
-                        <Vehicles
-
-                            key={index}
-                            index={index}
-                            vehicle={vehicle}
-                            garage={dataGarage}
-                        />
-                    ))}
-                </Accordion>
+                {filteredVehicles.length > 0 ? (
+                    <Accordion variant="separated" transitionDuration={700}
+                        styles={{
+                            item: {
+                                backgroundColor: '#2e3036',
+                            },
+                            content: {
+                                padding: 5,
+                            },
+                        }}
+                    >
+                        {filteredVehicles.map((vehicle, index) => (
+                            <Vehicles
+                                key={index}
+                                index={index}
+                                vehicle={vehicle}
+                                garage={dataGarage}
+                            />
+                        ))}
+                    </Accordion>
+                ) : (
+                    <Center  h={100} mx="auto">
+                        <div>😢</div>
+                    </Center>
+                )}
 
             </div>
         </div>
@@ -68,11 +75,11 @@ export default Garage;
 debugData([
     {
         action: "setVisibleGarage",
-        data: false
+        data: true
     },
     {
         action: "setVisibleMenu",
-        data: true,
+        data: false,
     },
     {
         action: "GarageZones",
@@ -159,7 +166,7 @@ debugData([
                 "TargetId": 2,
                 "points": [{ "w": 0.0, "z": 0.0, "y": 0.0, "x": 0.0 }],
                 "priceImpound": 232,
-                "garagetype": "custom",
+                "garagetype": "garage",
                 "intocar": false,
                 "npchash": "csb_trafficwarden",
                 "debug": false,
@@ -198,6 +205,7 @@ debugData([
                     "engineHealth": 90,
                     "fuelLevel": 1,
                     "bodyHealth": 82,
+                    "fakeplate": "BRBRBRBR",
                 },
                 {
                     "isOwner": true,
@@ -215,6 +223,7 @@ debugData([
                     "engineHealth": 90,
                     "fuelLevel": 1,
                     "bodyHealth": 82,
+                    "fakeplate": null,
                 },
                 {
                     "isOwner": false,
