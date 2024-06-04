@@ -437,6 +437,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             setOwner = false,
             intocar = data.garage.intocar and source,
             owner = identifier,
+            keys = {[identifier] = identifier},
             coords = coords.coords,
             vehicle = {
                 model = model,
