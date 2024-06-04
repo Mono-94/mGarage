@@ -1,4 +1,3 @@
-
 local VehicleTypes = {
     ['car'] = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
     ['boat'] = { 'submarine', 'submarinecar', 'boat' },
@@ -145,7 +144,11 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             action.RetryVehicle(coords.coords)
 
             if Config.CarkeysItem then
-                Vehicles.ItemCarKeys(source, 'add', vehicle.plate)
+                if vehicledata.metadata.fakeplate then
+                    Vehicles.ItemCarKeys(source, 'add', vehicledata.metadata.fakeplate)
+                else
+                    Vehicles.ItemCarKeys(source, 'add', vehicle.plate)
+                end
             end
             retval = true
         end
@@ -182,7 +185,12 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             end
             if Vehicle.owner == identifier or Vehicle.keys[identifier] then
                 if Config.CarkeysItem then
-                    Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
+                    local fakepalte = Vehicle.GetMetadata('fakeplate')
+                    if fakepalte then
+                        Vehicles.ItemCarKeys(source, 'delete', fakepalte)
+                    else
+                        Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
+                    end
                 end
                 return Vehicle.StoreVehicle(data.name)
             else
@@ -217,7 +225,6 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 MySQL.update(Querys.queryStore2, { data.name, data.props, VehicleType, data.plate },
                     function(affectedRows)
                         if affectedRows then
-                           
                             if Config.CarkeysItem then
                                 Vehicles.ItemCarKeys(source, 'remove', data.plate)
                             end
@@ -251,7 +258,8 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         local entity = NetworkGetEntityFromNetworkId(data.entity)
         local Vehicle = Vehicles.GetVehicle(entity)
         if Vehicle then
-            Vehicle.ImpoundVehicle(data.garage, infoimpound.price, infoimpound.reason, infoimpound.time, infoimpound.endPound)
+            Vehicle.ImpoundVehicle(data.garage, infoimpound.price, infoimpound.reason, infoimpound.time,
+                infoimpound.endPound)
         else
             local plate = GetVehicleNumberPlateText(entity)
             local row = Vehicles.GetVehicleByPlateDB(plate)
