@@ -84,7 +84,7 @@
     "ImpoundOption11": "Embargo canceled!",
     "ImpoundOption12": "You will be able to recover this vehicle",
     "ImpoundOption13": "Remaining impound time  \n  **%s days, %s hours, %s minutes**",
-    "ImpoundOption14": "Incautar",
+    "ImpoundOption14": "Impound",
     "GarageCreate1": "mGarage CREATE",
     "GarageCreate2": "mGarage DELETE",
     "GarageCreate3": "mGarage UPDATE",

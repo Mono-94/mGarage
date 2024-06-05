@@ -226,7 +226,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                     function(affectedRows)
                         if affectedRows then
                             if Config.CarkeysItem then
-                                Vehicles.ItemCarKeys(source, 'remove', data.plate)
+                                Vehicles.ItemCarKeys(source, 'delete', data.plate)
                             end
                             DeleteEntity(entity)
                         end
