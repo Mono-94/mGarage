@@ -257,11 +257,6 @@ function PlayCam(distance)
   return hit, coords, entity, a, d
 end
 
-RegisterCommand('gc', function(source, args, raw)
-  CopyCoords('multi', function(coords, tostring)
-    lib.setClipboard(tostring)
-  end)
-end)
 
 function CopyCoords(action, cb, textui)
   local viewEntity
