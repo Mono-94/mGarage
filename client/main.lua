@@ -23,40 +23,42 @@ function OpenGarage(data)
     local Vehicles = {}
     if data.garagetype == 'impound' or data.garagetype == 'garage' then
         if getVehicles.vehicles then
-            if #getVehicles.vehicles <= 0 then
-                return Notification({ title = data.name, description = locale('noVehicles') })
-            end
 
             for i = 1, #getVehicles.vehicles do
                 local row = getVehicles.vehicles[i]
-                local props = json.decode(row.vehicle)
-                row.vehlabel = VehicleLabel(props.model)
-                row.seats = GetVehicleModelNumberOfSeats(props.model)
-                row.metadata = json.decode(row.metadata)
-                row.fuelLevel = props.fuelLevel
-                if row.metadata and row.metadata.fakeplate then
-                    row.fakeplate = row.metadata.fakeplate
-                end
-                if props.bodyHealth and props.engineHealth then
-                    row.engineHealth = props.bodyHealth / 10
-                    row.bodyHealth = props.engineHealth / 10
-                else
-                    row.engineHealth = 100
-                    row.bodyHealth = 100
-                end
-
-                row.mileage = row.mileage / 100
-
-                if data.garagetype == 'impound' then
-                    if row.pound and row.stored == 0 then
-                        row.infoimpound = json.encode(row.metadata.pound)
-                        table.insert(Vehicles, row)
+                if not row.private then
+                    local props = json.decode(row.vehicle)
+                    row.vehlabel = VehicleLabel(props.model)
+                    row.seats = GetVehicleModelNumberOfSeats(props.model)
+                    row.metadata = json.decode(row.metadata)
+                    row.fuelLevel = props.fuelLevel
+                    if row.metadata and row.metadata.fakeplate then
+                        row.fakeplate = row.metadata.fakeplate
                     end
-                else
-                    if not data.pound then
-                        table.insert(Vehicles, row)
+                    if props.bodyHealth and props.engineHealth then
+                        row.engineHealth = props.bodyHealth / 10
+                        row.bodyHealth = props.engineHealth / 10
+                    else
+                        row.engineHealth = 100
+                        row.bodyHealth = 100
+                    end
+
+                    row.mileage = row.mileage / 100
+
+                    if data.garagetype == 'impound' then
+                        if row.pound and row.stored == 0 then
+                            row.infoimpound = json.encode(row.metadata.pound)
+                            table.insert(Vehicles, row)
+                        end
+                    else
+                        if not data.pound then
+                            table.insert(Vehicles, row)
+                        end
                     end
                 end
+            end
+            if #Vehicles <= 0 then
+                return Notification({ title = data.name, description = locale('noVehicles') })
             end
             SendNUI('garage', { vehicles = Vehicles, garage = data })
 
@@ -225,7 +227,7 @@ function UnpoundVehicle(plate)
         return lib.error.warning('Plate Max 8 chars')
     end
     plate = plate:upper()
-    
+
     ServerCallBack('changeimpound', plate)
 end
 
@@ -263,6 +265,7 @@ exports.ox_target:addGlobalVehicle({
         groups = impoundGroups,
         distance = 5.0,
         onSelect = function(vehicle)
+            print(GetJob().name)
             ImpoundVehicle({
                 vehicle = vehicle.entity,
                 impoundName = Config.TargetImpound[GetJob().name].impoundName

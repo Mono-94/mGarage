@@ -3,15 +3,50 @@ import { useNuiEvent } from "../hooks/useNuiEvent";
 import { fetchNui } from "../utils/fetchNui";
 import { debugData } from "../utils/debugData";
 import SearchBox from "./lit/search";
-import { Accordion, Center, CloseButton } from '@mantine/core';
+import { Accordion, Center, CloseButton, ScrollArea, createStyles, rem } from '@mantine/core';
 import Vehicles from "./vehicle";
 import './index.scss'
 
 
-const Garage: React.FC = () => {
+const useStyles = createStyles((theme) => ({
+    root: {
+        padding: 0,
+    },
+
+    item: {
+        padding: 5,
+        backgroundColor: '#1A1B1E',
+        borderRadius: 10,
+        marginBottom: '5px',
+
+        '&[data-active]': {
+            backgroundColor: '#1A1B1E',
+        },
+    },
+
+    content: {
+        padding: 0
+    },
+
+    label: {
+        padding: 7,
+    },
+
+    chevron: {
+        '&[data-rotate]': {
+            transform: 'rotate(-90deg)',
+
+        },
+    },
+}));
+
+
+const Garage: React.FC<{ visible: boolean }> = ({ visible }) => {
+
     const [dataGarage, GarageData] = useState<any>({});
     const [vehiclesData, setVehicleData] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [activeAccordion, setActiveAccordion] = useState<string | null>(null);
 
     useNuiEvent<any>('garage', (data) => {
         GarageData(data.garage);
@@ -20,6 +55,7 @@ const Garage: React.FC = () => {
 
 
     const handleClose = async () => {
+        setActiveAccordion(null);
         fetchNui('mGarage:Close', { name: 'setVisibleGarage' });
     };
 
@@ -27,28 +63,29 @@ const Garage: React.FC = () => {
         (vehicle.plate && vehicle.plate.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (vehicle.vehlabel && vehicle.vehlabel.toLowerCase().includes(searchTerm.toLowerCase()))
     );
-
+    const { classes } = useStyles();
     return (
 
-        <div className="Garage">
+        <div className={`Garage ${visible ? 'slide-in' : 'slide-out'}`}>
+
             <div className="Garage-head">
-                <div className="overflow-ellipsis">{dataGarage.name}</div>
-                <div style={{ width: 'auto' }}><SearchBox searchTerm={searchTerm} setSearchTerm={setSearchTerm} /></div>
-                <div style={{ width: 'auto' }}> <CloseButton size={'md'} onClick={handleClose} color="red" /></div>
+                <div className="name">{dataGarage.name}</div>
+                <SearchBox searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+                <CloseButton radius={10} size={'md'} onClick={handleClose} color="red" variant="light" />
             </div>
 
-
-            <div className="content">
+            <ScrollArea mah={440} scrollbarSize={0}>
                 {filteredVehicles.length > 0 ? (
-                    <Accordion variant="separated" transitionDuration={700}
-                        styles={{
-                            item: {
-                                backgroundColor: '#2e3036',
-                            },
-                            content: {
-                                padding: 5,
-                            },
-                        }}
+                    <Accordion
+                        variant="filled"
+                        defaultValue="customization"
+                        classNames={classes}
+                        className={classes.root}
+                        transitionDuration={500}
+                        mah={490}
+                        value={activeAccordion}
+                        onChange={setActiveAccordion}
+
                     >
                         {filteredVehicles.map((vehicle, index) => (
                             <Vehicles
@@ -56,31 +93,25 @@ const Garage: React.FC = () => {
                                 index={index}
                                 vehicle={vehicle}
                                 garage={dataGarage}
+                                Close={handleClose}
+
                             />
                         ))}
                     </Accordion>
                 ) : (
-                    <Center  h={100} mx="auto">
+                    <Center h={100} mx="auto" sx={{ backgroundColor: '#1A1B1E' }}>
                         <div>😢</div>
                     </Center>
                 )}
+            </ScrollArea>
 
-            </div>
-        </div>
+        </div >
     );
 };
 
 export default Garage;
 
 debugData([
-    {
-        action: "setVisibleGarage",
-        data: true
-    },
-    {
-        action: "setVisibleMenu",
-        data: false,
-    },
     {
         action: "GarageZones",
         data: [
@@ -166,7 +197,7 @@ debugData([
                 "TargetId": 2,
                 "points": [{ "w": 0.0, "z": 0.0, "y": 0.0, "x": 0.0 }],
                 "priceImpound": 232,
-                "garagetype": "garage",
+                "garagetype": "impound",
                 "intocar": false,
                 "npchash": "csb_trafficwarden",
                 "debug": false,
@@ -206,40 +237,6 @@ debugData([
                     "fuelLevel": 1,
                     "bodyHealth": 82,
                     "fakeplate": "BRBRBRBR",
-                },
-                {
-                    "isOwner": true,
-                    "infoimpound": "{\"date\":\"2024-04-11 21:03:45\",\"reason\":\"Lorem ipsum, dolor sit amet consectetur adipisicing elit. Modi ad similique incidunt praesentium voluptatem quam. Quae odit est perferendis soluta eum modi. In, corporis quod cum quis quaerat laborum quasi.\",\"price\":10}",
-                    "pound": 0,
-                    "seats": 4,
-                    "stored": 0,
-                    "vehlabel": 'Karin Sultan',
-                    "model2": 'sultan',
-                    "plate": "MONO 735s",
-                    "mileage": 6534.24,
-                    "id": 8,
-                    "parking": "Impound",
-                    "ownername": "Mono Test",
-                    "engineHealth": 90,
-                    "fuelLevel": 1,
-                    "bodyHealth": 82,
-                    "fakeplate": null,
-                },
-                {
-                    "isOwner": false,
-                    "infoimpound": "{\"date\":\"2024-04-11 21:03:45\",\"reason\":\"Lorem ipsum, dolor sit amet consectetur adipisicing elit. Modi ad similique incidunt praesentium voluptatem quam. Quae odit est perferendis soluta eum modi. In, corporis quod cum quis quaerat laborum quasi.\",\"price\":10}",
-                    "pound": 1,
-                    "seats": 4,
-                    "stored": 0,
-                    "vehlabel": 'Karin Sultan',
-                    "plate": "MONO 420",
-                    "mileage": 12.32,
-                    "id": 8,
-                    "parking": "Impound",
-                    "ownername": "Mono Test",
-                    "engineHealth": 34,
-                    "fuelLevel": 68,
-                    "bodyHealth": 82,
                 },
             ]
         },

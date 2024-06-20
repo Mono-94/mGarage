@@ -9,8 +9,10 @@ import { Tabs, Paper, ScrollArea, CloseButton } from '@mantine/core';
 import { IconList, IconPlus } from '@tabler/icons-react';
 
 
-const Menu: React.FC = () => {
+const Menu: React.FC<{ visible: boolean }> = ({ visible }) =>{
+    
     const [garages, setGarageData] = useState<any[]>([]);
+
     const lang = Lang();
 
     const handleClose = async () => {
@@ -20,14 +22,7 @@ const Menu: React.FC = () => {
     useNuiEvent<any[]>('GarageZones', (data) => { setGarageData(data); });
 
     return (
-        <Paper p='xs'   style={{
-            width: '600px',
-            height: 'auto',
-            position: 'fixed',
-            top: '50%',
-            right: '10px',
-            transform: 'translateY(-50%)',
-        }}>
+        <Paper className={`menu ${visible ? 'slide-in' : 'slide-out'}`}>
             <Tabs variant="outline" defaultValue="create">
                 <Tabs.List >
                     <Tabs.Tab value="create" icon={<IconPlus size="0.8rem" />}>{lang.GarageButton4}</Tabs.Tab>

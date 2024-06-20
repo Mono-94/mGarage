@@ -437,7 +437,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             setOwner = false,
             intocar = data.garage.intocar and source,
             owner = identifier,
-            keys = {[identifier] = identifier},
+            keys = { [identifier] = identifier },
             coords = coords.coords,
             vehicle = {
                 model = model,
@@ -483,7 +483,8 @@ end)
 
 
 RegisterServerEvent('mGarage:Server:TaskLeaveVehicle', function(peds)
-    for k, v in pairs(peds) do
-        TriggerClientEvent('mGarage:Client:TaskLeaveVehicle', v)
+    --for k, v in pairs(peds) do
+    for i = 1, #peds do
+        TriggerClientEvent('mGarage:Client:TaskLeaveVehicle', i)
     end
 end)

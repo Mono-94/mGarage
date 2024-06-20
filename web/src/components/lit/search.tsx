@@ -25,7 +25,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ searchTerm, setSearchTerm }) => {
     return (
         <div className="search">
             <a className="search-btn" href="#" onClick={handleSearchClick}>
-                {isSearchEmpty ? <IconSearch  size={20}/> : <IconX  size={20}/>}
+                {isSearchEmpty ? <IconSearch  size={17} /> : <IconX  size={17} color='red'/>}
             </a>
             <input
                 type="text"

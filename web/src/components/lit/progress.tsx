@@ -1,5 +1,6 @@
 import React from 'react';
-import { Progress, Text, Flex, Paper } from '@mantine/core';
+import { Progress, Text, Flex, Paper, RingProgress, Center, ThemeIcon, Tooltip } from '@mantine/core';
+import { IconCheck } from '@tabler/icons-react';
 
 interface ProgressBarProps {
     value: number;
@@ -20,18 +21,29 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ value, text, icon }) => {
     const fuelColor = getProgressColor(value);
 
     return (
-        <Paper style={{ backgroundColor: '#373A40', padding:5 }} >
-            <Flex justify="space-between" style={{ marginBottom: 5 }}><Text fz="sm">{text}</Text><Text fz="sm"> {icon}</Text></Flex>
-            <Progress
-                sx={{ backgroundColor: '#14141486' }}
-                value={value}
+        <Tooltip sx={{ padding: '2px 10px', borderRadius: 7 }} openDelay={400} label={`${text}: ${value}%`} color={fuelColor} >
+            <RingProgress
                 color={fuelColor}
-                radius={5}
+                size={50}
+                thickness={3}
                 sections={[
-                    { value: value, color: fuelColor, tooltip: `${value}%` },
+                    { value: value, color: fuelColor }
                 ]}
+                label={
+                    <Center >
+
+                        <ThemeIcon color={fuelColor} variant="light" radius="xl" size={30}>
+
+                            {icon}
+
+                        </ThemeIcon>
+
+                    </Center>
+
+                }
             />
-        </Paper>
+        </Tooltip >
+
     );
 };
 
