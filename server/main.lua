@@ -192,7 +192,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                         Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
                     end
                 end
-                return Vehicle.StoreVehicle(data.name)
+                return Vehicle.StoreVehicle(data.name, data.props)
             else
                 Player.Notify({
                     title = data.name,
