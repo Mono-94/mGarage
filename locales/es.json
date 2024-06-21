@@ -140,5 +140,7 @@
     "private_manage_s12": "Te dieron permiso para entrar al garaje %s",
     "private_manage_s13": "Accesor retirado a %s",
     "private_manage_s14": "",
-    "private_manage_s15": ""
+    "private_manage_s15": "",
+    "private_ui1": "Slots:"
+
 }

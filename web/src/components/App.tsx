@@ -5,19 +5,20 @@ import { fetchNui } from '../utils/fetchNui';
 import { useNuiEvent } from '../hooks/useNuiEvent';
 import { debugData } from '../utils/debugData';
 import { isEnvBrowser } from '../utils/misc';
+import BuyGarage from './buyprivate';
 
 debugData([
   {
     action: 'setVisibleGarage',
-    data: true
+    data: false
   },
   {
     action: 'setVisibleMenu',
     data: false
   },
   {
-    action: 'setVisibleMenuKeys',
-    data: false
+    action: 'setVisibleBuy',
+    data: true
   }
 ], 100);
 
@@ -25,15 +26,21 @@ debugData([
 const App: React.FC = () => {
   const [garageVisible, setGarageVisible] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [buyVisible, setbuyVisible] = useState(false);
 
   useNuiEvent<boolean>('setVisibleGarage', (isVisible) => {
     setGarageVisible(isVisible);
-    if (isVisible) setMenuVisible(false); 
+    if (isVisible) setMenuVisible(false);
   });
 
   useNuiEvent<boolean>('setVisibleMenu', (isVisible) => {
     setMenuVisible(isVisible);
-    if (isVisible) setGarageVisible(false); 
+    if (isVisible) setGarageVisible(false);
+  });
+
+  useNuiEvent<boolean>('setVisibleBuy', (isVisible) => {
+    setbuyVisible(isVisible);
+    if (isVisible) setGarageVisible(false);
   });
 
   useEffect(() => {
@@ -44,10 +51,13 @@ const App: React.FC = () => {
             fetchNui('mGarage:Close', { name: 'setVisibleGarage' });
           } else if (menuVisible) {
             fetchNui('mGarage:Close', { name: 'setVisibleMenu' });
+          } else if (buyVisible) {
+            fetchNui('mGarage:Close', { name: 'setVisibleBuy' });
           }
         } else {
           setGarageVisible(false);
           setMenuVisible(false);
+          setbuyVisible(false);
         }
       }
     };
@@ -63,6 +73,8 @@ const App: React.FC = () => {
     <>
       <Menu visible={menuVisible} />
       <Garage visible={garageVisible} />
+      <BuyGarage visible={buyVisible} />
+
     </>
   );
 };
