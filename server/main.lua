@@ -183,7 +183,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                     return false
                 end
             end
-            if Vehicle.owner == identifier or Vehicle.keys[identifier] then
+            if Vehicle.owner == identifier or Vehicle.keys and Vehicle.keys[identifier] then
                 if Config.CarkeysItem then
                     local fakepalte = Vehicle.GetMetadata('fakeplate')
                     if fakepalte then
@@ -192,13 +192,15 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                         Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
                     end
                 end
-                return Vehicle.StoreVehicle(data.name, data.props)
+                Vehicle.StoreVehicle(data.name, data.props)
+                return true
             else
                 Player.Notify({
                     title = data.name,
                     description = locale('notYourVehicle'),
                     type = 'error',
                 })
+                return false
             end
         else
             data.plate = GetVehicleNumberPlateText(entity)
@@ -206,13 +208,12 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             local row = MySQL.single.await(Querys.queryStore1, { data.plate })
 
             if not row then
-                return false,
-
-                    Player.Notify({
-                        title = data.name,
-                        description = locale('notYourVehicle'),
-                        type = 'error',
-                    })
+                Player.Notify({
+                    title = data.name,
+                    description = locale('notYourVehicle'),
+                    type = 'error',
+                })
+                return false
             end
 
             if data.job then
@@ -479,11 +480,8 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
     return retval
 end)
 
-
-
-
 RegisterServerEvent('mGarage:Server:TaskLeaveVehicle', function(peds)
-    --for k, v in pairs(peds) do
+  
     for i = 1, #peds do
         TriggerClientEvent('mGarage:Client:TaskLeaveVehicle', i)
     end

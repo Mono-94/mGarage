@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { fetchNui } from "../utils/fetchNui";
+import { fetchNui } from '../../utils/fetchNui';
 import { CloseButton, Group, Stack, Text, Paper, Image, Badge, Button, Space, Checkbox } from '@mantine/core';
-import { useNuiEvent } from '../hooks/useNuiEvent';
-import Lang from '../utils/LangR';
-import { debugData } from '../utils/debugData';
+import { useNuiEvent } from '../../hooks/useNuiEvent';
+import Lang from '../../utils/LangR';
+import { debugData } from '../../utils/debugData';
 import { IconMoneybag } from '@tabler/icons-react';
 
 debugData([
@@ -42,6 +42,7 @@ debugData([
         }
     }
 ], 100);
+
 const BuyGarage: React.FC<{ visible: boolean }> = ({ visible }) => {
     const lang = Lang();
     const [garageData, setGarageData] = useState<any>(null);
@@ -90,7 +91,7 @@ const BuyGarage: React.FC<{ visible: boolean }> = ({ visible }) => {
 
     return (
         <div className={`Garage ${visible ? 'slide-in' : 'slide-out'}`}>
-            <Paper shadow="md" radius="lg" p="xs">
+            <Paper shadow="md" radius={10} p="xs">
                 <Group>
                     <Text weight={500} size="lg">{garageData.name}</Text>
                     <CloseButton radius={10} size={'md'} onClick={handleClose} color="red" variant="light" style={{ marginLeft: 'auto' }} />
@@ -98,8 +99,8 @@ const BuyGarage: React.FC<{ visible: boolean }> = ({ visible }) => {
                 <Space h="md" />
                 <Stack>
                     <Group position='apart'>
-                        <Badge color="green" size="lg">${garageData.price}</Badge>
-                        <Badge color="blue" size="lg">{lang.private_ui1} {slotCount}</Badge>
+                        <Badge color="green" radius={7} size="lg">{lang.private_manage21} $ {garageData.price.toLocaleString('en-US')}</Badge>
+                        <Badge color="blue" radius={7} size="lg">{lang.private_ui1} {slotCount}</Badge>
                     </Group>
 
                     <Image src={garageData.interiorData.image} alt={garageData.name} withPlaceholder radius={10} />
@@ -116,7 +117,7 @@ const BuyGarage: React.FC<{ visible: boolean }> = ({ visible }) => {
                             onChange={() => handlePaymentChange('bank')}
                         />
                     </Group>
-                    <Button   color='teal' variant="light" radius={10} leftIcon={<IconMoneybag size={20}/>} onClick={handleBuy} fullWidth>Buy</Button>
+                    <Button color='teal' radius={7} variant="light" leftIcon={<IconMoneybag size={20} />} onClick={handleBuy} fullWidth>Buy</Button>
                 </Stack>
             </Paper>
         </div>

@@ -3,30 +3,15 @@ import Garage from './garage';
 import Menu from './menu';
 import { fetchNui } from '../utils/fetchNui';
 import { useNuiEvent } from '../hooks/useNuiEvent';
-import { debugData } from '../utils/debugData';
 import { isEnvBrowser } from '../utils/misc';
-import BuyGarage from './buyprivate';
-
-debugData([
-  {
-    action: 'setVisibleGarage',
-    data: false
-  },
-  {
-    action: 'setVisibleMenu',
-    data: false
-  },
-  {
-    action: 'setVisibleBuy',
-    data: true
-  }
-], 100);
+import BuyGarage from './private/buyprivate';
+import VisibilityButtons from './mono';
 
 
 const App: React.FC = () => {
   const [garageVisible, setGarageVisible] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
-  const [buyVisible, setbuyVisible] = useState(false);
+  const [buyVisible, setBuyVisible] = useState(false);
 
   useNuiEvent<boolean>('setVisibleGarage', (isVisible) => {
     setGarageVisible(isVisible);
@@ -39,13 +24,31 @@ const App: React.FC = () => {
   });
 
   useNuiEvent<boolean>('setVisibleBuy', (isVisible) => {
-    setbuyVisible(isVisible);
+    setBuyVisible(isVisible);
     if (isVisible) setGarageVisible(false);
   });
 
+  const handleShowGarage = () => {
+    setGarageVisible(true);
+    setMenuVisible(false);
+    setBuyVisible(false);
+  };
+
+  const handleShowMenu = () => {
+    setGarageVisible(false);
+    setMenuVisible(true);
+    setBuyVisible(false);
+  };
+
+  const handleShowBuy = () => {
+    setGarageVisible(false);
+    setMenuVisible(false);
+    setBuyVisible(true);
+  };
+
   useEffect(() => {
     const keyHandler = (e: KeyboardEvent) => {
-      if ((garageVisible || menuVisible) && e.code === 'Escape') {
+      if ((garageVisible || menuVisible || buyVisible) && e.code === 'Escape') {
         if (!isEnvBrowser()) {
           if (garageVisible) {
             fetchNui('mGarage:Close', { name: 'setVisibleGarage' });
@@ -57,7 +60,7 @@ const App: React.FC = () => {
         } else {
           setGarageVisible(false);
           setMenuVisible(false);
-          setbuyVisible(false);
+          setBuyVisible(false);
         }
       }
     };
@@ -67,17 +70,23 @@ const App: React.FC = () => {
     return () => {
       window.removeEventListener('keydown', keyHandler);
     };
-  }, [garageVisible, menuVisible]);
+  }, [garageVisible, menuVisible, buyVisible]);
 
   return (
     <>
+     <VisibilityButtons 
+        handleShowGarage={handleShowGarage}
+        handleShowMenu={handleShowMenu}
+        handleShowBuy={handleShowBuy}
+        garageVisible={garageVisible}
+        menuVisible={menuVisible}
+        buyVisible={buyVisible}
+      />
       <Menu visible={menuVisible} />
       <Garage visible={garageVisible} />
       <BuyGarage visible={buyVisible} />
-
     </>
   );
 };
 
 export default App;
-

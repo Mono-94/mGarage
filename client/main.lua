@@ -23,7 +23,7 @@ function OpenGarage(data)
     local Vehicles = {}
     if data.garagetype == 'impound' or data.garagetype == 'garage' then
         if getVehicles.vehicles then
-
+            print(#getVehicles.vehicles)
             for i = 1, #getVehicles.vehicles do
                 local row = getVehicles.vehicles[i]
                 if not row.private then
@@ -32,8 +32,13 @@ function OpenGarage(data)
                     row.seats = GetVehicleModelNumberOfSeats(props.model)
                     row.metadata = json.decode(row.metadata)
                     row.fuelLevel = props.fuelLevel
-                    if row.metadata and row.metadata.fakeplate then
-                        row.fakeplate = row.metadata.fakeplate
+                    if row.metadata then
+                        if row.metadata.fakeplate then
+                            row.fakeplate = row.metadata.fakeplate
+                        end
+                        if row.metadata.vehname then
+                            row.vehlabel = row.metadata.vehname
+                        end
                     end
                     if props.bodyHealth and props.engineHealth then
                         row.engineHealth = props.bodyHealth / 10
