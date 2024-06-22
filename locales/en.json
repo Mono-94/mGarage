@@ -141,5 +141,8 @@
     "private_manage_s13": "Accesor retirado a %s",
     "private_manage_s14": "",
     "private_manage_s15": "",
-    "private_ui1": "Slots:"
+    "private_ui1": "Slots:",
+    "ui_name1": "Name",
+    "ui_name2": "Rename vehicle",
+    "ui_name3": "Change"
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Text, Group, TextInput, Button } from '@mantine/core';
+import Lang from '../../utils/LangR';
 
 interface AuthModalProps {
     opened: boolean;
@@ -10,6 +11,7 @@ interface AuthModalProps {
 
 const AuthModal: React.FC<AuthModalProps> = ({ opened, close, vehicleLabel, onChangeName }) => {
     const [newName, setNewName] = useState('');
+    const lang = Lang()
 
     const handleChangeName = () => {
         onChangeName(newName);
@@ -17,7 +19,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ opened, close, vehicleLabel, onCh
     };
 
     return (
-        <Modal opened={opened} onClose={close} title="New Name" centered size="xs" radius={10} yOffset={10}>
+        <Modal opened={opened} onClose={close} title={lang.ui_name2} centered size="xs" radius={10} yOffset={10}>
             <Group align="flex-end">
                 <TextInput
                     data-autofocus
@@ -27,7 +29,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ opened, close, vehicleLabel, onCh
                     sx={{ flex: 1 }}
                 />
                 <Button variant="light" onClick={handleChangeName}>
-                    Change
+                    {lang.ui_name3}
                 </Button>
             </Group>
         </Modal>

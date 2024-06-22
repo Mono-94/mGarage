@@ -167,7 +167,7 @@ const Vehicle: React.FC<VehicleProps> = ({ vehicle, index, garage, Close }) => {
                                 <Button color="green" onClick={SpawnVehicle} disabled={vehicle.stored == 0} leftIcon={<IconCarGarage size={17} />} variant="light" size='xs'>{lang.GarageMenu5}</Button>
                                 {vehicle.isOwner && (
                                     <>
-                                        <Button size='xs' variant="light" onClick={toggle} leftIcon={<IconPencil size={17} />} >Name</Button>
+                                        <Button size='xs' variant="light" onClick={toggle} leftIcon={<IconPencil size={17} />} >{lang.ui_name1}</Button>
                                         <Button onClick={ShowMenuKeys} variant="light" size='xs' leftIcon={<IconKey size={17} />}>{lang.GarageMenu6}</Button>
                                         <Button onClick={SetBlip} variant="light" size='xs' leftIcon={<IconMapSearch size={17} />} disabled={vehicle.stored == 1}>{lang.GarageMenu7}</Button>
                                     </>
