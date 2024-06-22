@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Garage from './garage';
 import Menu from './menu';
 import { fetchNui } from '../utils/fetchNui';
@@ -7,84 +7,60 @@ import { isEnvBrowser } from '../utils/misc';
 import BuyGarage from './private/buyprivate';
 import VisibilityButtons from './mono';
 
+enum View {
+  None,
+  Garage,
+  Menu,
+  Buy
+}
 
 const App: React.FC = () => {
-  const [garageVisible, setGarageVisible] = useState(false);
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [buyVisible, setBuyVisible] = useState(false);
+  const [visibleView, setVisibleView] = useState<View>(View.None);
 
-  useNuiEvent<boolean>('setVisibleGarage', (isVisible) => {
-    setGarageVisible(isVisible);
-    if (isVisible) setMenuVisible(false);
-  });
+  const setView = useCallback((view: View) => {
+    setVisibleView(view);
+  }, []);
 
-  useNuiEvent<boolean>('setVisibleMenu', (isVisible) => {
-    setMenuVisible(isVisible);
-    if (isVisible) setGarageVisible(false);
-  });
+  const handleShowGarage = () => setView(View.Garage);
+  const handleShowMenu = () => setView(View.Menu);
+  const handleShowBuy = () => setView(View.Buy);
 
-  useNuiEvent<boolean>('setVisibleBuy', (isVisible) => {
-    setBuyVisible(isVisible);
-    if (isVisible) setGarageVisible(false);
-  });
-
-  const handleShowGarage = () => {
-    setGarageVisible(true);
-    setMenuVisible(false);
-    setBuyVisible(false);
-  };
-
-  const handleShowMenu = () => {
-    setGarageVisible(false);
-    setMenuVisible(true);
-    setBuyVisible(false);
-  };
-
-  const handleShowBuy = () => {
-    setGarageVisible(false);
-    setMenuVisible(false);
-    setBuyVisible(true);
-  };
+  useNuiEvent<boolean>('setVisibleGarage', (isVisible) => setView(isVisible ? View.Garage : View.None));
+  useNuiEvent<boolean>('setVisibleMenu', (isVisible) => setView(isVisible ? View.Menu : View.None));
+  useNuiEvent<boolean>('setVisibleBuy', (isVisible) => setView(isVisible ? View.Buy : View.None));
 
   useEffect(() => {
     const keyHandler = (e: KeyboardEvent) => {
-      if ((garageVisible || menuVisible || buyVisible) && e.code === 'Escape') {
+      if (visibleView !== View.None && e.code === 'Escape') {
         if (!isEnvBrowser()) {
-          if (garageVisible) {
-            fetchNui('mGarage:Close', { name: 'setVisibleGarage' });
-          } else if (menuVisible) {
-            fetchNui('mGarage:Close', { name: 'setVisibleMenu' });
-          } else if (buyVisible) {
-            fetchNui('mGarage:Close', { name: 'setVisibleBuy' });
-          }
+          let action = '';
+          if (visibleView === View.Garage) action = 'setVisibleGarage';
+          else if (visibleView === View.Menu) action = 'setVisibleMenu';
+          else if (visibleView === View.Buy) action = 'setVisibleBuy';
+          fetchNui(`mGarage:Close`, { name: action });
         } else {
-          setGarageVisible(false);
-          setMenuVisible(false);
-          setBuyVisible(false);
+          setView(View.None);
         }
       }
     };
 
     window.addEventListener('keydown', keyHandler);
-
-    return () => {
-      window.removeEventListener('keydown', keyHandler);
-    };
-  }, [garageVisible, menuVisible, buyVisible]);
+    return () => window.removeEventListener('keydown', keyHandler);
+  }, [visibleView, setView]);
 
   return (
     <>
-     <VisibilityButtons 
+      <VisibilityButtons
         handleShowGarage={handleShowGarage}
         handleShowMenu={handleShowMenu}
         handleShowBuy={handleShowBuy}
-        garageVisible={garageVisible}
-        menuVisible={menuVisible}
-        buyVisible={buyVisible}
+        garageVisible={visibleView === View.Garage}
+        menuVisible={visibleView === View.Menu}
+        buyVisible={visibleView === View.Buy}
       />
-      <Menu visible={menuVisible} />
-      <Garage visible={garageVisible} />
-      <BuyGarage visible={buyVisible} />
+      <Menu visible={visibleView === View.Menu} />
+      <Garage visible={visibleView === View.Garage} />
+      <BuyGarage visible={visibleView === View.Buy} />
     </>
   );
 };

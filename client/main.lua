@@ -9,7 +9,14 @@ local VehicleLabel = function(model)
         lib.print.error(model .. ' - Model invalid')
         return model
     end
+
     local makeName = GetMakeNameFromVehicleModel(model)
+
+    if not makeName then
+        lib.print.error(model .. ' - No Make Name')
+        return 'Unknown'
+    end
+
     makeName = makeName:sub(1, 1):upper() .. makeName:sub(2):lower()
     local displayName = GetDisplayNameFromVehicleModel(model)
     displayName = displayName:sub(1, 1):upper() .. displayName:sub(2):lower()
@@ -23,7 +30,6 @@ function OpenGarage(data)
     local Vehicles = {}
     if data.garagetype == 'impound' or data.garagetype == 'garage' then
         if getVehicles.vehicles then
-            print(#getVehicles.vehicles)
             for i = 1, #getVehicles.vehicles do
                 local row = getVehicles.vehicles[i]
                 if not row.private then

@@ -51,17 +51,24 @@ const Garage: React.FC<{ visible: boolean }> = ({ visible }) => {
         setVehicleData(data.vehicles);
     });
 
-
     const handleClose = async () => {
         setActiveAccordion(null);
         fetchNui('mGarage:Close', { name: 'setVisibleGarage' });
     };
+    const keyHandler = (e: KeyboardEvent) => {
+        if (e.code === 'Escape') {
+            setActiveAccordion(null);
+        }
+    }
+    window.addEventListener('keydown', keyHandler);
 
     const filteredVehicles = vehiclesData.filter((vehicle) =>
         (vehicle.plate && vehicle.plate.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (vehicle.vehlabel && vehicle.vehlabel.toLowerCase().includes(searchTerm.toLowerCase()))
     );
+
     const { classes } = useStyles();
+
     return (
         <div className={`Garage ${visible ? 'slide-in' : 'slide-out'}`}>
 
@@ -71,7 +78,7 @@ const Garage: React.FC<{ visible: boolean }> = ({ visible }) => {
                 <CloseButton radius={10} size={'md'} onClick={handleClose} color="red" variant="light" />
             </div>
 
-            <ScrollArea.Autosize  mah={440} placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }}  scrollbarSize={0}>
+            <ScrollArea.Autosize mah={440} placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} scrollbarSize={0}>
                 {filteredVehicles.length > 0 ? (
                     <Accordion
                         variant="filled"
@@ -107,4 +114,3 @@ const Garage: React.FC<{ visible: boolean }> = ({ visible }) => {
 };
 
 export default Garage;
-

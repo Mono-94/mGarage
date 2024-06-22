@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@mantine/core';
+import { Button, Paper } from '@mantine/core';
 import { isEnvBrowser } from '../utils/misc';
 import { debugData } from '../utils/debugData';
 
@@ -14,13 +14,13 @@ interface VisibilityButtonsProps {
 
 const VisibilityButtons: React.FC<VisibilityButtonsProps> = ({ handleShowGarage, handleShowMenu, handleShowBuy, garageVisible, menuVisible, buyVisible }) => {
   return (
-    <div className={` ${isEnvBrowser() ? 'slide-in' : 'slide-out'}`} style={{ display: 'flex', width: 'fit-content', height: 'auto', backgroundColor: '#1A1B1E', borderRadius: 10, padding: 10, margin: 10 }}>
-      <Button.Group>
-        <Button variant="light" color={garageVisible ? 'orange' : 'green'} onClick={handleShowGarage}>Show Garage</Button>
-        <Button variant="light" color={menuVisible ? 'orange' : 'green'} onClick={handleShowMenu}>Show Menu</Button>
-        <Button variant="light" color={buyVisible ? 'orange' : 'green'} onClick={handleShowBuy}>Show Buy</Button>
+    <Paper className={` ${isEnvBrowser() ? 'slide-in' : 'slide-out'}`} style={{ display: 'flex', width: 'fit-content', height: 'auto', backgroundColor: '#1A1B1E', borderRadius: 10, padding: 10, margin: 10 }}>
+      <Button.Group orientation="vertical">
+        <Button compact variant="light" color={garageVisible ? 'orange' : 'green'} onClick={handleShowGarage}>Show Garage</Button>
+        <Button compact variant="light" color={menuVisible ? 'orange' : 'green'} onClick={handleShowMenu}>Show Menu</Button>
+        <Button compact variant="light" color={buyVisible ? 'orange' : 'green'} onClick={handleShowBuy}>Show Buy</Button>
       </Button.Group>
-    </div>
+    </Paper>
   );
 };
 
@@ -122,7 +122,7 @@ debugData([
         "TargetId": 2,
         "points": [{ "w": 0.0, "z": 0.0, "y": 0.0, "x": 0.0 }],
         "priceImpound": 232,
-        "garagetype": "garage",
+        "garagetype": "impound",
         "intocar": false,
         "npchash": "csb_trafficwarden",
         "debug": false,
@@ -164,7 +164,7 @@ debugData([
           "fakeplate": "BRBRBRBR",
         },
         {
-          "isOwner": true,
+          "isOwner": false,
           "infoimpound": "{\"endPound\":\"2024-05-09 01:00\",\"date\":\"2024/05/09 00:24\",\"price\":1,\"reason\":\"asdasad asda sadasd \"}",
           "pound": 1,
           "seats": 4,

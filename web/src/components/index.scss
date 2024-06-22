@@ -14,19 +14,20 @@ body {
 
 
 .Garage {
-    position: absolute;
+    position: fixed;
     display: flex;
     flex-direction: column;
     padding: 10px;
     right: -500px;
+    height: max-content;
     top: 50%;
     transform: translateY(-50%);
     gap: 10px;
     width: 390px;
-    max-height: 80%;
     border-radius: $Border;
     background-color: #252525fa;
     transition: right 0.7s ease-in-out, opacity 0.7s ease-in-out, height 0.7s ease-in-out;
+    overflow: hidden;
 
 
     .Garage-head {
@@ -89,6 +90,12 @@ body {
     align-items: center;
     height: 28px;
 
+    &:focus{
+        width: 110px;
+        margin-left: 5px;
+        padding: 0 5px;
+        color: #ccc;
+    }
 
     &:hover {
         background-color: $color2;
