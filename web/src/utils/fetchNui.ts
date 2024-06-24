@@ -31,7 +31,7 @@ export async function fetchNui<T = unknown>(
     ? (window as any).GetParentResourceName()
     : "nui-frame-app";
 
-  const resp = await fetch(`https://${resourceName}/${eventName}`, options);
+  const resp = await fetch(`https://mGarage/${eventName}`, options);
 
   const respFormatted = await resp.json();
 

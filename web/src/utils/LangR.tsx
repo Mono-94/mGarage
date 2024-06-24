@@ -119,6 +119,7 @@ const defaultLangData: LangData = {
     "private_manage_s14": "",
     "private_manage_s15": "",
     "private_ui1": "Slots:",
+    "private_ui2": "Comprar garaje",
     "ui_name1": "Nombre",
     "ui_name2": "Renombrar vehiculo",
     "ui_name3": "Cambiar"

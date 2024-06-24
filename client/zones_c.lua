@@ -104,7 +104,7 @@ function CreateGarage(data)
         debug = data.debug,
         inside = function()
             if data.zoneType == 'textui' and (not data.job or GetJob().name == data.job) then
-                if IsControlJustReleased(0, 38) and not EditGarage() then
+                if IsControlJustReleased(0, 38)  then
                     data.entity = cache.vehicle
                     if GetPedInVehicleSeat(data.entity, -1) == cache.ped then
                         SaveCar(data)

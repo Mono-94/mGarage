@@ -21,7 +21,6 @@ RegisterNuiCallback('mGarage:Close', function(data, cb)
 
 end)
 
-
 AddEventHandler('ox_lib:setLocale',function (locale)
   SendNUIMessage({ action = 'mGarage:Lang', data = lib.getLocales() })
 end)

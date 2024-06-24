@@ -1,6 +1,6 @@
 Config = {}
 
-Config.Debug = false
+Config.Debug = true
 
 Config.Framework = 'esx'     -- esx/ox/standalone/qbox/qb
 

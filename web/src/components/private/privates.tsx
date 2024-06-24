@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { fetchNui } from '../../utils/fetchNui';
-import { CloseButton, Group, Stack, Text, Paper, Image, Badge, Button, Space, Select } from '@mantine/core';
 import { useNuiEvent } from '../../hooks/useNuiEvent';
 import Lang from '../../utils/LangR';
 import { debugData } from '../../utils/debugData';
-import { IconMoneybag } from '@tabler/icons-react';
+import { useScrollIntoView } from '@mantine/hooks';
+import { Button, Text, Group, Box } from '@mantine/core';
+
 
 debugData([
     {
-        action: 'buyAction',
+        action: 'manage',
         data: {
             "door": { "x": 344.3371887207031, "y": -1000.44091796875, "z": 29.56710052490234, "w": 6.5362000465393 },
             "name": "Private garage Big - Mission Row",
@@ -48,81 +49,16 @@ debugData([
     }
 ], 100);
 
-const BuyGarage: React.FC<{ visible: boolean }> = ({ visible }) => {
+const PrivateGarages: React.FC<{ visible: boolean }> = ({ visible }) => {
     const lang = Lang();
-    const [garageData, setGarageData] = useState<any>(null);
-    const [paymentMethod, setPaymentMethod] = useState(''); // default value
-
-    const handlePaymentChange = (value: string | null) => {
-        if (value) {
-            setPaymentMethod(value);
-            setGarageData((prevData: any) => ({
-                ...prevData,
-                moneytype: value,
-            }));
-        }
-    };
-
-    const handleBuy = async () => {
-        const response = await fetchNui('mGarage:BuyPrivate', garageData);
-
-        if (response === true) {
-            handleClose();
-            setPaymentMethod('');
-        }
-    };
-
-    useNuiEvent<any>('buyAction', (data) => {
-        setGarageData(data);
+    const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
+        offset: 60,
     });
-
-    const handleClose = async () => {
-        fetchNui('mGarage:Close', { name: 'setVisibleBuy' });
-        setPaymentMethod('');
-    };
-
-    if (!garageData) {
-        return null;
-    }
-
-    const slotCount = garageData.interiorData.slot.length;
-
     return (
         <div className={`Garage ${visible ? 'slide-in' : 'slide-out'}`}>
-            <Paper shadow="md" radius={10} p="xs">
-                <Group>
-                    <Text weight={500} size="lg">{garageData.name}</Text>
-                    <CloseButton radius={10} size={'md'} onClick={handleClose} color="red" variant="light" style={{ marginLeft: 'auto' }} />
-                </Group>
-                <Space h="md" />
-                <Stack>
-                    <Group position='apart'>
-                        <Badge color="green" radius={7} size="lg">{lang.private_manage21} $ {garageData.price.toLocaleString('en-US')}</Badge>
-                        <Badge color="blue" radius={7} size="lg">{lang.private_ui1} {slotCount}</Badge>
-                    </Group>
-
-                    <Image src={garageData.interiorData.image} alt={garageData.name} withPlaceholder radius={10} />
-        
-                    <Select
-                        dropdownPosition={"top"}
-                        label={lang.GaragePayMethod}
-                        placeholder={lang.GaragePayMethod}
-                        height={10}
-                        value={paymentMethod}
-                        onChange={handlePaymentChange}
-                        data={[
-                            { value: 'money', label: lang.GaragePayMethodMoney },
-                            { value: 'bank', label: lang.GaragePayMethodBank },
-                        ]}
-                    />
-                   
-                    <Button color='teal' radius={7} variant="light" leftIcon={<IconMoneybag size={20} />} onClick={handleBuy} fullWidth>
-                        {lang.private_ui2}
-                    </Button>
-                </Stack>
-            </Paper>
+           
         </div>
     );
 };
 
-export default BuyGarage;
+export default PrivateGarages;

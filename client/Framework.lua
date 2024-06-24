@@ -5,10 +5,6 @@ Core = nil
 function LoadCore()
     if Config.Framework == "esx" then
         Core = exports["es_extended"]:getSharedObject()
-    elseif Config.Framework == "ox" then
-        Core = require '@ox_core.lib.init'
-    elseif Config.FrameWork == "qb" then
-        Core = exports['qb-core']:GetCoreObject()
     elseif Config.Framework == "LG" then
         Core = exports['LegacyFramework']:ReturnFramework()
     elseif Config.Framework == "qbox" then
@@ -27,7 +23,6 @@ function GetJob()
             job = Core.PlayerData.job
         end
         return { name = job.name, grade = job.grade }
-    elseif Config.Framework == "qb" then
 
     elseif Config.Framework == "qbox" then
         local name, grade
@@ -38,8 +33,6 @@ function GetJob()
         return { name = name, grade = grade }
     elseif Config.Framework == "standalone" then
         return true
-    elseif Config.Framework == "ox" then
-
     elseif Config.Framework == "LG" then
         local PlayerData = Core.PlayerFunctions.GetClientData()[1]
         local Job = PlayerData?.nameJob
