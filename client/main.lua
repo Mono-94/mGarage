@@ -27,8 +27,7 @@ end
 
 
 function OpenGarage(data)
-
-    local getVehicles = ServerCallBack('get', data, 500)
+    local getVehicles = ServerCallBack('get', data)
 
     local PlayerJob = getVehicles.job
 
@@ -252,13 +251,8 @@ end
 
 RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
     local retval = nil
-    local delay = false
 
-    if data.action == 'spawncustom' or data.action == 'spawn' or data.action == 'impound' then
-        delay = 1000
-    end
-
-    retval = ServerCallBack(data.action, data.data, delay)
+    retval = ServerCallBack(data.action, data.data)
 
     if data.action == 'setBlip' then
         blipcar(retval, data.data.plate)

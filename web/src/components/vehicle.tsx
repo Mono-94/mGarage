@@ -18,7 +18,8 @@ const Vehicle: React.FC<VehicleProps> = ({ vehicle, index, garage, Close }) => {
     const [vehicleData, setVehicleData] = useState(vehicle);
     const [paymentMethod, setPaymentMethod] = useState('money');
     const [opened, { toggle, close }] = useDisclosure(false);
-
+    const [isSpawning, setIsSpawning] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const lang = Lang();
     let pound;
 
@@ -31,17 +32,25 @@ const Vehicle: React.FC<VehicleProps> = ({ vehicle, index, garage, Close }) => {
     };
 
     const SpawnVehicle = async () => {
+        setIsSpawning(true);
+        setIsLoading(true);
         const fetchData = await fetchNui<any>('mGarage:PlyInteract', { action: 'spawn', data: { vehicleid: vehicle.id, garage: garage } });
         if (fetchData) {
             vehicle.stored = 0;
+            setIsSpawning(false);
+            setIsLoading(false);
             Close();
         }
     };
 
     const Impound = async () => {
+        setIsLoading(true);
         const fetchData = await fetchNui<any>('mGarage:PlyInteract', { action: 'impound', data: { vehicleid: vehicle.id, garage: garage, paymentMethod: paymentMethod } });
         if (fetchData) {
             Close();
+            setIsLoading(false);
+        } else {
+            setIsLoading(false);
         }
     };
 
@@ -129,9 +138,10 @@ const Vehicle: React.FC<VehicleProps> = ({ vehicle, index, garage, Close }) => {
                                         { value: 'bank', label: lang.GaragePayMethodBank },
                                     ]}
                                 />
-                                <Button onClick={Impound} variant="light" size='xs' color={'teal'} leftIcon={<IconMoneybag size={15} />}>
-                                    {lang.GarageMenu3}
+                                <Button onClick={Impound} variant="light" size='xs' color={'teal'} loading={isLoading} leftIcon={<IconMoneybag size={15} />}>
+                                    {lang.GarageMenu3} | {pound.price.toLocaleString('en-US')} $
                                 </Button>
+
                             </Stack>
                         </>
 
@@ -157,7 +167,7 @@ const Vehicle: React.FC<VehicleProps> = ({ vehicle, index, garage, Close }) => {
                                 <AuthModal opened={opened} close={close} vehicleLabel={vehicle.vehlabel} onChangeName={ChangeName} />
                             </Stack>
                             <Stack justify="flex-start" spacing={5} >
-                                <Button color="green" onClick={SpawnVehicle} disabled={vehicle.stored == 0} leftIcon={<IconCarGarage size={17} />} variant="light" size='xs'>{lang.GarageMenu5}</Button>
+                                <Button color="green" onClick={SpawnVehicle} disabled={vehicle.stored == 0 || isSpawning} loading={isLoading} leftIcon={<IconCarGarage size={17} />} variant="light" size='xs'>{lang.GarageMenu5}</Button>
                                 {vehicle.isOwner && (
                                     <>
                                         <Button size='xs' variant="light" onClick={toggle} leftIcon={<IconPencil size={17} />} >{lang.ui_name1}</Button>

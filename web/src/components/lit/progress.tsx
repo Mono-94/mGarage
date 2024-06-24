@@ -21,7 +21,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ value, text, icon }) => {
     const fuelColor = getProgressColor(value);
 
     return (
-        <Tooltip sx={{ padding: '2px 10px', borderRadius: 7 }} openDelay={400} label={`${text}: ${value}%`} color={fuelColor} >
+        <Tooltip sx={{ padding: '2px 10px', borderRadius: 7 }} openDelay={400} label={`${text}: ${value}%`} color={fuelColor} transitionProps={{ transition: 'skew-down', duration: 300 }}  withArrow>
             <RingProgress
                 color={fuelColor}
                 size={50}
