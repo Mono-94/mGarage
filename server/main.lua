@@ -477,26 +477,32 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             retval = false
         end
     elseif action == 'changeName' then
-        local row = MySQL.single.await('SELECT `metadata` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1', {
-            data.vehicle.plate
-        })
+        local Vehicle = Vehicles.GetVehicleByPlate(data.vehicle.plate)
 
-        if row then
-            local metadata = json.decode(row.metadata)
-            if not metadata then
-                metadata = {}
-            end
-            if metadata then
-                metadata.vehname = data.newName
-                local updatedMetadata = json.encode(metadata)
-                MySQL.update('UPDATE `owned_vehicles` SET `metadata` = ? WHERE `plate` = ?',
-                    { updatedMetadata, data.vehicle.plate })
-                retval = true
+        if Vehicle then
+            Vehicle.SetMetadata('vehname', data.newName)
+            retval = true
+        else
+            local row = MySQL.single.await('SELECT `metadata` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1', {
+                data.vehicle.plate
+            })
+            if row then
+                local metadata = json.decode(row.metadata)
+                if not metadata then
+                    metadata = {}
+                end
+                if metadata then
+                    metadata.vehname = data.newName
+                    local updatedMetadata = json.encode(metadata)
+                    MySQL.update('UPDATE `owned_vehicles` SET `metadata` = ? WHERE `plate` = ?',
+                        { updatedMetadata, data.vehicle.plate })
+                    retval = true
+                else
+                    retval = false
+                end
             else
                 retval = false
             end
-        else
-            retval = false
         end
     end
     return retval
