@@ -12,21 +12,33 @@ body {
     overflow: hidden;
 }
 
+.Private {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    height: max-content;
+    right: 5%;
+    gap: 10px;
+    width: 500px;
+    transform: translateY(-50%);
+    border-radius: $Border;
+    background-color: #252525fa;
+    overflow: hidden;
+}
 
 .Garage {
     position: fixed;
     display: flex;
     flex-direction: column;
     padding: 10px;
-    right: -500px;
     height: max-content;
-    top: 50%;
-    transform: translateY(-50%);
+    right: 5%;
     gap: 10px;
     width: 390px;
+    transform: translateY(-50%);
     border-radius: $Border;
     background-color: #252525fa;
-    transition: right 0.7s ease-in-out, opacity 0.7s ease-in-out, height 0.7s ease-in-out;
     overflow: hidden;
 
 
@@ -66,7 +78,7 @@ body {
     height: auto;
     position: fixed;
     top: 50%;
-    right: -500px;
+    right: 5px;
     transform: translateY(-50%);
     transition: right 0.7s ease-in-out, opacity 0.7s ease-in-out;
 }

@@ -171,7 +171,6 @@ function Core.Player(src)
                 local job = Player.PlayerData.job.name
                 local grade = Player.PlayerData.job.grade.level
                 local grade_name = Player.PlayerData.job.grade.name
-                print(job, grade, grade_name)
                 return { name = job, grade = tonumber(grade), gradeName = grade_name }
             end
         elseif Config.Framework == "qb" then

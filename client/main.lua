@@ -283,7 +283,6 @@ exports.ox_target:addGlobalVehicle({
         groups = impoundGroups,
         distance = 5.0,
         onSelect = function(vehicle)
-            print(GetJob().name)
             ImpoundVehicle({
                 vehicle = vehicle.entity,
                 impoundName = Config.TargetImpound[GetJob().name].impoundName

@@ -5,7 +5,10 @@ import { fetchNui } from "../utils/fetchNui";
 import Lang from "../utils/LangR";
 import { IconCarCrash, IconDatabase, IconMapPin, IconPlus, IconTrash } from "@tabler/icons-react";
 
-const Create: React.FC = () => {
+
+
+
+const Create: React.FC = ({ }) => {
    const lang = Lang()
 
    const form = useForm({
@@ -49,7 +52,7 @@ const Create: React.FC = () => {
       const { model, price, grades } = newVehicle;
       if (!model) {
          return;
-     }
+      }
       if (price === 0 && grades.length === 0) {
          form.setFieldValue('defaultCars', [
             ...form.values.defaultCars,
@@ -84,6 +87,10 @@ const Create: React.FC = () => {
       value: (index).toString()
    }));
 
+   const close = () => {
+      fetchNui('mGarage:Close', { name: 'setVisibleMenu' });
+   }
+
 
    const handleCreateGarage = async () => {
       const fetchResult = await fetchNui('mGarage:adm', { action: 'create', data: form.values });
@@ -91,14 +98,17 @@ const Create: React.FC = () => {
    };
 
    const handleZoneGarage = async () => {
+      close()
       const fetchResult = await fetchNui<any>('mGarage:adm', { action: 'zone', data: false })
       if (fetchResult) {
+
          form.setFieldValue('points', fetchResult.points);
          form.setFieldValue('thickness', fetchResult.thickness);
       }
    };
 
    const handleCoordsGarage = async () => {
+      close()
       const fetchResult = await fetchNui<any>('mGarage:adm', { action: 'coords', data: false })
       if (fetchResult) {
          form.setFieldValue('actioncoords', fetchResult);
@@ -106,6 +116,7 @@ const Create: React.FC = () => {
    };
 
    const handleSpawnCoords = async () => {
+      close()
       const fetchResult = await fetchNui<any>('mGarage:adm', { action: 'spawn_coords', data: false })
       if (fetchResult) {
          form.setFieldValue('spawnpos', fetchResult);

@@ -8,13 +8,15 @@ interface VisibilityButtonsProps {
   handleShowMenu: () => void;
   handleShowBuy: () => void;
   handleShowPrivates: () => void;
+  handleShowTooltip: () => void;
   garageVisible: boolean;
   menuVisible: boolean;
   buyVisible: boolean;
   privatesVisible: boolean;
+  privatesTooltip: boolean;
 }
 
-const VisibilityButtons: React.FC<VisibilityButtonsProps> = ({ handleShowGarage, handleShowMenu, handleShowBuy, handleShowPrivates, garageVisible, menuVisible, buyVisible, privatesVisible }) => {
+const VisibilityButtons: React.FC<VisibilityButtonsProps> = ({ handleShowGarage, handleShowMenu, handleShowBuy, handleShowPrivates,handleShowTooltip, garageVisible, menuVisible, buyVisible, privatesVisible, privatesTooltip }) => {
   return (
     <Paper className={` ${isEnvBrowser() ? 'slide-in' : 'slide-out'}`} style={{ display: 'flex', width: 'fit-content', height: 'auto', backgroundColor: '#1A1B1E', borderRadius: 10, padding: 10, margin: 10 }}>
       <Stack  >
@@ -22,6 +24,7 @@ const VisibilityButtons: React.FC<VisibilityButtonsProps> = ({ handleShowGarage,
         <Button size='md'compact variant="light" color={menuVisible ? 'teal' : ''} onClick={handleShowMenu}>Show Menu</Button>
         <Button size='md'compact variant="light" color={buyVisible ? 'teal' : ''} onClick={handleShowBuy}>Show Buy</Button>
         <Button size='md'compact variant="light" color={privatesVisible ? 'teal' : ''} onClick={handleShowPrivates}>Show Private Menu</Button>
+        <Button size='md'compact variant="light" color={privatesTooltip ? 'teal' : ''} onClick={handleShowTooltip}>Show Private Menu</Button>
       </Stack>
     </Paper>
   );
@@ -42,6 +45,10 @@ debugData([
   },
   {
     action: 'setVisiblePrivates',
+    data: false
+  },
+  {
+    action: 'setVisibleTooltip',
     data: false
   },
   {

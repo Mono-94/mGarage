@@ -104,7 +104,7 @@ function CreateGarage(data)
         debug = data.debug,
         inside = function()
             if data.zoneType == 'textui' and (not data.job or GetJob().name == data.job) then
-                if IsControlJustReleased(0, 38)  then
+                if IsControlJustReleased(0, 38) then
                     data.entity = cache.vehicle
                     if GetPedInVehicleSeat(data.entity, -1) == cache.ped then
                         SaveCar(data)
@@ -250,7 +250,6 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
     if data.action == 'create' then
         retval = GarageAdmAction('create', data.data)
     elseif data.action == 'zone' then
-        ShowNui('setVisibleMenu', false)
         promi = promise:new()
         CreateZone('mGarage:ExitZone_' .. #ZoneData + 1, function(zoone)
             retval = zoone
@@ -259,7 +258,6 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
         end)
     elseif data.action == 'coords' then
         promi = promise:new()
-        ShowNui('setVisibleMenu', false)
         CopyCoords('single', function(coords)
             if coords then
                 ShowNui('setVisibleMenu', true)
@@ -269,7 +267,6 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
         end, true)
     elseif data.action == 'spawn_coords' then
         promi = promise:new()
-        ShowNui('setVisibleMenu', false)
         CopyCoords('multi', function(coords)
             if coords then
                 ShowNui('setVisibleMenu', true)

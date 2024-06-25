@@ -73,7 +73,7 @@ function CreateZone(polyzoneName, cb)
 
             CreateZone()
           else
-            print('No points avaible')
+            lib.print.warn('No points avaible')
           end
         elseif IsControlPressed(0, 194) then
           cb(false)

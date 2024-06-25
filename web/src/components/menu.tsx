@@ -10,7 +10,7 @@ import { IconList, IconPlus } from '@tabler/icons-react';
 
 
 const Menu: React.FC<{ visible: boolean }> = ({ visible }) => {
-
+    
     const [garages, setGarageData] = useState<any[]>([]);
 
     const lang = Lang();
