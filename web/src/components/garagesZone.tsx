@@ -14,7 +14,6 @@ const GaragesZones: React.FC<{ zone: string }> = ({ zone }) => {
     });
 
     const handleChange = (index: number, property: string, value: any) => {
-        console.log(index, property, value)
         const newData = [...garagesData];
         newData[index][property] = value;
         setGaragesData(newData);

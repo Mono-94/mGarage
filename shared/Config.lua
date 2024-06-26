@@ -6,7 +6,7 @@ Config.Framework = 'esx'     -- esx/ox/standalone/qbox/qb
 
 Config.DefaultGarages = true -- Config Garages ???
 
-Config.CarkeysItem = false
+Config.CarkeysItem = true
 
 Config.ClearTimeBlip = 1000 * 120 -- 2 mins
 

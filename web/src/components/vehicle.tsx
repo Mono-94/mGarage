@@ -77,7 +77,6 @@ const Vehicle: React.FC<VehicleProps> = ({ vehicle, index, garage, Close }) => {
     const ChangeName = async (newName: string) => {
         const fetchData = await fetchNui<any>('mGarage:PlyInteract', { action: 'changeName', data: { vehicle: vehicleData, newName: newName } });
         if (fetchData) {
-            console.log(fetchData);
             setVehicleData((prevVehicleData: any) => ({
                 ...prevVehicleData,
                 vehlabel: newName

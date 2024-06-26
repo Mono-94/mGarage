@@ -3,9 +3,9 @@ import { fetchNui } from '../../utils/fetchNui';
 import { useNuiEvent } from '../../hooks/useNuiEvent';
 import Lang from '../../utils/LangR';
 import { debugData } from '../../utils/debugData';
-import { Button, Text, Group, Box, Transition, Table, Modal, TextInput, Tabs, ActionIcon, CloseButton, ScrollArea, SimpleGrid, Paper, Stack, Divider, NumberInput, Badge, Tooltip } from '@mantine/core';
-import { IconBox, IconBuildingWarehouse, IconCar, IconCarGarage, IconKey, IconMessageCircle, IconPhoto, IconPlus, IconSettings, IconTrash, IconUser, IconUsers } from '@tabler/icons-react';
-
+import { Button, Text, Group, Box, Transition, Table, Modal, TextInput, Tabs, ActionIcon, CloseButton, ScrollArea, SimpleGrid, Paper, Stack, Divider, NumberInput, Badge, Tooltip, Card, Image } from '@mantine/core';
+import { IconBox, IconBuildingWarehouse, IconCar, IconCarGarage, IconKey, IconMessageCircle, IconPencil, IconPhoto, IconPlus, IconSettings, IconTrash, IconUser, IconUsers } from '@tabler/icons-react';
+import AuthModal from '../lit/vehName';
 debugData([
     {
         action: 'private',
@@ -52,8 +52,8 @@ debugData([
                             "w": 180.8424072265625
                         },
                         "busy": false,
-                        "vehname": "Test Vehiculo",
-                        "isOwner": false
+                        "vehname": "Test Vehiculo ",
+                        "isOwner": true
                     },
                     {
                         "coords": {
@@ -64,7 +64,7 @@ debugData([
                         },
                         "busy": false,
                         "vehname": "Test Vehiculo",
-                        "isOwner": false,
+                        "isOwner": true,
 
                     },
                     {
@@ -154,11 +154,13 @@ debugData([
                 ],
                 "name": "Private garage Small - Mission Row",
                 "price": 95000,
+
                 "interior": 1,
                 "ownerName": "Mono Test"
             },
             "name": "Private garage Small - Mission Row",
             "id": 1,
+            "image": "https://i.imgur.com/wYittKy.png",
             "private": true
         }
     }
@@ -168,6 +170,8 @@ const PrivateGarages: React.FC<{ visible: boolean }> = ({ visible }) => {
     const lang = Lang();
     const [dataPrivate, setDataPrivate] = useState<any>({});
     const [newAccess, setNewAccess] = useState(0);
+    const [selectedSlot, setSelectedSlot] = useState<any>(null); // Nuevo estado
+    const [modalOpened, setModalOpened] = useState(false); // Nuevo estado
 
     useNuiEvent<any>('private', (data) => {
         setDataPrivate(data);
@@ -219,35 +223,95 @@ const PrivateGarages: React.FC<{ visible: boolean }> = ({ visible }) => {
 
     const hasAccessRows = accessRows.length > 0;
 
-    const garageInfo = dataPrivate.garage ? (
-        <SimpleGrid cols={2}>
-            <Text size="sm"><strong>Owner:</strong> {dataPrivate.garage.ownerName}</Text>
-            <Text size="sm"><strong>Price:</strong> ${dataPrivate.garage.price}</Text>
-            <Text size="sm"><strong>Location:</strong> {dataPrivate.garage.name}</Text>
-            <Text size="sm"><strong>Slots:</strong> {dataPrivate.garage.slots.length}</Text>
-            <Text size="sm"><strong>Occupied Slots:</strong> {dataPrivate.garage.slots.filter((slot: any) => slot.busy).length}</Text>
-        </SimpleGrid>
-    ) : null;
+    const handleChangeName = async (newName: string) => {
+        const fetchData = await fetchNui<any>('mGarage:PlyInteract', { action: 'changeName', data: { vehicle: selectedSlot, newName: newName } });
+        if (fetchData) {
+            if (selectedSlot) {
+                const updatedSlots = dataPrivate.garage.slots.map((slot: any) =>
+                    slot === selectedSlot ? { ...slot, vehname: newName } : slot
+                );
+                setDataPrivate((prev: any) => ({
+                    ...prev,
+                    garage: {
+                        ...prev.garage,
+                        slots: updatedSlots,
+                    },
+                }));
+            }
+        }
+    };
 
+    const openModal = (slot: any) => {
+        setSelectedSlot(slot);
+        setModalOpened(true);
+    }
+
+    const closeModal = () => {
+        setModalOpened(false);
+        setSelectedSlot(null);
+    }
+
+    const truncateString = (str: string, maxLength: number) => {
+        if (str.length > maxLength) {
+            return str.slice(0, maxLength) + '...';
+        }
+        return str;
+    };
+
+    const ShowMenuKeys = (plate: string) => {
+        fetchNui<any>('privateGarage', { action: 'accessVeh', plate: plate });
+    };
+    const GiveKey = (plate: string) => {
+        fetchNui<any>('privateGarage', { action: 'givekey', plate: plate });
+    };
     return (
         <Transition mounted={visible} transition="slide-left" duration={600} timingFunction="ease">
             {(styles) => <div style={styles} className='Private'>
 
                 <Tabs variant="pills" defaultValue="Garage" color='gray'>
                     <Tabs.List>
-                        <Tabs.Tab value="Garage" icon={<IconBuildingWarehouse size="0.8rem" />}>Garage</Tabs.Tab>
-                        <Tabs.Tab value="Access" icon={<IconUsers size="0.8rem" />}>Access</Tabs.Tab>
-                        <Tabs.Tab value="Vehicles" icon={<IconCarGarage size="0.8rem" />}>Vehicles</Tabs.Tab>
+                        <Tabs.Tab value="Garage" icon={<IconBuildingWarehouse size="0.8rem" />}>{lang.private_ui8}</Tabs.Tab>
+                        <Tabs.Tab value="Access" icon={<IconUsers size="0.8rem" />}>{lang.private_ui9}</Tabs.Tab>
+                        <Tabs.Tab value="Vehicles" icon={<IconCarGarage size="0.8rem" />}>{lang.private_ui10}</Tabs.Tab>
                         <CloseButton radius={10} size={'md'} onClick={handleClose} color="red" variant="light" style={{ marginLeft: 'auto' }} />
                     </Tabs.List>
 
                     <Tabs.Panel value="Garage" pt="xs">
-                        <Paper p={10} radius={10} >
-                            <Text size={20}>{dataPrivate.name}</Text>
-                            {garageInfo}
-                            <Button color={'brown'} size="xs" variant="light" leftIcon={<IconBox size={15} />} onClick={OpenStash}>
-                                Open Stash
-                            </Button>
+
+                        <Paper p={10} radius={10}>
+                            <Card shadow="sm" padding="lg" radius="md" >
+                                <Card.Section>
+
+                                    <Image
+                                        src={dataPrivate.image}
+                                        height={150}
+                                        width={500}
+                                    />
+                                </Card.Section>
+
+                                <Group position="apart" mt="md" mb="xs">
+                                    <Text weight={500} size="xl">{dataPrivate.name}</Text><Text weight={500} size="md">{dataPrivate.garage.ownerName}</Text>
+                                </Group>
+
+                                <Text size="sm" color="dimmed">
+                                    <Group position="apart">
+                                        <Text>{lang.private_ui4}</Text> <Text weight={'bold'}>${dataPrivate.garage.price}</Text>
+                                    </Group>
+                                    <Group position="apart">
+                                        <Text>{lang.private_ui5}</Text> <Text weight={'bold'}>{dataPrivate.streetName}</Text>
+                                    </Group>
+                                    <Group position="apart">
+                                        <Text>{lang.private_ui6}</Text> <Text weight={'bold'}>{dataPrivate.garage.slots.length}</Text>
+                                    </Group>
+                                    <Group position="apart">
+                                        <Text>{lang.private_ui7}</Text> <Text weight={'bold'}>{dataPrivate.garage.slots.filter((slot: any) => slot.busy).length}</Text>
+                                    </Group>
+
+                                </Text>
+                                <Button variant="light" color="blue" fullWidth mt="md" radius="md" leftIcon={<IconBox size={15} />} onClick={OpenStash}>
+                                    {lang.private_manage5}
+                                </Button>
+                            </Card>
                         </Paper>
 
                     </Tabs.Panel>
@@ -256,7 +320,7 @@ const PrivateGarages: React.FC<{ visible: boolean }> = ({ visible }) => {
                         <Paper p={10} radius={10} >
                             <Text size={25}>Access</Text>
                             <Stack>
-                                <Stack style={{ border: '1px solid #2e3036', borderRadius: 5 }} p={10}>
+                                <Stack p={10}>
                                     <NumberInput
                                         size="xs"
                                         placeholder="Player ID"
@@ -267,7 +331,7 @@ const PrivateGarages: React.FC<{ visible: boolean }> = ({ visible }) => {
                                         max={10000}
                                     />
                                     <Button color='green' size="xs" variant="light" leftIcon={<IconPlus size={15} />} onClick={addAccess}>
-                                        Add Access
+                                        {lang.private_ui11}
                                     </Button>
                                     {hasAccessRows && (
                                         <ScrollArea.Autosize mah={200} p={10} placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} scrollbarSize={10}>
@@ -286,40 +350,55 @@ const PrivateGarages: React.FC<{ visible: boolean }> = ({ visible }) => {
 
                     <Tabs.Panel value="Vehicles" pt="xs">
                         <Paper p={10} radius={10}>
-                            <Text size={25}>Vehicles</Text>
-                            <Table highlightOnHover>
+                            <Text size={25}>{lang.private_ui10}</Text>
+                            <Table highlightOnHover >
+
                                 <thead>
                                     <tr>
-                                        <th>Slot</th>
-                                        <th>Vehicle</th>
-                                        <th>Plate</th>
-                                        <th>Options</th>
+                                        <th>{lang.private_ui12}</th>
+                                        <th>{lang.private_ui13}</th>
+                                        <th>{lang.private_ui14}</th>
+                                        <th>{lang.private_ui15}</th>
                                     </tr>
                                 </thead>
+
                             </Table>
-                            <ScrollArea.Autosize mah={300} p={10} placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} scrollbarSize={10}>
-                                <Table highlightOnHover striped   >
+                            <ScrollArea.Autosize mah={300} placeholder="" onPointerEnterCapture={() => { }} onPointerLeaveCapture={() => { }} scrollbarSize={10}>
+                                <Table >
                                     <tbody>
                                         {dataPrivate.garage?.slots.map((slot: any, index: number) => (
                                             <tr key={index}>
-                                                <td>Slot {index + 1}</td>
-                                                <td>{slot.busy ? (slot.vehname || 'Unknown') : '-'}</td>
-                                                <td>{slot.busy ? (<Badge radius={5}>{slot.plate}</Badge>) : '-'}</td>
+                                                <td> <Group position="center">{lang.private_ui12} {index + 1}</Group></td>
                                                 <td>
-                                                    {slot.busy ? (
-                                                        <Group position="center">
-                                                            <Tooltip sx={{ padding: '2px 10px', borderRadius: 7 }} openDelay={200} color='teal'  label={`Access`} transitionProps={{ transition: 'skew-down', duration: 300 }} withArrow>
-                                                                <ActionIcon disabled={slot.isOwner === true} color='green' variant="light">
-                                                                    <IconUsers size={15} />
+                                                    <Group position="center">
+                                                        {slot.busy ? (truncateString(slot.vehname, 15)) : '-'}
+                                                    </Group>
+                                                </td>
+
+                                                <td><Group position="center">{slot.busy ? (<Badge radius={5}>{slot.plate}</Badge>) : '-'}</Group></td>
+                                                <td>
+                                                    <Group position="center">
+                                                        {slot.busy ? (<>
+                                                            <Tooltip sx={{ padding: '2px 10px', borderRadius: 7 }} openDelay={200} color='teal' label={lang.private_ui16} transitionProps={{ transition: 'skew-down', duration: 300 }} withArrow>
+                                                                <ActionIcon disabled={!slot.isOwner} color='green' variant="light" onClick={() => ShowMenuKeys(slot.plate)}>
+                                                                    <IconUsers size="1rem" />
                                                                 </ActionIcon>
                                                             </Tooltip>
-                                                            <Tooltip sx={{ padding: '2px 10px', borderRadius: 7 }} openDelay={200} color='yellow' label={`Give Key`} transitionProps={{ transition: 'skew-down', duration: 300 }} withArrow>
-                                                                <ActionIcon disabled={slot.isOwner === true} color='yellow' variant="light">
-                                                                    <IconKey size={15} />
+                                                            <Tooltip sx={{ padding: '2px 10px', borderRadius: 7 }} openDelay={200} color='blue' label={lang.private_ui17} transitionProps={{ transition: 'skew-down', duration: 300 }} withArrow>
+                                                                <ActionIcon disabled={!slot.isOwner} color='blue' variant="light" onClick={() => openModal(slot)}>
+                                                                    <IconPencil size={15} />
                                                                 </ActionIcon>
                                                             </Tooltip>
-                                                        </Group>
-                                                    ) : '-'}
+                                                            {dataPrivate.giveKey && (
+                                                                <Tooltip sx={{ padding: '2px 10px', borderRadius: 7 }} openDelay={200} color='yellow' label={lang.private_ui18} transitionProps={{ transition: 'skew-down', duration: 300 }} withArrow>
+                                                                    <ActionIcon color='yellow' variant="light" onClick={() => GiveKey(slot.plate)}>
+                                                                        <IconKey size={15} />
+                                                                    </ActionIcon>
+                                                                </Tooltip>
+                                                            )}
+
+                                                        </>) : '-'}
+                                                    </Group>
                                                 </td>
                                             </tr>
                                         ))}
@@ -334,7 +413,14 @@ const PrivateGarages: React.FC<{ visible: boolean }> = ({ visible }) => {
 
 
 
-
+                {selectedSlot && (
+                    <AuthModal
+                        opened={modalOpened}
+                        close={closeModal}
+                        vehicleLabel={selectedSlot.vehname}
+                        onChangeName={handleChangeName}
+                    />
+                )}
 
 
 

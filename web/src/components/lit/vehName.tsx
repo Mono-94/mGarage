@@ -25,6 +25,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ opened, close, vehicleLabel, onCh
                     data-autofocus
                     placeholder={vehicleLabel}
                     value={newName}
+                    min={1}
+                    max={25}
                     onChange={(e) => setNewName(e.currentTarget.value)}
                     sx={{ flex: 1 }}
                 />
