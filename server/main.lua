@@ -145,9 +145,9 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
             if Config.CarkeysItem then
                 if vehicledata.metadata.fakeplate then
-                    Vehicles.ItemCarKeys(source, 'add', vehicledata.metadata.fakeplate)
+                    Vehicles.ItemCarKeys(source, 'add', vehicledata.metadata.fakeplate, data.vehicleid)
                 else
-                    Vehicles.ItemCarKeys(source, 'add', vehicle.plate)
+                    Vehicles.ItemCarKeys(source, 'add', vehicle.plate, data.vehicleid)
                 end
             end
             retval = true
@@ -169,7 +169,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             local metadata = Vehicle.GetMetadata('customGarage')
             if metadata then
                 if Config.CarkeysItem then
-                    Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
+                    Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate, Vehicle.id)
                 end
                 return Vehicle.DeleteVehicle(false)
             end
@@ -187,9 +187,9 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 if Config.CarkeysItem then
                     local fakepalte = Vehicle.GetMetadata('fakeplate')
                     if fakepalte then
-                        Vehicles.ItemCarKeys(source, 'delete', fakepalte)
+                        Vehicles.ItemCarKeys(source, 'delete', fakepalte, Vehicle.id)
                     else
-                        Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
+                        Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate, Vehicle.id)
                     end
                 end
                 Vehicle.StoreVehicle(data.name, data.props)
@@ -227,7 +227,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                     function(affectedRows)
                         if affectedRows then
                             if Config.CarkeysItem then
-                                Vehicles.ItemCarKeys(source, 'delete', data.plate)
+                                Vehicles.ItemCarKeys(source, 'delete', data.plate, Vehicle.id)
                             end
                             DeleteEntity(entity)
                         end
