@@ -1,3 +1,5 @@
+local Core = require 'framework'
+
 local ServerCallBack = function(action, data, delay)
     return lib.callback.await('mGarage:Interact', delay or false, action, data)
 end

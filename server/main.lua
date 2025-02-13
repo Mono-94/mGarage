@@ -1,3 +1,19 @@
+local Core = require 'framework'
+
+local query = {
+    ['esx'] = {
+        queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1',
+        queryStore2 =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
+        queryImpound =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `coords` = NULL, metadata = ? WHERE `plate` = ?',
+        setImpound =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `coords` = NULL, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
+    },
+}
+
+local Querys = query[Core.FrameWork]
+
 lib.callback.register('mGarage:Interact', function(source, action, data, vehicle)
     local retval = nil
     local Player = Core:Player(source)

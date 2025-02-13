@@ -2,9 +2,6 @@ Config                = {}
 
 Config.Debug          = false
 
--- esx | standalone
-Config.Framework      = 'esx'
-
 -- To edit/create garages
 Config.AdminGroup     = 'admin'
 

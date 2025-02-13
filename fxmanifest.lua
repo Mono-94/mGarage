@@ -13,6 +13,7 @@ shared_scripts {
   '@mVehicle/import.lua',
   'Config.lua',
   'addons/**/Config.lua',
+
 }
 
 client_scripts {
@@ -27,6 +28,7 @@ server_scripts {
 }
 
 files {
+  'framework.lua',
   'DefaultGarages.lua',
   'locales/*.json',
   'web/build/index.html',

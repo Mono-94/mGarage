@@ -321,7 +321,7 @@ RegisterSafeEvent('mGarage:editcreate', function()
 end)
 
 
-if Config.DefaultGarages then
+if Config.DefaultGarages and DefaultGarages then
     for k, v in pairs(DefaultGarages) do
         v.id = k + 42094
         v.default = true
@@ -333,7 +333,7 @@ end
 
 AddEventHandler('onResourceStop', function(name)
     if name == GetCurrentResourceName() then
-        lib.hideTextUI()
+        Config.Textui.HideText()
 
         for k, v in pairs(ZoneData) do
             if ZoneData[k].targetEntity then
