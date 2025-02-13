@@ -17,7 +17,8 @@ local Querys = query[Core.FrameWork]
 lib.callback.register('mGarage:Interact', function(source, action, data, vehicle)
     local retval = nil
     local Player = Core:Player(source)
-    local identifier = Player.identifier()
+
+    local identifier = Player.identifier
 
     if action == 'get' then
         local vehicles = {}
