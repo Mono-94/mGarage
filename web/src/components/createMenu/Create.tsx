@@ -47,7 +47,12 @@ const Create: React.FC = ({ }) => {
          name: (value) => (value.trim() ? null : 'Required'),
          garagetype: (value) => (value ? null : 'Required'),
          zoneType: (value) => (value ? null : 'Required'),
-         carType: (value) => (value.length > 0 ? null : 'Required'),
+         carType: (value, values) => {
+            if (values.garagetype === 'custom') {
+               return null; 
+            }
+            return value.length > 0 ? null : 'Required';
+         },
          points: (value) => (value.length > 0 ? null : 'Required'),
          spawnpos: (value) => (value.length > 0 ? null : 'Required'),
          actioncoords: (value) => {
