@@ -7,12 +7,28 @@ local FrameWorks = {
 
 Core.FrameWork = FrameWorks.esx or FrameWorks.ox or 'standalone'
 
+ESX, OX = nil, nil
+
+
+if Core.FrameWork == "esx" then
+    ESX = exports["es_extended"]:getSharedObject()
+elseif Core.FrameWork == 'ox' then
+   
+end
 
 if not IsDuplicityVersion() then -- client side
+    if Core.FrameWork == "esx" then
+        RegisterNetEvent('esx:setJob', function(job, lastJob)
+            ESX.PlayerData.job = job
+        end)
+    end
+
     function Core:GetPlayerJob()
         if Core.FrameWork == "esx" then
-            local Job = LocalPlayer.state.job
+            local Job = ESX.PlayerData.job
             return { name = Job.name, grade = Job.grade, gradeName = Job.grade_name }
+        elseif Core.FrameWork == "ox" then
+
         elseif Core.FrameWork == "standalone" then
             -- Your custom logic for standalone framework
             return { name = '', grade = '', gradeName = '' }
@@ -22,6 +38,8 @@ if not IsDuplicityVersion() then -- client side
     function Core:PlayerGroup()
         if Core.FrameWork == "esx" then
             return LocalPlayer.state.group
+        elseif Core.FrameWork == "ox" then
+
         elseif Core.FrameWork == "standalone" then
             -- Your custom logic for standalone framework
             return ''
@@ -30,21 +48,32 @@ if not IsDuplicityVersion() then -- client side
 
     function Core:GetPlayerMetadata()
         if Core.FrameWork == "esx" then
-            return LocalPlayer.state.metadata
+            return ESX.PlayerData.metadata
+        elseif Core.FrameWork == "ox" then
+
         elseif Core.FrameWork == "standalone" then
             -- Your custom logic for standalone frameworkr
             return {}
         end
     end
-else -- server side
-    ESX, OX = nil, nil
 
-    if Core.FrameWork == "esx" then
-        ESX = exports["es_extended"]:getSharedObject()
-    elseif Core.FrameWork == 'ox' then
-        OX = require '@ox_core.lib.init'
+    ---@param callback function
+    function Core:ClienPlayerLoad(callback)
+        if Core.FrameWork == "esx" then
+            RegisterNetEvent('esx:playerLoaded')
+            AddEventHandler('esx:playerLoaded', function(xPlayer)
+                callback(xPlayer)
+            end)
+            RegisterNetEvent('esx:playerLoaded', function(sourcePlayer, xPlayer, isNew)
+                callback(sourcePlayer, xPlayer, isNew)
+            end)
+        elseif Core.FrameWork == "ox" then
+
+        elseif Core.FrameWork == "standalone" then
+
+        end
     end
-
+else -- server side
     --- @class Player
     --- @field clientEvent function
     --- @field PlayerFunctions function
@@ -75,7 +104,7 @@ else -- server side
             if Core.FrameWork == "esx" then
                 return ESX.GetPlayerFromId(src)
             elseif Core.FrameWork == "ox" then
-               
+
             elseif Core.FrameWork == "standalone" then
 
             end
@@ -208,7 +237,7 @@ else -- server side
                 account.addMoney(ammount)
             end)
         elseif Core.FrameWork == "ox" then
-            
+
         elseif Core.FrameWork == "standalone" then
             return true
         end

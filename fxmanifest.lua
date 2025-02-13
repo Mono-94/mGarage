@@ -18,13 +18,13 @@ shared_scripts {
 
 client_scripts {
   'client/**/*',
-  'addons/**/client.lua',
+  'addons/**/client/client.lua',
 }
 
 server_scripts {
   '@oxmysql/lib/MySQL.lua',
   'server/**/*',
-  'addons/**/server.lua',
+  'addons/**/server/server.lua',
 }
 
 files {
