@@ -1,44 +1,21 @@
-Core = nil
+Core = {}
 
 
-
-function LoadCore()
+function Core:GetPlayerJob()
     if Config.Framework == "esx" then
-        Core = exports["es_extended"]:getSharedObject()
-    elseif Config.Framework == "LG" then
-        Core = exports['LegacyFramework']:ReturnFramework()
-    elseif Config.Framework == "qbox" then
-        Core = exports.qbx_core:GetPlayerData()
+        local Job = LocalPlayer.state.job
+        return { name = Job.name, grade = Job.grade, gradeName = Job.grade_name }
+    elseif Config.Framework == "standalone" then
+        -- Your custom logic for standalone framework
+        return { name = '', grade = '', gradeName = '' }
     end
 end
 
-LoadCore()
-
-function GetJob()
+function Core:PlayerGroup()
     if Config.Framework == "esx" then
-        local job = Core.PlayerData.job
-        if not job then
-            print('not load?...')
-            LoadCore()
-            job = Core.PlayerData.job
-        end
-        return { name = job.name, grade = job.grade }
-
-    elseif Config.Framework == "qbox" then
-        local name, grade
-        for k, v in pairs(Core.jobs) do
-            name = k
-            grade = v
-        end
-        return { name = name, grade = grade }
+        return LocalPlayer.state.group
     elseif Config.Framework == "standalone" then
+        -- Your custom logic for standalone framework
         return true
-    elseif Config.Framework == "LG" then
-        local PlayerData = Core.PlayerFunctions.GetClientData()[1]
-        local Job = PlayerData?.nameJob
-        local Grade = PlayerData?.gradeJob
-
-        return { name = Job, grade = Grade }
     end
-    return false
 end

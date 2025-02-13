@@ -1,0 +1,19 @@
+$color1: #1A1B1E;
+$color2: #292929e6;
+
+.createmenu {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    bottom: 0;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.cm {
+    background-color: #25262bfa;
+    border-radius: 5px;
+    transition: height 0.3s ease, width 0.3s ease;
+    margin-bottom: 40px;
+}
+

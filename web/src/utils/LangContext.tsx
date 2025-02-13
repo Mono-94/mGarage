@@ -1,4 +1,12 @@
-{
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { fetchNui } from './fetchNui';
+import { useNuiEvent } from '../hooks/useNuiEvent';
+import { isEnvBrowser } from './misc';
+
+interface Lang { [key: string]: string; }
+
+//default lang
+const DevLang: Lang = {
     "GarageName": "Nombre del Garaje",
     "GarageCreateSpan": "Nombre único por garaje",
     "GarageJob": "Trabajo",
@@ -92,7 +100,7 @@
     "GarageCreate5": "Garaje %s Creado correctamente",
     "GarageCreate6": "Garaje eliminado correctamente",
     "GarageCreate7": "Garaje actualizado correctamente",
-    "TextUiCreateZone": "[MB1] Set Point  \n  [MB2] Delete last point  \n  [SCROLL] Height  \n  [ENTER] Save Zone  \n  [BACKSPACE] Close  \n  [W] Move Forward  \n  [S] Move Backward  \n  [A] Move Left  \n  [D] Move Right  \n  [Q] Move Down  \n  [E] Move Up",
+    "TextUiCreateZone": "[MB1] + Punto   \n  [MB2] Eliminar ultimo punto   \n  [SCROLL] Altura  \n  [ENTER] Guardar Zona  \n  [BACKSPACE] Cerrar ",
     "TextUiCoords": "[E] +Coords  \n  [SCROLL] Direccion  \n  [BACKSPACE] Eliminar ultima coord  \n  [G] Nada/Player/Vehículo  \n  [ENTER] Guardar Coords",
     "private_addon": "",
     "private_addon_client": "",
@@ -162,4 +170,41 @@
     "ui_name1": "Nombre",
     "ui_name2": "Renombrar vehículo",
     "ui_name3": "Cambiar"
-}
+};
+
+
+const LangContext = createContext<Lang>(DevLang);
+
+export const LangProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [lang, setLang] = useState<Lang>(DevLang);
+
+    useNuiEvent<Lang>('mGarage:Lang', (data) => {
+        setLang(data);
+    });
+
+    useEffect(() => {
+        if (isEnvBrowser()) {
+            setLang(DevLang);
+        } else {
+            fetchNui<Lang>('mGarage:Lang')
+                .then(data => {
+                    setLang(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching language data:', error);
+                });
+        }
+    }, []);
+
+    const value = useMemo(() => lang, [lang]);
+
+    return (
+        <LangContext.Provider value={value}>
+            {children}
+        </LangContext.Provider>
+    );
+};
+
+export const useLang = () => {
+    return useContext(LangContext);
+};

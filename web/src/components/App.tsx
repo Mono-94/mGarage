@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import Garage from './garage';
-import Menu from './menu';
+import Garage from './garageMenu/garage';
+import Menu from './createMenu/menu';
 import { fetchNui } from '../utils/fetchNui';
 import { useNuiEvent } from '../hooks/useNuiEvent';
 import { isEnvBrowser } from '../utils/misc';
-import BuyGarage from './private/buyprivate';
+import BuyGarage from './privateMenu/buyprivate';
 import VisibilityButtons from './mono';
-import PrivateGarages from './private/privates';
-import VehicleToolTip from './private/vehicleTooltip';
+import PrivateGarages from './privateMenu/privates';
+import VehicleToolTip from './privateMenu/vehicleTooltip';
+import './index.scss';
+
 
 enum View {
   None,
@@ -21,16 +23,18 @@ enum View {
 const App: React.FC = () => {
   const [visibleView, setVisibleView] = useState<View>(View.None);
 
+
   const setView = useCallback((view: View) => {
     setVisibleView(view);
   }, []);
+
 
   const handleShowGarage = () => setView(View.Garage);
   const handleShowMenu = () => setView(View.Menu);
   const handleShowBuy = () => setView(View.Buy);
   const handleShowPrivates = () => setView(View.Privates);
   const handleShowTooltip = () => setView(View.Tooltip);
-  
+
   useNuiEvent<boolean>('setVisibleGarage', (isVisible) => setView(isVisible ? View.Garage : View.None));
   useNuiEvent<boolean>('setVisibleMenu', (isVisible) => setView(isVisible ? View.Menu : View.None));
   useNuiEvent<boolean>('setVisibleBuy', (isVisible) => setView(isVisible ? View.Buy : View.None));
@@ -73,7 +77,7 @@ const App: React.FC = () => {
         privatesVisible={visibleView === View.Privates}
         privatesTooltip={visibleView === View.Tooltip}
       />
-      
+
       <Menu visible={visibleView === View.Menu} />
       <Garage visible={visibleView === View.Garage} />
       <BuyGarage visible={visibleView === View.Buy} />

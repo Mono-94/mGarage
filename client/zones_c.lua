@@ -1,16 +1,23 @@
 local Target = exports.ox_target
 local ZoneData = {}
 local PolyZone = {}
+local DefaultGarages = require 'DefaultGarages'
 
-local SendZones = function()
+
+local SendZones = function(show)
     local filteredData = {}
+
     for _, v in pairs(ZoneData) do
-        if v ~= nil then
+        if v ~= nil and not v.default then
             table.insert(filteredData, v)
         end
     end
+
     SendNUI("GarageZones", filteredData)
+
+    if show then ShowNui('setVisibleMenu', true) end
 end
+
 
 local SetBlip = function(data)
     local entity = AddBlipForCoord(data.actioncoords.x, data.actioncoords.y, data.actioncoords.z)
@@ -27,8 +34,9 @@ end
 
 local SetNPC = function(data)
     lib.requestModel(data.npchash, 5000)
-    local entity = CreatePed(2, data.npchash, data.actioncoords.x, data.actioncoords.y, data.actioncoords.z, false, false)
-    SetEntityHeading(entity, data.actioncoords.w)
+    local entity = CreatePed(2, data.npchash, data.actioncoords.x, data.actioncoords.y, data.actioncoords.z,
+        data.actioncoords.w, false, false)
+
     if Config.PedAnims.anims then
         local RandomAnim = Config.PedAnims.list[math.random(1, #Config.PedAnims.list)]
         TaskStartScenarioInPlace(entity, RandomAnim, 0, true)
@@ -39,21 +47,36 @@ local SetNPC = function(data)
     return entity
 end
 
+local SetProp = function(data)
+    lib.requestModel('prop_parkingpay', 5000)
+    local entity = CreateObjectNoOffset('prop_parkingpay', data.actioncoords.x, data.actioncoords.y, data.actioncoords.z,
+        false,
+        false, nil)
+    SetEntityHeading(entity, data.actioncoords.w / 2)
+    return entity
+end
+
 local DeleteZone = function(id)
     if ZoneData[id].zoneType == 'target' then
-        Target:removeZone(ZoneData[id].TargetId)
+        Target:removeLocalEntity(ZoneData[id].targetEntity)
     end
-    if DoesEntityExist(ZoneData[id].npcEntity) then
-        DeleteEntity(ZoneData[id].npcEntity)
+
+    if DoesEntityExist(ZoneData[id].targetEntity) then
+        DeleteEntity(ZoneData[id].targetEntity)
     end
 
     if DoesBlipExist(ZoneData[id].blipEntity) then
         RemoveBlip(ZoneData[id].blipEntity)
     end
 
-    PolyZone[id]:remove()
+    Target:removeGlobalVehicle({ 'mGarage:SaveTarget' .. ZoneData[id].name })
+
+
+    if PolyZone[id] then PolyZone[id]:remove() end
 
     ZoneData[id] = nil
+
+    SendZones()
 
     if not ZoneData[id] then
         return true
@@ -62,48 +85,41 @@ local DeleteZone = function(id)
     end
 end
 
-lib.callback('mGarage:GarageZones', false, function(response)
-    if response then
-        for k, v in pairs(response) do
-            if not v.private then
-                local eng = json.decode(v.garage)
-                eng.name  = v.name
-                eng.id    = v.id
-                CreateGarage(eng)
-            end
-        end
-    end
-end, 'getZones')
+
+
 
 function CreateGarage(data)
-    if not ZoneData[data.id] then ZoneData[data.id] = data end
-
     if type(data.points) ~= 'table' then
         data.points = json.decode(data.points)
     end
 
-    if not data.points or #data.points == 1 then
-        return lib.print.error(('Garage [ ID %s - NAME %s ] - data points malformed | Set new Zoona'):format(data.id,
-            data.name))
+    if not data.points or #data.points == 1 or not next(data.points) then
+        lib.print.error(('Garage [ ID %s - NAME %s ] - data points malformed | Set new Zoona'):format(data.id, data.name))
+        return
     end
 
-    if not data.actioncoords then
-        return lib.print.error(('Garage [ ID %s - NAME %s ] - no Action Coords | Set new Coords'):format(data.id,
-            data.name))
+    if not data.actioncoords or not next(data.actioncoords) then
+        lib.print.error(('Garage [ ID %s - NAME %s ] - no Action Coords | Set new Coords'):format(data.id, data.name))
+        return
     end
 
     if data.blip then
-        ZoneData[data.id].blipEntity = SetBlip(data)
+        data.blipEntity = SetBlip(data)
     end
+
+    if data.job and type(data.job) == 'string' and data.job == '' then
+        data.job = false
+    end
+
 
     PolyZone[data.id] = lib.zones.poly({
         name = data.name .. '-garage',
         points = data.points,
-        debugColour = vec4(51, 54, 92, 50.0),
+        debugColour = vec4(255.0, 255.0, 255.0, 50.0),
         thickness = data.thickness,
         debug = data.debug,
         inside = function()
-            if data.zoneType == 'textui' and (not data.job or GetJob().name == data.job) then
+            if data.zoneType == 'textui' and (not data.job or Core:GetPlayerJob().name == data.job) then
                 if IsControlJustReleased(0, 38) then
                     data.entity = cache.vehicle
                     if GetPedInVehicleSeat(data.entity, -1) == cache.ped then
@@ -115,21 +131,18 @@ function CreateGarage(data)
             end
         end,
         onEnter = function()
-            if data.job == '' then
-                data.job = false
-            end
-
             if data.zoneType == 'target' then
-                if not data.npchash or data.npchash == '' then
-                    data.npchash = 'csb_trafficwarden'
+                if data.prop then
+                    data.targetEntity = SetProp(data)
+                elseif not data.prop then
+                    if not data.npchash or data.npchash == '' then
+                        data.npchash = 'csb_trafficwarden'
+                    end
+                    data.targetEntity = SetNPC(data)
                 end
 
-                ZoneData[data.id].npcEntity = SetNPC(data)
-
-                ZoneData[data.id].TargetId = Target:addLocalEntity(ZoneData[data.id].npcEntity, {
+                data.TargetId = Target:addLocalEntity(data.targetEntity, {
                     {
-                        debug = true,
-                        drawSprite = true,
                         groups = data.job,
                         label = data.name,
                         icon = "fa-solid fa-warehouse",
@@ -139,18 +152,11 @@ function CreateGarage(data)
                         end
                     },
                 })
-            elseif data.zoneType == 'textui' or Config.Debug then
-                local Action = function()
-                    TextUI(data.name)
+            elseif data.zoneType == 'textui' then
+                if not data.job or Core:GetPlayerJob().name == data.job then
+                    Config.Textui.Showtext(data.name)
                 end
-                if data.job then
-                    if GetJob().name == data.job then
-                        Action()
-                    end
-                else
-                    TextUI(data.name)
-                end
-            elseif data.zoneType == 'radial' or Config.Debug then
+            elseif data.zoneType == 'radial' then
                 local Action = function()
                     lib.addRadialItem({
                         {
@@ -171,11 +177,7 @@ function CreateGarage(data)
                         }
                     })
                 end
-                if data.job then
-                    if GetJob().name == data.job then
-                        Action()
-                    end
-                else
+                if not data.job or Core:GetPlayerJob().name == data.job then
                     Action()
                 end
             end
@@ -187,7 +189,7 @@ function CreateGarage(data)
                         icon = 'fa-solid fa-road',
                         label = locale('TargetSaveCar'),
                         groups = data.job,
-                        distance = 3.0,
+                        distance = Config.TargetDistance,
                         onSelect = function(vehicle)
                             data.entity = vehicle.entity
                             SaveCar(data)
@@ -198,39 +200,51 @@ function CreateGarage(data)
         end,
         onExit = function()
             exports.ox_target:removeGlobalVehicle({ 'mGarage:SaveTarget' .. data.name })
-            if ZoneData[data.id].zoneType == 'target' then
-                if DoesEntityExist(ZoneData[data.id].npcEntity) then
-                    DeleteEntity(ZoneData[data.id].npcEntity)
-                    Target:removeLocalEntity(ZoneData[data.id].npcEntity)
+
+            if data.zoneType == 'target' then
+                if DoesEntityExist(data.targetEntity) then
+                    DeleteEntity(data.targetEntity)
+                    Target:removeLocalEntity(data.targetEntity)
                 end
-            elseif ZoneData[data.id].zoneType == 'textui' then
-                HideTextUI()
-            elseif ZoneData[data.id].zoneType == 'radial' then
+            elseif data.zoneType == 'textui' then
+                Config.Textui.HideText()
+            elseif data.zoneType == 'radial' then
                 lib.removeRadialItem('garage_save')
                 lib.removeRadialItem('garage_access')
             end
         end
     })
+
+    ZoneData[data.id] = data
+
+    Citizen.Wait(100)
+
+    SendZones()
 end
 
-if Config.DefaultGarages then
-    for k, v in pairs(Config.GaragesDefault) do
-        v.id = k + 42094
-        v.default = true
-        CreateGarage(v)
+lib.callback('mGarage:GarageZones', false, function(response)
+    if response then
+        for k, v in pairs(response) do
+            if not v.private then
+                local eng = json.decode(v.garage)
+                eng.name  = v.name
+                eng.id    = v.id
+                if eng.job == '' then
+                    eng.job = false
+                end
+
+                CreateGarage(eng)
+            end
+        end
     end
-end
+end, 'getZones')
 
 
-
-RegisterNetEvent('mGarage:Zone', function(action, data)
+RegisterSafeEvent('mGarage:Zone', function(action, data)
     if action == 'add' then
         CreateGarage(data)
     elseif action == 'delete' then
-        local check = DeleteZone(data)
-        if check then
-            SendZones()
-        end
+        DeleteZone(data)
     elseif action == 'update' then
         local check = DeleteZone(data.id)
         if check then
@@ -239,64 +253,107 @@ RegisterNetEvent('mGarage:Zone', function(action, data)
     end
 end)
 
-local promi = nil
 
-local GarageAdmAction = function(action, data, delay)
+local ZonesCallBack = function(action, data, delay)
     return lib.callback.await('mGarage:GarageZones', delay or false, action, data)
 end
 
+local usePromise = nil
+---@param cb function
 RegisterNuiCallback('mGarage:adm', function(data, cb)
     local retval
+    usePromise = nil
     if data.action == 'create' then
-        retval = GarageAdmAction('create', data.data)
+        retval = ZonesCallBack('create', data.data)
     elseif data.action == 'zone' then
-        promi = promise:new()
-        CreateZone('mGarage:ExitZone_' .. #ZoneData + 1, function(zoone)
+        ToggleMenu(true, 'zone')
+
+        usePromise = promise:new()
+
+        CreateZone('mGarage:ExitZone_' .. #ZoneData + 1, false, function(zoone)
             retval = zoone
-            promi:resolve(zoone)
-            ShowNui('setVisibleMenu', true)
+            usePromise:resolve(zoone)
+            ToggleMenu(false)
         end)
     elseif data.action == 'coords' then
-        promi = promise:new()
-        CopyCoords('single', function(coords)
+        ToggleMenu(true, 'coords')
+
+        usePromise = promise:new()
+
+        CopyCoords('single', 'ped', false, function(coords)
             if coords then
-                ShowNui('setVisibleMenu', true)
-                retval = { x = coords.x, y = coords.y, z = coords.z, w = coords.w }
-                promi:resolve()
-            end
-        end, true)
-    elseif data.action == 'spawn_coords' then
-        promi = promise:new()
-        CopyCoords('multi', function(coords)
-            if coords then
-                ShowNui('setVisibleMenu', true)
+                ToggleMenu(false)
                 retval = coords
-                promi:resolve()
+                usePromise:resolve()
             end
-        end, true)
+        end)
+    elseif data.action == 'spawn_coords' then
+        ToggleMenu(true, 'coords')
+
+        usePromise = promise:new()
+
+        CopyCoords('multi', 'car', false, function(coords)
+            if coords then
+                ToggleMenu(false)
+                retval = coords
+                usePromise:resolve()
+            end
+        end)
     elseif data.action == 'update' then
-        retval = GarageAdmAction('update', data.data)
+        retval = ZonesCallBack('update', data.data)
     elseif data.action == 'delete' then
-        retval = GarageAdmAction('delete', data.data, 1500)
+        retval = ZonesCallBack('delete', data.data, 1500)
     elseif data.action == 'teleport' then
         retval = true
-        SetEntityCoords(PlayerPedId(), data.data.actioncoords.x + 1.0, data.data.actioncoords.y, data.data.actioncoords
-            .z)
+        SetEntityCoords(cache.ped, data.data.actioncoords.x + 1.0, data.data.actioncoords.y,
+            data.data.actioncoords.z or 0,
+            nil, nil, false, false)
     end
-    if promi then
-        Citizen.Await(promi)
-    end
+
+    if usePromise then Citizen.Await(usePromise) end
 
     cb(retval)
 end)
 
-lib.callback.register('mGarage:OpenAdmins', function()
-    SendZones()
-    ShowNui('setVisibleMenu', true)
+
+RegisterSafeEvent('mGarage:editcreate', function()
+    if Core:PlayerGroup() == Config.AdminGroup then SendZones(true) end
 end)
 
-AddEventHandler('onResourceStart', function(name)
+
+if Config.DefaultGarages then
+    for k, v in pairs(DefaultGarages) do
+        v.id = k + 42094
+        v.default = true
+        CreateGarage(v)
+    end
+end
+
+
+
+AddEventHandler('onResourceStop', function(name)
     if name == GetCurrentResourceName() then
         lib.hideTextUI()
+
+        for k, v in pairs(ZoneData) do
+            if ZoneData[k].targetEntity then
+                DeleteEntity(ZoneData[k].targetEntity)
+            end
+        end
     end
 end)
+
+function GetGaragesData()
+    local Garages = { impound = {}, garage = {}, custom = {} }
+    for k, v in pairs(ZoneData) do
+        if v ~= nil then
+            if v.job then
+                v.jobname = ('%s, Job: %s'):format(v.name, v.job)
+            end
+            table.insert(Garages[v.garagetype], v)
+        end
+    end
+    return Garages
+end
+
+exports('GetGaragesData', GetGaragesData)

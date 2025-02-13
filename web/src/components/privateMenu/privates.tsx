@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { fetchNui } from '../../utils/fetchNui';
 import { useNuiEvent } from '../../hooks/useNuiEvent';
-import Lang from '../../utils/LangR';
+import {useLang} from '../../utils/LangContext';
 import { debugData } from '../../utils/debugData';
-import { Button, Text, Group, Box, Transition, Table, Modal, TextInput, Tabs, ActionIcon, CloseButton, ScrollArea, SimpleGrid, Paper, Stack, Divider, NumberInput, Badge, Tooltip, Card, Image } from '@mantine/core';
-import { IconBox, IconBuildingWarehouse, IconCar, IconCarGarage, IconKey, IconMessageCircle, IconPencil, IconPhoto, IconPlus, IconSettings, IconTrash, IconUser, IconUsers } from '@tabler/icons-react';
-import AuthModal from '../lit/vehName';
+import { Button, Text, Group,  Transition, Table,  Tabs, ActionIcon, CloseButton, ScrollArea, SimpleGrid, Paper, Stack,  NumberInput, Badge, Tooltip, Card, Image } from '@mantine/core';
+import { IconBox, IconBuildingWarehouse, IconCarGarage, IconKey, IconPencil, IconPlus,  IconTrash,  IconUsers } from '@tabler/icons-react';
+import AuthModal from '../garageTools/vehName';
+
 debugData([
     {
         action: 'private',
@@ -166,12 +167,14 @@ debugData([
     }
 ], 100);
 
+
+
 const PrivateGarages: React.FC<{ visible: boolean }> = ({ visible }) => {
-    const lang = Lang();
+    const lang = useLang();
     const [dataPrivate, setDataPrivate] = useState<any>({});
     const [newAccess, setNewAccess] = useState(0);
-    const [selectedSlot, setSelectedSlot] = useState<any>(null); // Nuevo estado
-    const [modalOpened, setModalOpened] = useState(false); // Nuevo estado
+    const [selectedSlot, setSelectedSlot] = useState<any>(null);
+    const [modalOpened, setModalOpened] = useState(false);
 
     useNuiEvent<any>('private', (data) => {
         setDataPrivate(data);
@@ -211,11 +214,12 @@ const PrivateGarages: React.FC<{ visible: boolean }> = ({ visible }) => {
     const accessRows = Object.entries(dataPrivate.garage?.access || {}).map(([identifier, name]) => (
         <React.Fragment key={identifier}>
             <Group position="apart" style={{ marginRight: 20 }}>
-                <Badge radius={4} >{name}</Badge>
-                <Button compact size="xs" color='red' variant="light" leftIcon={<IconTrash size="1rem" />} onClick={() => removeAccess(identifier, name)}>Remove Access</Button>
+                <Badge radius={4}>{name as string}</Badge>
+                <Button compact size="xs" color='red' variant="light" leftIcon={<IconTrash size="1rem" />} onClick={() => removeAccess(identifier, name as string)}>Remove Access</Button>
             </Group>
         </React.Fragment>
     ));
+    
 
     const handleClose = async () => {
         fetchNui('mGarage:Close', { name: 'setVisiblePrivates' });
@@ -410,20 +414,15 @@ const PrivateGarages: React.FC<{ visible: boolean }> = ({ visible }) => {
 
 
                 </Tabs>
-
-
-
                 {selectedSlot && (
                     <AuthModal
                         opened={modalOpened}
                         close={closeModal}
                         vehicleLabel={selectedSlot.vehname}
-                        onChangeName={handleChangeName}
-                    />
+                        onChangeName={handleChangeName} onCleanName={function (): void {
+                            throw new Error('Function not implemented.');
+                        } }                    />
                 )}
-
-
-
 
             </div>}
         </Transition>

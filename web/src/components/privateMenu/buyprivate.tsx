@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { fetchNui } from '../../utils/fetchNui';
 import { CloseButton, Group, Stack, Text, Paper, Image, Badge, Button, Space, Select, Transition } from '@mantine/core';
 import { useNuiEvent } from '../../hooks/useNuiEvent';
-import Lang from '../../utils/LangR';
+import {useLang} from '../../utils/LangContext';
 import { debugData } from '../../utils/debugData';
 import { IconMoneybag } from '@tabler/icons-react';
 
@@ -49,7 +49,7 @@ debugData([
 ], 100);
 
 const BuyGarage: React.FC<{ visible: boolean }> = ({ visible }) => {
-    const lang = Lang();
+    const lang = useLang();
     const [garageData, setGarageData] = useState<any>(null);
     const [paymentMethod, setPaymentMethod] = useState(''); // default value
 

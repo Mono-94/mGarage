@@ -1,6 +1,5 @@
 import React from 'react';
-import { Progress, Text, Flex, Paper, RingProgress, Center, ThemeIcon, Tooltip } from '@mantine/core';
-import { IconCheck } from '@tabler/icons-react';
+import { RingProgress, Center, ThemeIcon, Tooltip } from '@mantine/core';
 
 interface ProgressBarProps {
     value: number;

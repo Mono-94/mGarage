@@ -2,26 +2,32 @@ fx_version 'cerulean'
 
 game 'gta5'
 
-version '1.1.0'
+version '1.1.9'
+
+use_experimental_fxv2_oal 'yes'
 
 lua54 'yes'
 
 shared_scripts {
-  'shared/*.lua',
   '@ox_lib/init.lua',
-  '@mVehicle/import.lua'
+  '@mVehicle/import.lua',
+  'Config.lua',
+  'addons/**/Config.lua',
 }
 
 client_scripts {
   'client/**/*',
+  'addons/**/client.lua',
 }
 
 server_scripts {
   '@oxmysql/lib/MySQL.lua',
-  'server/**/*'
+  'server/**/*',
+  'addons/**/server.lua',
 }
 
 files {
+  'DefaultGarages.lua',
   'locales/*.json',
   'web/build/index.html',
   'web/build/**/*',

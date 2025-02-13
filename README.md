@@ -2,7 +2,21 @@
  ![Discord](https://img.shields.io/discord/1048630711881568267?style=flat&label=Online%20Users)
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FMono-94%2FmGarage&count_bg=%23E9A711&title_bg=%23232323&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
+> [!NOTE]
+> Useful information that users should know, even when skimming content.
 
+> [!TIP]
+> Helpful advice for doing things better or more easily.
+
+> [!IMPORTANT]
+> Key information users need to know to achieve their goal.
+
+> [!WARNING]
+> Urgent info that needs immediate user attention to avoid problems.
+
+> [!]
+> Advises about risks or negative outcomes of certain actions.
+> 
 # mGarage
 
 * Create garages/impounds in-game or in the Config file
@@ -117,3 +131,6 @@ end)
 ```
 
 ![image](https://i.imgur.com/Y9RXYBH.png)
+
+
+

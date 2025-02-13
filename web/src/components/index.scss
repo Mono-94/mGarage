@@ -1,15 +1,37 @@
-$color1: #1A1B1E;
-$color2: #2e3036;
+$color1: #25262bfa;
+$color2: #272727;
 $Border: 10px;
-
-
-
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
 
 body {
+    -webkit-user-select: none;
     user-select: none;
     color: #ccc;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     overflow: hidden;
+    height: 100%;
+    margin: 0;
+
+
+}
+
+.plate {
+    background-color: $color1;
+    padding: 5px 10px;
+    border-radius: 4px;
+    width: 120px;
+    text-align: center;
+
+}
+
+.vehicleCard {
+    background-color: $color2;
+    padding: 5px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
 }
 
 .Private {
@@ -21,33 +43,47 @@ body {
     right: 5%;
     gap: 10px;
     width: 500px;
-    transform: translateY(-50%);
     border-radius: $Border;
-    background-color: #252525fa;
+    background-color: #1A1B1Efa;
     overflow: hidden;
 }
 
 .Garage {
     position: fixed;
+    top: 50%;
+    right: 10px;
+    width: 350px;
+    height: auto;
+    border-radius: 5px;
+    transform: translateY(-50%);
+    background-color: $color1;
+    padding: 10px;
     display: flex;
     flex-direction: column;
-    padding: 10px;
-    height: max-content;
-    right: 5%;
     gap: 10px;
-    width: 390px;
-    transform: translateY(-50%);
-    border-radius: $Border;
-    background-color: #252525fa;
-    overflow: hidden;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+
+
+    .vehicles {
+        padding-top: 10px;
+        border-radius: 5px;
+        overflow: hidden;
+        padding-bottom: 10px;
+    }
+
+    .head {
+        padding: 10px;
+        border-radius: 5px;
+        overflow: hidden;
+    }
 
 
     .Garage-head {
         display: flex;
-        gap: 10px;
-        padding: 8px;
-        border-radius: $Border;
-        background-color: $color1;
+        flex-direction: column;
+        gap: 5px;
+        border-radius: 5px;
+        justify-content: center;
 
         .name {
             white-space: nowrap;
@@ -66,21 +102,40 @@ body {
             background-color: rgb(78, 12, 12);
             align-items: center;
             display: flex;
-            border-radius: $Border;
+            border-radius: 5px;
         }
     }
-
 }
 
 
 .menu {
-    width: 600px;
-    height: auto;
+    position: absolute;
+    width: 1100px;
+    max-height: 750px;
+    border-radius: 5px 5px 0px 0px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: left 0.7s ease-in-out, opacity 0.7s ease-in-out, transform 0.5s ease, max-height 0.5s ease;
+    overflow: hidden;
+    background-color: rgba(58, 58, 58, 0.9);
+
+    .space {
+        border-radius: 5px;
+        padding: 10px;
+        background-color: $color1;
+    }
+}
+
+.menucontetn {
     position: fixed;
-    top: 50%;
-    right: 5px;
-    transform: translateY(-50%);
-    transition: right 0.7s ease-in-out, opacity 0.7s ease-in-out;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.minimized {
+    transform: translate(-50%, 90%);
 }
 
 .slide-in {
@@ -94,68 +149,39 @@ body {
     pointer-events: none;
 }
 
-.search {
-    display: flex;
+.visible {
+    transform: translateY(-50%) translateX(0);
+    opacity: 1;
+}
+
+.no-visible {
+    transform: translateY(-50%) translateX(100%);
+    opacity: 0;
+}
+
+.textred {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 2px;
     color: #ccc;
-    border-radius: $Border;
-    background-color: $color2;
-    align-items: center;
-    height: 28px;
+    text-shadow: 0px 0px 4px #fa0000d5;
+    text-transform: capitalize;
+}
 
-    &:focus{
-        width: 110px;
-        margin-left: 5px;
-        padding: 0 5px;
-        color: #ccc;
-    }
+.textgreen {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: #ccc;
+    text-shadow: 0px 0px 4px #3cff00d5;
+    text-transform: capitalize;
+}
 
-    &:hover {
-        background-color: $color2;
-        border-radius: $Border;
-        font-weight: bold;
-
-        .search-txt {
-            width: 110px;
-            margin-left: 5px;
-            padding: 0 5px;
-            color: #ccc;
-            border-radius: $Border;
-        }
-
-        .search-btn {
-            font-size: 10px;
-            color: #ccc;
-        }
-    }
-
-    .search-btn {
-        padding: 5px;
-        width: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #ccc;
-    }
-
-    .search-txt {
-        border: none;
-        background: none;
-        outline: none;
-        padding: 0;
-        font-size: 16px;
-        transition: ease-in 0.4s;
-        width: 0;
-        color: #ccc;
-     
-    }
-
-    .search-txt.has-text {
-        width: 110px;
-        margin-left: 5px;
-        padding: 0 5px;
-        color: #ccc;
-    }
-
-
-
+.textyellow {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: #ccc;
+    text-shadow: 0px 0px 4px gold;
+    text-transform: capitalize;
 }

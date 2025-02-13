@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useNuiEvent } from '../../hooks/useNuiEvent';
 import { Button, Group, Paper, Stack, Text } from '@mantine/core';
 import { debugData } from '../../utils/debugData';
-import ProgressBar from '../lit/progress';
+import ProgressBar from '../garageTools/progress';
 import { IconCarCrash, IconEngine, IconGasStation, IconTool } from '@tabler/icons-react';
-import Lang from '../../utils/LangR';
+import {useLang} from '../../utils/LangContext';
 
 debugData([
     {
@@ -37,7 +37,7 @@ debugData([
 const VehicleToolTip: React.FC<{ visible: boolean }> = ({ visible }) => {
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [vehicleData, setVehicleData] = useState<any>(null);
-    const lang = Lang();
+    const lang = useLang();
 
     useNuiEvent<any>('tooltipCoords', (data) => {
         setPosition({ x: data.x, y: data.y });

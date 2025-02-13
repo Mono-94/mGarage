@@ -1,70 +1,46 @@
-Config = {}
-
-Config.Debug = true
-
-Config.Framework = 'esx'     -- esx/ox/standalone/qbox/qb
-
-Config.DefaultGarages = true -- Config Garages ???
-
-Config.CarkeysItem = true
-
-Config.ClearTimeBlip = 1000 * 120 -- 2 mins
-
-Config.TargetDistance = 3.0
-
-Config.BlipDefault = {
-    sprite = 50,
-    color = 0,
-    size = 0.5,
-}
-
---  👍 🕺
-Config.PedAnims = {
-    anims = true,
-    list = {
-        "WORLD_HUMAN_AA_SMOKE",
-        "WORLD_HUMAN_AA_COFFEE",
-        "WORLD_HUMAN_CLIPBOARD",
-        "WORLD_HUMAN_MUSICIAN",
-        "WORLD_HUMAN_STUPOR",
-    }
-}
-
--- ox Target Based job and grade min grade
-Config.TargetImpound = {
-
-    ['police'] = {                  -- jobName
-        minGrades = 0,              -- Min Grade to use
-        impoundName = "Impound Car" -- Impound to send vehicle
-    },
-
-}
-
-Config.GaragesDefault = {
-    --cars
+---@class DefaultGarages
+---@field name string
+---@field garagetype string
+---@field debug boolean
+---@field zoneType string
+---@field prop boolean
+---@field job string|boolean
+---@field blip boolean
+---@field intocar boolean
+---@field isShared boolean
+---@field carType string[] 
+---@field defaultImpound string|boolean
+---@field priceImpound number
+---@field defaultCars? table[]|boolean
+---@field platePrefix? string
+---@field actioncoords vector4
+---@field npchash string|boolean
+---@field thickness number
+---@field points vector3[]
+---@field spawnpos vector4[]
+local DefaultGarages = {
     {
         name = 'Pillbox Hill',
-        garagetype = 'garage',                                                                                                -- 'garage', 'impound'
-        debug = false,                                                                                                        -- true/false Zone debug | boolean
-        zoneType = 'target',                                                                                                  -- 'target', 'textui', 'radial'
-        job = false,                                                                                                          -- string/nil or false  | string / false
-        blip = true,                                                                                                          -- showBlip? | boolean
-        intocar = false,                                                                                                      -- Player in to car? | boolean
-        isShared = false,                                                                                                     -- Take all vehicles from diferent garages.
-        carType = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' }, -- automobile, bike, boat, heli, plane, submarine, trailer, train | string
-        defaultImpound = 'Impound Car',                                                                                       -- Name of impound  | string / false
-        priceImpound = 110,                                                                                                   -- Price of impound | number
-        defaultCars = false,                                                                                                  -- Table {model,plate,price?} | boolean
-        actioncoords = vec4(214.6645, -807.0635, 29.8006, 338.9730),                                                          -- vector4
-        npchash = 'csb_trafficwarden',                                                                                        -- string or false
+        garagetype = 'garage',
+        debug = false,
+        zoneType = 'target',
+        prop = false,
+        job = false,
+        blip = true,
+        intocar = false,
+        isShared = false,
+        carType = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
+        defaultImpound = 'Impound Car',
+        defaultCars = false,
+        actioncoords = vec4(214.5461, -806.9030, 29.8057, 325),
+        npchash = 'csb_trafficwarden',
         thickness = 11.5,
-        points = {                                                                                                            -- Poly Zone Coords
+        points = {
             vec3(199.0, -806.0, 31.0),
             vec3(228.0, -723.0, 31.0),
             vec3(275.0, -739.5, 31.0),
             vec3(244.0, -823.5, 31.0),
         },
-        -- Spawn Coords
         spawnpos = {
             vec4(220.2780456543, -809.17193603516, 30.056179046631, 249.62936401367),
             vec4(221.07490539551, -806.69848632813, 30.390104293823, 248.47229003906),
@@ -136,15 +112,15 @@ Config.GaragesDefault = {
         defaultGarage = 'Pillbox Hill',
         debug = false,
         zoneType = 'target',
+        prop = false,
         job = nil,
         society = nil,
         blip = true,
         intocar = false,
         isShared = false,
         carType = { 'automobile', 'bike' },
-        priceImpound = 110,
         defaultCars = false,
-        actioncoords = vec4(409.2166, -1623.1970, 28.2919, 228.9087),
+        actioncoords = vec4(407.5116, -1624.9034, 28.2919, 228.4878),
         npchash = 'csb_trafficwarden',
         thickness = 4.0,
         points = {
@@ -172,20 +148,18 @@ Config.GaragesDefault = {
             vec4(408.76055908203, -1639.0087890625, 28.291940689087, 50.569999694824)
         }
     },
-
-    --Air
     {
         name = "Los Santos Airport Garage",
         garagetype = 'garage',
         debug = false,
         zoneType = 'target',
+        prop = false,
         job = nil,
         society = nil,
         blip = true,
         intocar = false,
         isShared = false,
         carType = { 'blimp', 'heli', 'plane' },
-        priceImpound = 110,
         defaultCars = false,
         actioncoords = vec4(-993.6690, -2947.7861, 12.9573, 69.3818),
         npchash = 'csb_trafficwarden',
@@ -206,13 +180,13 @@ Config.GaragesDefault = {
         garagetype = 'garage',
         debug = false,
         zoneType = 'target',
+        prop = false,
         job = nil,
         society = nil,
         blip = true,
         intocar = false,
         isShared = false,
         carType = { 'blimp', 'heli', 'plane' },
-        priceImpound = 110,
         defaultCars = false,
         actioncoords = vec4(-1242.0502, -3393.2512, 12.9401, 47.2912),
         npchash = 'csb_trafficwarden',
@@ -228,21 +202,18 @@ Config.GaragesDefault = {
 
         }
     },
-
-
-    --Boat
     {
         name = "La Puerta Boat Garage",
         garagetype = 'garage',
         debug = false,
         zoneType = 'target',
+        prop = false,
         job = nil,
         society = nil,
         blip = true,
         intocar = true,
         isShared = false,
         carType = { 'submarine', 'submarinecar', 'boat' },
-        priceImpound = 110,
         defaultCars = false,
         actioncoords = vec4(-717.8421, -1327.1147, 0.5963, 45.4428),
         npchash = 'csb_trafficwarden',
@@ -263,13 +234,13 @@ Config.GaragesDefault = {
         garagetype = 'impound',
         debug = false,
         zoneType = 'target',
+        prop = false,
         job = nil,
         society = nil,
         blip = true,
         intocar = true,
         isShared = false,
         carType = { 'submarine', 'submarinecar', 'boat' },
-        priceImpound = 110,
         defaultCars = false,
         actioncoords = vec4(-783.7498, -1506.9052, 0.5952, 287.7686),
         npchash = 'csb_trafficwarden',
@@ -285,22 +256,17 @@ Config.GaragesDefault = {
 
         }
     },
-
-
-
-    --- Custom
     {
         name = "LSPD",
         garagetype = 'custom',
         debug = false,
-        zoneType = 'target',
+        zoneType = 'textui',
         job = 'police',
         society = nil,
         blip = false,
         intocar = true,
         isShared = false,
         carType = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
-        priceImpound = 110,
         platePrefix = 'LSPD',
         defaultCars = {
             { model = 'police',  grades = { 1, 2, 3, 4 } }, -- Grandes for jobs
@@ -316,8 +282,16 @@ Config.GaragesDefault = {
         },
         thickness = 6.0,
         spawnpos = {
-            vec4(449.81292724609, -1018.3796386719, 27.528268814087, 330.99160766602)
+            vec4(427.49328613281, -1026.6474609375, 27.984563827515, 0.0),
+            vec4(431.70553588867, -1027.1921386719, 27.911247253418, 0.0),
+            vec4(434.88592529297, -1026.8707275391, 27.853136062622, 0.0),
+            vec4(438.6435546875, -1026.3154296875, 27.784854888916, 0.0),
+            vec4(442.08258056641, -1026.2355957031, 27.722387313843, 0.0),
+            vec4(446.2666015625, -1025.5489501953, 27.642635345459, 0.0)
         }
     },
 
 }
+
+
+return DefaultGarages
