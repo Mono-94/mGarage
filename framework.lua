@@ -75,7 +75,7 @@ else -- server side
             if Core.FrameWork == "esx" then
                 return ESX.GetPlayerFromId(src)
             elseif Core.FrameWork == "ox" then
-                return OX.OxPlayer()
+               
             elseif Core.FrameWork == "standalone" then
 
             end
@@ -207,6 +207,8 @@ else -- server side
             TriggerEvent('esx_addonaccount:getSharedAccount', society, function(account)
                 account.addMoney(ammount)
             end)
+        elseif Core.FrameWork == "ox" then
+            
         elseif Core.FrameWork == "standalone" then
             return true
         end
@@ -218,6 +220,8 @@ else -- server side
             RegisterNetEvent('esx:playerLoaded', function(sourcePlayer, xPlayer, isNew)
                 callback(sourcePlayer, xPlayer, isNew)
             end)
+        elseif Core.FrameWork == "ox" then
+
         elseif Core.FrameWork == "standalone" then
 
         end
