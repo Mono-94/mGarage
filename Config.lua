@@ -62,18 +62,8 @@ end
 
 
 Config.Textui = {
-    Showtext = function(text)
-        lib.showTextUI('[ E ] ' .. text, {
-            position = "bottom-center",
-            icon = 'square-parking',
-            alignIcon = 'top',
-            iconColor = '#7acf3a',
-            style = {
-                borderRadius = 5,
-                backgroundColor = '#141414',
-                fontSize = '14px',
-            }
-        })
+    Showtext = function(text, ...)
+        lib.showTextUI(text, ...)
     end,
 
     HideText = function()
