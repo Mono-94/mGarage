@@ -25,18 +25,17 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         local PlyVehicles = Vehicles.GetAllPlayerVehicles(source, false, true)
 
         if PlyVehicles then
-            for i = 1, #PlyVehicles do
-                local row = PlyVehicles[i]
+            lib.array.forEach(PlyVehicles, function(row)
                 if (data.isShared or data.name == row.parking) then
                     row.isOwner = row.owner == identifier
                     if (data.garagetype == 'garage' and (not row.pound or row.pound == 0)) or data.garagetype == 'impound' then
                         if data.isShared or (type(data.carType) == 'table' and lib.table.contains(data.carType, row.type)) or data.carType == row.type then
                             table.insert(vehicles, row)
                         end
-                        if not row.job == data.job then break end
                     end
                 end
-            end
+            end)
+          
         end
 
         retval = vehicles
