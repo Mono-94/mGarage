@@ -6,7 +6,7 @@
 
 # mGarage 2.0.0 
 
-# [Documents](https://mono-94.github.io/mDocuments/) 
+# [Documents](https://mono-94.github.io/mDocuments/docs/mGarage) 
 
 
 ![image](https://i.imgur.com/Y9RXYBH.png)
