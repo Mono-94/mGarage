@@ -8,12 +8,12 @@ Config.AdminGroup     = 'admin'
 -- Start defaultGarages.lua
 Config.DefaultGarages = true
 
-Config.ClearTimeBlip  = 1000 * 120       -- 2 mins
+Config.ClearTimeBlip  = 1000 * 120 -- 2 mins
 
 Config.TargetDistance = 10.0
 
 
-Config.BlipDefault    = {
+Config.BlipDefault          = {
     sprite = 50,
     color = 0,
     size = 0.5,
@@ -26,15 +26,12 @@ Config.PedAnims             = {
 
 -- ox Target Based job and grade min grade
 Config.TargetImpound        = {
-
-    ['police'] = {                  -- jobName
-        minGrades = 0,              -- Min Grade to use
-        impoundName = "Impound Car" -- Impound to send vehicle
-    },
+    -- job     -- min grade
+    ['police'] = 0,
 
 }
 ----------------------------------------------------------------------
--- on Vehicles delete or /dv 
+-- on Vehicles delete or /dv
 Config.ImpoundVehicledelete = true
 
 -- Default impounds names
