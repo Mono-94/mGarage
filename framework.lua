@@ -17,8 +17,9 @@ elseif Core.FrameWork == 'ox' then
 end
 
 if not IsDuplicityVersion() then -- client side
+
     if Core.FrameWork == "esx" then
-        RegisterNetEvent('esx:setJob', function(job, lastJob)
+        RegisterNetEvent('esx:setJob', function(job)
             ESX.PlayerData.job = job
         end)
     end
@@ -62,10 +63,8 @@ if not IsDuplicityVersion() then -- client side
         if Core.FrameWork == "esx" then
             RegisterNetEvent('esx:playerLoaded')
             AddEventHandler('esx:playerLoaded', function(xPlayer)
+                ESX.PlayerData = xPlayer
                 callback(xPlayer)
-            end)
-            RegisterNetEvent('esx:playerLoaded', function(sourcePlayer, xPlayer, isNew)
-                callback(sourcePlayer, xPlayer, isNew)
             end)
         elseif Core.FrameWork == "ox" then
 
@@ -119,6 +118,7 @@ else -- server side
             if Core.FrameWork == "esx" then
                 return Player.identifier
             elseif Core.FrameWork == "ox" then
+
             elseif Core.FrameWork == "standalone" then
                 return GetPlayerIdentifierByType(src, 'license')
             end
@@ -130,6 +130,7 @@ else -- server side
             if Core.FrameWork == "esx" then
                 return Player.getName()
             elseif Core.FrameWork == "ox" then
+
             elseif Core.FrameWork == "standalone" then
                 return GetPlayerName(src)
             end
@@ -150,6 +151,7 @@ else -- server side
             if Core.FrameWork == "esx" then
                 return Player.removeAccountMoney(account, amount)
             elseif Core.FrameWork == "ox" then
+
             elseif Core.FrameWork == "standalone" then
                 return true
             end
@@ -159,6 +161,7 @@ else -- server side
             if Core.FrameWork == "esx" then
                 return (Player.getGroup() == 'admin')
             elseif Core.FrameWork == "ox" then
+
             elseif Core.FrameWork == "standalone" then
                 return false
             end
@@ -181,6 +184,7 @@ else -- server side
                 local job = Player.getJob()
                 return { name = job.name, grade = job.grade, gradeName = job.grade_name }
             elseif Core.FrameWork == "ox" then
+
             elseif Core.FrameWork == "standalone" then
                 return { name = '', grade = '', gradeName = '' }
             end
@@ -192,6 +196,7 @@ else -- server side
             if Core.FrameWork == "esx" then
                 return Player.getMeta(key)
             elseif Core.FrameWork == "ox" then
+
             elseif Core.FrameWork == "standalone" then
                 return {}
             end
@@ -203,6 +208,7 @@ else -- server side
             if Core.FrameWork == "esx" then
                 Player.setMeta(key, data)
             elseif Core.FrameWork == "ox" then
+
             elseif Core.FrameWork == "standalone" then
 
             end
@@ -214,6 +220,7 @@ else -- server side
             if Core.FrameWork == "esx" then
                 Player.clearMeta(key)
             elseif Core.FrameWork == "ox" then
+                
             elseif Core.FrameWork == "standalone" then
 
             end
