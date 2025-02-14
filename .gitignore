@@ -40,5 +40,9 @@ luac.out
 *.hex
 
 /addons
+# Ignorar todo en la carpeta web
+/web/*
 
-/web/src/**
+# Excepción para la carpeta build y su contenido
+!web/build/
+!web/build/**
