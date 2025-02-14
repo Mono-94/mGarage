@@ -87,3 +87,40 @@ function RegisterSafeEvent(eventName, funct)
     funct(...)
   end)
 end
+
+function SetBlip(data)
+  local entity = AddBlipForCoord(data.actioncoords.x, data.actioncoords.y, data.actioncoords.z)
+  SetBlipSprite(entity, data.blipsprite or Config.BlipDefault.sprite)
+  SetBlipDisplay(entity, 4)
+  SetBlipScale(entity, Config.BlipDefault.size)
+  SetBlipColour(entity, data.blipcolor or Config.BlipDefault.color)
+  SetBlipAsShortRange(entity, true)
+  BeginTextCommandSetBlipName("STRING")
+  AddTextComponentString(data.name)
+  EndTextCommandSetBlipName(entity)
+  return entity
+end
+
+function SetNPC(data)
+  lib.requestModel(data.npchash, 5000)
+  local entity = CreatePed(2, data.npchash, data.actioncoords.x, data.actioncoords.y, data.actioncoords.z,
+    data.actioncoords.w, false, false)
+
+  if Config.PedAnims.anims then
+    local RandomAnim = Config.PedAnims.list[math.random(1, #Config.PedAnims.list)]
+    TaskStartScenarioInPlace(entity, RandomAnim, 0, true)
+  end
+  SetBlockingOfNonTemporaryEvents(entity, true)
+  SetEntityInvincible(entity, true)
+  FreezeEntityPosition(entity, true)
+  return entity
+end
+
+function SetProp(data)
+  lib.requestModel('prop_parkingpay', 5000)
+  local entity = CreateObjectNoOffset('prop_parkingpay', data.actioncoords.x, data.actioncoords.y, data.actioncoords.z,
+    false,
+    false, nil)
+  SetEntityHeading(entity, data.actioncoords.w / 2)
+  return entity
+end
