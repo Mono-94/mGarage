@@ -17,15 +17,13 @@ function OpenGarage(data)
     local SendData = {}
 
     if data.garagetype == 'impound' or data.garagetype == 'garage' then
-        for i = 1, #VehiclesData do
-            local row = VehiclesData[i]
+        lib.array.forEach(VehiclesData, function(row)
             if not row.private then
                 local props = json.decode(row.vehicle)
                 row.vehlabel = Vehicles.GetVehicleLabel(props.model)
                 row.vehlabel_original = row.vehlabel
                 row.metadata = json.decode(row.metadata)
                 row.fuelLevel = props.fuelLevel
-
                 if row.metadata then
                     if row.metadata.fakeplate then
                         row.fakeplate = row.metadata.fakeplate
@@ -56,7 +54,7 @@ function OpenGarage(data)
                     end
                 end
             end
-        end
+        end)
     elseif data.garagetype == 'custom' then
         for k, v in pairs(data.defaultCars) do
             local isValid = true
@@ -107,6 +105,17 @@ function SaveCar(data)
     if not DoesEntityExist(data.entity) then
         return false
     end
+
+    -- local IsTrailer, trailerEntity = GetVehicleTrailerVehicle(data.entity)
+    -- if IsTrailer then
+    --     local trailer = data
+    --     trailer.props = json.encode(lib.getVehicleProperties(trailerEntity))
+    --     trailer.vehmodel = GetDisplayNameFromVehicleModel(GetEntityModel(trailerEntity))
+    --     trailer.entity = VehToNet(trailerEntity)
+    --     trailer.seats = GetVehicleMaxNumberOfPassengers(data.entity)
+    --     ServerCallBack('saveCar', trailer, 0)
+    -- end
+
 
     data.props = json.encode(lib.getVehicleProperties(data.entity))
     data.vehmodel = GetDisplayNameFromVehicleModel(GetEntityModel(data.entity))
@@ -163,28 +172,68 @@ end
 
 
 
-function ImpoundVehicle(data)
-    if DoesEntityExist(data.vehicle) then
+function ImpoundVehicle(vehicleEntity)
+    if DoesEntityExist(vehicleEntity) then
+        local date = nil
+
+        local options = {}
+
+
+        local Garages = GetGaragesData()
+
+        local vehicleClass = GetVehicleType(vehicleEntity)
+
+        lib.array.forEach(Garages.impound, function(garage)
+            if lib.table.contains(garage.carType, vehicleClass) then
+                local label = garage.jobname or garage.name
+                table.insert(options, { value = garage.name, label = label })
+            end
+        end)
+
+
         local input = lib.inputDialog(locale('ImpoundOption1'), {
             { type = 'textarea', label = locale('ImpoundOption2'), required = true, },
-            { type = 'number',   label = locale('ImpoundOption3'), icon = 'dollar-sign',         min = 1 },
-            { type = 'date',     label = locale('ImpoundOption4'), icon = { 'far', 'calendar' }, default = false, format = "DD/MM/YYYY" },
-            { type = 'time',     label = locale('ImpoundOption5'), icon = { 'far', 'clock' },    default = false, format = '24' }
+            { type = 'number',   label = locale('ImpoundOption3'), icon = 'dollar-sign', min = 1 },
+            { type = 'select',   label = 'Select impound',  icon = 'hashtag',     options = options, },
+            { type = 'checkbox', label = 'Time seizure', },
         })
+
         if not input then return end
 
+        if input[4] then
+            date = lib.inputDialog(locale('ImpoundOption1'), {
+                { type = 'date', label = locale('ImpoundOption4'), icon = { 'far', 'calendar' }, default = false, format = "DD/MM/YYYY" },
+                { type = 'time', label = locale('ImpoundOption5'), icon = { 'far', 'clock' },    default = false, format = '24' }
+            })
+        end
+
+
+
         local dataImpound = {
-            entity = VehToNet(data.vehicle),
+            entity = VehToNet(vehicleEntity),
             price = input[2],
             reason = input[1],
-            dateEndPound = input[3],
-            hourEndPound = input[4],
-            garage = data.impoundName
+            dateEndPound = date and date[1],
+            hourEndPound = date and date[2],
+            garage = input[3]
         }
 
         ServerCallBack('setimpound', dataImpound)
     end
 end
+
+exports.ox_target:addGlobalVehicle({
+    {
+        name = 'Impound_Car',
+        icon = 'fa-solid fa-warehouse',
+        label = locale('ImpoundOption14'),
+        groups = Config.TargetImpound,
+        distance = 5.0,
+        onSelect = function(dta)
+            ImpoundVehicle(dta.entity)
+        end
+    },
+})
 
 function UnpoundVehicle(plate)
     if not plate then
@@ -224,26 +273,7 @@ end)
 
 -- Vehicle Impound
 
-local impoundGroups = {}
-for job, data in pairs(Config.TargetImpound) do
-    impoundGroups[job] = data.minGrades
-end
 
-exports.ox_target:addGlobalVehicle({
-    {
-        name = 'Impound_Car',
-        icon = 'fa-solid fa-warehouse',
-        label = locale('ImpoundOption14'),
-        groups = impoundGroups,
-        distance = 5.0,
-        onSelect = function(vehicle)
-            ImpoundVehicle({
-                vehicle = vehicle.entity,
-                impoundName = Config.TargetImpound[Core:GetPlayerJob().name].impoundName
-            })
-        end
-    },
-})
 
 
 exports('UnpoundVehicle', UnpoundVehicle)
