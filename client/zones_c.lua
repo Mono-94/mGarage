@@ -3,7 +3,6 @@ local ZoneData = {}
 local PolyZone = {}
 local DefaultGarages = require 'DefaultGarages'
 
-
 local SendZones = function(show)
     local filteredData = {}
 
@@ -18,43 +17,6 @@ local SendZones = function(show)
     if show then ShowNui('setVisibleMenu', true) end
 end
 
-
-local SetBlip = function(data)
-    local entity = AddBlipForCoord(data.actioncoords.x, data.actioncoords.y, data.actioncoords.z)
-    SetBlipSprite(entity, data.blipsprite or Config.BlipDefault.sprite)
-    SetBlipDisplay(entity, 4)
-    SetBlipScale(entity, Config.BlipDefault.size)
-    SetBlipColour(entity, data.blipcolor or Config.BlipDefault.color)
-    SetBlipAsShortRange(entity, true)
-    BeginTextCommandSetBlipName("STRING")
-    AddTextComponentString(data.name)
-    EndTextCommandSetBlipName(entity)
-    return entity
-end
-
-local SetNPC = function(data)
-    lib.requestModel(data.npchash, 5000)
-    local entity = CreatePed(2, data.npchash, data.actioncoords.x, data.actioncoords.y, data.actioncoords.z,
-        data.actioncoords.w, false, false)
-
-    if Config.PedAnims.anims then
-        local RandomAnim = Config.PedAnims.list[math.random(1, #Config.PedAnims.list)]
-        TaskStartScenarioInPlace(entity, RandomAnim, 0, true)
-    end
-    SetBlockingOfNonTemporaryEvents(entity, true)
-    SetEntityInvincible(entity, true)
-    FreezeEntityPosition(entity, true)
-    return entity
-end
-
-local SetProp = function(data)
-    lib.requestModel('prop_parkingpay', 5000)
-    local entity = CreateObjectNoOffset('prop_parkingpay', data.actioncoords.x, data.actioncoords.y, data.actioncoords.z,
-        false,
-        false, nil)
-    SetEntityHeading(entity, data.actioncoords.w / 2)
-    return entity
-end
 
 local DeleteZone = function(id)
     if ZoneData[id].zoneType == 'target' then
@@ -85,9 +47,6 @@ local DeleteZone = function(id)
     end
 end
 
-
-
-
 function CreateGarage(data)
     if type(data.points) ~= 'table' then
         data.points = json.decode(data.points)
@@ -111,8 +70,10 @@ function CreateGarage(data)
         data.job = false
     end
 
+    local id = data.id or data.name
 
-    PolyZone[data.id] = lib.zones.poly({
+
+    PolyZone[id] = lib.zones.poly({
         name = data.name .. '-garage',
         points = data.points,
         debugColour = vec4(255.0, 255.0, 255.0, 50.0),
@@ -215,30 +176,12 @@ function CreateGarage(data)
         end
     })
 
-    ZoneData[data.id] = data
+    ZoneData[id] = data
 
-    Citizen.Wait(100)
-
-    SendZones()
-end
-
-lib.callback('mGarage:GarageZones', false, function(response)
-    if response then
-        for k, v in pairs(response) do
-            if not v.private then
-                local eng = json.decode(v.garage)
-                eng.name  = v.name
-                eng.id    = v.id
-                if eng.job == '' then
-                    eng.job = false
-                end
-
-                CreateGarage(eng)
-            end
-        end
+    if not data.default then
+        SendZones()
     end
-end, 'getZones')
-
+end
 
 RegisterSafeEvent('mGarage:Zone', function(action, data)
     if action == 'add' then
@@ -253,7 +196,31 @@ RegisterSafeEvent('mGarage:Zone', function(action, data)
     end
 end)
 
+if Config.DefaultGarages and DefaultGarages then
+    lib.array.forEach(DefaultGarages, function(garage)
+        garage.default = true
+        CreateGarage(garage)
+    end)
+end
 
+lib.callback('mGarage:GarageZones', false, function(response)
+    if response then
+        lib.array.forEach(response, function(garage)
+            if not garage.private then
+                local eng = json.decode(garage.garage)
+                eng.name  = garage.name
+                eng.id    = garage.id
+                if eng.job == '' then
+                    eng.job = false
+                end
+                CreateGarage(eng)
+            end
+        end)
+    end
+end, 'getZones')
+
+
+-- Manage Zones
 local ZonesCallBack = function(action, data, delay)
     return lib.callback.await('mGarage:GarageZones', delay or false, action, data)
 end
@@ -321,16 +288,6 @@ RegisterSafeEvent('mGarage:editcreate', function()
 end)
 
 
-if Config.DefaultGarages and DefaultGarages then
-    for k, v in pairs(DefaultGarages) do
-        v.id = k + 42094
-        v.default = true
-        CreateGarage(v)
-    end
-end
-
-
-
 AddEventHandler('onResourceStop', function(name)
     if name == GetCurrentResourceName() then
         Config.Textui.HideText()
@@ -343,17 +300,21 @@ AddEventHandler('onResourceStop', function(name)
     end
 end)
 
-function GetGaragesData()
-    local Garages = { impound = {}, garage = {}, custom = {} }
+
+---@param count? boolean
+---@return integer|table
+function GetGaragesData(count)
+    local Garages = { impound = {}, garage = {}, custom = {}, totalGarges = 0 }
     for k, v in pairs(ZoneData) do
         if v ~= nil then
+            Garages.totalGarges = Garages.totalGarges + 1
             if v.job then
                 v.jobname = ('%s, Job: %s'):format(v.name, v.job)
             end
             table.insert(Garages[v.garagetype], v)
         end
     end
-    return Garages
+    return count and Garages.totalGarges or Garages
 end
 
 exports('GetGaragesData', GetGaragesData)
