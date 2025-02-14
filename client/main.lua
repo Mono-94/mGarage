@@ -171,13 +171,29 @@ local blipcar = function(coords, plate)
 end
 
 
+RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
+    local retval = nil
+
+    retval = ServerCallBack(data.action, data.data)
+
+    if data.action == 'setBlip' then
+        blipcar(retval, data.data.plate)
+    elseif data.action == 'keys' then
+        Vehicles.VehicleKeysMenu(data.plate, function()
+            OpenGarage(lastData)
+        end)
+    end
+
+    cb(retval)
+end)
+
+
 
 function ImpoundVehicle(vehicleEntity)
     if DoesEntityExist(vehicleEntity) then
         local date = nil
 
         local options = {}
-
 
         local Garages = GetGaragesData()
 
@@ -194,7 +210,7 @@ function ImpoundVehicle(vehicleEntity)
         local input = lib.inputDialog(locale('ImpoundOption1'), {
             { type = 'textarea', label = locale('ImpoundOption2'), required = true, },
             { type = 'number',   label = locale('ImpoundOption3'), icon = 'dollar-sign', min = 1 },
-            { type = 'select',   label = 'Select impound',  icon = 'hashtag',     options = options, },
+            { type = 'select',   label = 'Select impound',         icon = 'hashtag',     options = options, },
             { type = 'checkbox', label = 'Time seizure', },
         })
 
@@ -206,7 +222,6 @@ function ImpoundVehicle(vehicleEntity)
                 { type = 'time', label = locale('ImpoundOption5'), icon = { 'far', 'clock' },    default = false, format = '24' }
             })
         end
-
 
 
         local dataImpound = {
@@ -253,28 +268,6 @@ function UnpoundVehicle(plate)
 
     ServerCallBack('changeimpound', plate)
 end
-
-RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
-    local retval = nil
-
-    retval = ServerCallBack(data.action, data.data)
-
-    if data.action == 'setBlip' then
-        blipcar(retval, data.data.plate)
-    elseif data.action == 'keys' then
-        Vehicles.VehicleKeysMenu(data.plate, function()
-            OpenGarage(lastData)
-        end)
-    end
-
-    cb(retval)
-end)
-
-
--- Vehicle Impound
-
-
-
 
 exports('UnpoundVehicle', UnpoundVehicle)
 exports('ImpoundVehicle', ImpoundVehicle)
