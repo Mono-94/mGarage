@@ -8,7 +8,7 @@
 ---@field blip boolean
 ---@field intocar boolean
 ---@field isShared boolean
----@field carType string[] 
+---@field carType string[]
 ---@field defaultImpound string|boolean
 ---@field priceImpound number
 ---@field defaultCars? table[]|boolean
@@ -269,8 +269,8 @@ local DefaultGarages = {
         carType = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
         platePrefix = 'LSPD',
         defaultCars = {
-            { model = 'police',  grades = { 1, 2, 3, 4 } }, -- Grandes for jobs
-            { model = 'police2', grades = { 'boss' } },     -- Grandes for jobs
+            { model = 'police',  grades = { 1, 2, 3, 4 } },
+            { model = 'police2', grades = { 'boss' } },
         },
         actioncoords = vec4(457.27026367188, -1007.4309082031, 27.297456741333, 195.85415649414),
         npchash = 'csb_trafficwarden',
