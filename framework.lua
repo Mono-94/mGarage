@@ -13,11 +13,10 @@ ESX, OX = nil, nil
 if Core.FrameWork == "esx" then
     ESX = exports["es_extended"]:getSharedObject()
 elseif Core.FrameWork == 'ox' then
-   
+
 end
 
 if not IsDuplicityVersion() then -- client side
-
     if Core.FrameWork == "esx" then
         RegisterNetEvent('esx:setJob', function(job)
             ESX.PlayerData.job = job
@@ -105,7 +104,7 @@ else -- server side
             elseif Core.FrameWork == "ox" then
 
             elseif Core.FrameWork == "standalone" then
-
+                -- Your custom logic for standalone frameworkr
             end
         end
 
@@ -220,7 +219,7 @@ else -- server side
             if Core.FrameWork == "esx" then
                 Player.clearMeta(key)
             elseif Core.FrameWork == "ox" then
-                
+
             elseif Core.FrameWork == "standalone" then
 
             end
