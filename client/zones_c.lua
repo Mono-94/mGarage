@@ -3,11 +3,12 @@ local ZoneData = {}
 local PolyZone = {}
 local DefaultGarages = require 'DefaultGarages'
 
+
+
 local SendZones = function(show)
     local filteredData = {}
-
     for _, v in pairs(ZoneData) do
-        if v ~= nil and not v.default then
+        if v ~= nil then
             table.insert(filteredData, v)
         end
     end
