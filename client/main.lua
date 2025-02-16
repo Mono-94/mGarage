@@ -1,4 +1,4 @@
-local Core = require 'framework'
+Core = require 'framework'
 
 local ServerCallBack = function(action, data, delay)
     return lib.callback.await('mGarage:Interact', delay or false, action, data)
@@ -209,8 +209,8 @@ function ImpoundVehicle(vehicleEntity)
 
         local input = lib.inputDialog(locale('ImpoundOption1'), {
             { type = 'textarea', label = locale('ImpoundOption2'), required = true, },
-            { type = 'number',   label = locale('ImpoundOption3'), icon = 'dollar-sign', min = 1 },
-            { type = 'select',   label = 'Select impound',         icon = 'hashtag',     options = options, },
+            { type = 'number',   label = locale('ImpoundOption3'), icon = 'dollar-sign', min = 0,           default = 0 },
+            { type = 'select',   label = 'Select impound',         icon = 'hashtag',     options = options, required = true },
             { type = 'checkbox', label = 'Time seizure', },
         })
 
