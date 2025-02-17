@@ -290,6 +290,21 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
 end)
 
 
+RegisterNuiCallback('mGarage:ValidModel', function(model, cb)
+    if model then
+        local valid = IsModelValid(model)
+        if not valid then
+            Config.Notify({
+                title = 'mGarage',
+                icon = 'car',
+                description = ('Invalid model: %s'):format(model),
+                type = 'error',
+            })
+        end
+        cb(valid)
+    end
+end)
+
 RegisterSafeEvent('mGarage:editcreate', function()
     if Core:PlayerGroup() == Config.AdminGroup then SendZones(true) end
 end)
