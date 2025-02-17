@@ -18,6 +18,7 @@
 ---@field thickness number
 ---@field points vector3[]
 ---@field spawnpos vector4[]
+---@field rent boolean
 local DefaultGarages = {
     {
         name = 'Pillbox Hill',
@@ -35,6 +36,7 @@ local DefaultGarages = {
         actioncoords = vec4(214.5461, -806.9030, 29.8057, 325),
         npchash = 'csb_trafficwarden',
         thickness = 11.5,
+        rent = false,
         points = {
             vec3(199.0, -806.0, 31.0),
             vec3(228.0, -723.0, 31.0),
@@ -120,6 +122,7 @@ local DefaultGarages = {
         isShared = false,
         carType = { 'automobile', 'bike' },
         defaultCars = false,
+        rent = false,
         actioncoords = vec4(407.5116, -1624.9034, 28.2919, 228.4878),
         npchash = 'csb_trafficwarden',
         thickness = 4.0,
@@ -159,6 +162,7 @@ local DefaultGarages = {
         blip = true,
         intocar = false,
         isShared = false,
+        rent = false,
         carType = { 'blimp', 'heli', 'plane' },
         defaultCars = false,
         actioncoords = vec4(-993.6690, -2947.7861, 12.9573, 69.3818),
@@ -177,7 +181,7 @@ local DefaultGarages = {
     },
     {
         name = "Impound Air",
-        garagetype = 'garage',
+        garagetype = 'impound',
         debug = false,
         zoneType = 'target',
         prop = false,
@@ -186,6 +190,7 @@ local DefaultGarages = {
         blip = true,
         intocar = false,
         isShared = false,
+        rent = false,
         carType = { 'blimp', 'heli', 'plane' },
         defaultCars = false,
         actioncoords = vec4(-1242.0502, -3393.2512, 12.9401, 47.2912),
@@ -213,6 +218,7 @@ local DefaultGarages = {
         blip = true,
         intocar = true,
         isShared = false,
+        rent = false,
         carType = { 'submarine', 'submarinecar', 'boat' },
         defaultCars = false,
         actioncoords = vec4(-717.8421, -1327.1147, 0.5963, 45.4428),
@@ -242,6 +248,7 @@ local DefaultGarages = {
         isShared = false,
         carType = { 'submarine', 'submarinecar', 'boat' },
         defaultCars = false,
+        rent = false,
         actioncoords = vec4(-783.7498, -1506.9052, 0.5952, 287.7686),
         npchash = 'csb_trafficwarden',
         points = {
@@ -268,6 +275,7 @@ local DefaultGarages = {
         isShared = false,
         carType = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
         platePrefix = 'LSPD',
+        rent = false,
         defaultCars = {
             { model = 'police',  grades = { 1, 2, 3, 4 } },
             { model = 'police2', grades = { 'boss' } },
