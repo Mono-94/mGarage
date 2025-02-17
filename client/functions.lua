@@ -89,6 +89,9 @@ function RegisterSafeEvent(eventName, funct)
 end
 
 function SetBlip(data)
+  if Config.BlipDefault.stackBlips then
+    data.name = data.rent and Config.BlipDefault.rent or Config.BlipDefault[data.garagetype]
+  end
   local entity = AddBlipForCoord(data.actioncoords.x, data.actioncoords.y, data.actioncoords.z)
   SetBlipSprite(entity, data.blipsprite or Config.BlipDefault.sprite)
   SetBlipDisplay(entity, 4)
