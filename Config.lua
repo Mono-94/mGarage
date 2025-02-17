@@ -17,6 +17,11 @@ Config.BlipDefault          = {
     sprite = 50,
     color = 0,
     size = 0.5,
+    stackBlips = false,
+    impound = 'Impound', 
+    garage = 'Garage',
+    custom = 'Garage',
+    rent = 'Rent a Car',
 }
 
 Config.PedAnims             = {
