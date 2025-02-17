@@ -40,3 +40,18 @@ ox_libs { 'locale' }
 ui_page 'web/build/index.html'
 
 dependencies { 'mVehicle' }
+
+
+-- escrow_ignore {
+--   'framework.lua',
+--   'Config.lua',
+--   'DefaultGarages.lua',
+--   'locales/*.json',
+--   'server/**/*',
+--   'client/**/*',
+--   'web/build/index.html',
+--   'web/build/**/*',
+--   'addons/**/Config.lua',
+--   'addons/**/*.lua',
+--   'addons/**/*.lua',
+-- }

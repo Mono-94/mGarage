@@ -47,18 +47,18 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             return false
         end
 
-        Vehicles.SpawnVehicleId({ id = data.vehicleid, coords = coords, source = source, intocar = data.garage.intocar }, function(vehicleData, Vehicle)
-            if vehicleData and Vehicle then
-                if Vehicles.Config.ItemKeys then
-                    Vehicles.ItemCarKeys(source, 'add', vehicleData.metadata.fakeplate or vehicleData.plate)
+        Vehicles.SpawnVehicleId({ id = data.vehicleid, coords = coords, source = source, intocar = data.garage.intocar },
+            function(vehicleData, Vehicle)
+                if vehicleData and Vehicle then
+                    if Vehicles.Config.ItemKeys then
+                        Vehicles.ItemCarKeys(source, 'add', vehicleData.metadata.fakeplate or vehicleData.plate)
+                    end
+                    Vehicle.RetryVehicle()
+                    retval = true
+                else
+                    retval = false
                 end
-                Vehicle.RetryVehicle()
-                retval = true
-            else
-                retval = false
-            end
-        end)
-
+            end)
     elseif action == 'saveCar' then
         local entity = NetworkGetEntityFromNetworkId(data.entity)
         local Vehicle = Vehicles.GetVehicle(entity)
@@ -327,6 +327,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             source   = source,
             intocar  = data.garage.intocar and source,
             owner    = identifier,
+
             keys     = { [identifier] = identifier },
             coords   = coords,
             metadata = { customGarage = data.garage.name },
@@ -362,6 +363,52 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         else
             retval = false
         end
+    elseif action == 'spawnrent' then
+        local coords = SpawnClearArea({ coords = data.garage.spawnpos, distance = 2.0, player = source })
+
+        if not coords then
+            Player.Notify({ title = data.name, description = locale('noSpawnPos'), type = 'error' })
+            return false
+        end
+
+
+        print(data.rentDate, data.totalPrice, data.paymentMethod)
+
+        local PlayerMoney = Player.getMoney(data.paymentMethod)
+        if PlayerMoney.money >= tonumber(data.totalPrice) then
+            
+            local plate = Vehicles.GeneratePlate()
+
+          
+             if data.garage.platePrefix and #data.garage.platePrefix > 0 then
+                 if #data.garage.platePrefix < 4 then
+                     data.garage.platePrefix = string.format("%-4s", data.garage.platePrefix)
+                 end
+                 plate = data.garage.platePrefix:upper() .. string.sub(plate, 5)
+             end
+             
+            Player.RemoveMoney(data.paymentMethod, tonumber(data.totalPrice))
+
+            Vehicles.CreateVehicle({
+                vehicle   = { model = data.vehicle.model, plate = plate, fuelLevel = 100 },
+                job       = (data.garage.job == false) and nil or data.garage.job,
+                source    = source,
+                intocar   = data.garage.intocar,
+                owner     = identifier,
+                coords    = coords,
+                setOwner  = true,
+                metadata  = { rent = true, rentName = data.garage.name },
+                temporary = data.rentDate
+            }, function(VehicleData, Vehicle)
+                if Vehicles.Config.ItemKeys then
+                    Vehicles.ItemCarKeys(source, 'add', VehicleData.plate)
+                end
+            end)
+            retval = true
+        else
+            retval = false
+        end
+        retval = false
     elseif action == 'changeName' then
         local Vehicle = Vehicles.GetVehicleByPlate(data.vehicle.plate)
 

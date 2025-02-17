@@ -9,6 +9,12 @@ local SendZones = function(show)
     local filteredData = {}
     for _, v in pairs(ZoneData) do
         if v ~= nil then
+            if v.defaultCars then
+                for _, vehicle in pairs(v.defaultCars) do
+                    vehicle.vehlabel = Vehicles.GetVehicleLabel(vehicle.model)
+                end
+            end
+
             table.insert(filteredData, v)
         end
     end
@@ -144,7 +150,7 @@ function CreateGarage(data)
                 end
             end
 
-            if data.garagetype ~= 'impound' and data.zoneType == 'target' then
+            if data.garagetype ~= 'impound' and data.zoneType == 'target' and not data.rent then
                 Target:addGlobalVehicle({
                     {
                         name = 'mGarage:SaveTarget' .. data.name,
