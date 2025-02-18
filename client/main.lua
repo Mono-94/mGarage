@@ -12,9 +12,9 @@ function OpenGarage(data)
 
     lastData = data
 
-    local PlayerJob = Core:GetPlayerJob()
-
     local SendData = {}
+    
+    local PlayerJob = Core:GetPlayerJob()
 
     if data.garagetype == 'impound' or data.garagetype == 'garage' then
         lib.array.forEach(VehiclesData, function(row)
@@ -56,6 +56,8 @@ function OpenGarage(data)
             end
         end)
     elseif data.garagetype == 'custom' then
+
+  
         for k, v in pairs(data.defaultCars) do
             local isValid = true
             local isModelValid = IsModelValid(v.model)
@@ -74,8 +76,7 @@ function OpenGarage(data)
                     end
                 end
             else
-                lib.print.warn(('vehicle model %s is not valid at Garage Name %s'):format(v.model:upper(),
-                    data.name:upper()))
+                lib.print.warn(('vehicle model %s is not valid at Garage Name %s'):format(v.model:upper(), data.name:upper()))
                 isValid = false
             end
 
@@ -106,15 +107,15 @@ function SaveCar(data)
         return false
     end
 
-    -- local IsTrailer, trailerEntity = GetVehicleTrailerVehicle(data.entity)
-    -- if IsTrailer then
-    --     local trailer = data
-    --     trailer.props = json.encode(lib.getVehicleProperties(trailerEntity))
-    --     trailer.vehmodel = GetDisplayNameFromVehicleModel(GetEntityModel(trailerEntity))
-    --     trailer.entity = VehToNet(trailerEntity)
-    --     trailer.seats = GetVehicleMaxNumberOfPassengers(data.entity)
-    --     ServerCallBack('saveCar', trailer, 0)
-    -- end
+     local IsTrailer, trailerEntity = GetVehicleTrailerVehicle(data.entity)
+     if IsTrailer then
+         local trailer = data
+         trailer.props = json.encode(lib.getVehicleProperties(trailerEntity))
+         trailer.vehmodel = GetDisplayNameFromVehicleModel(GetEntityModel(trailerEntity))
+         trailer.entity = VehToNet(trailerEntity)
+         trailer.seats = GetVehicleMaxNumberOfPassengers(data.entity)
+         ServerCallBack('saveCar', trailer, 0)
+     end
 
 
     data.props = json.encode(lib.getVehicleProperties(data.entity))
