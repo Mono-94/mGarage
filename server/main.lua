@@ -327,7 +327,6 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             source   = source,
             intocar  = data.garage.intocar and source,
             owner    = identifier,
-
             keys     = { [identifier] = identifier },
             coords   = coords,
             metadata = { customGarage = data.garage.name },
@@ -371,22 +370,20 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             return false
         end
 
-
-        print(data.rentDate, data.totalPrice, data.paymentMethod)
-
         local PlayerMoney = Player.getMoney(data.paymentMethod)
+
+
         if PlayerMoney.money >= tonumber(data.totalPrice) then
-            
             local plate = Vehicles.GeneratePlate()
 
-          
-             if data.garage.platePrefix and #data.garage.platePrefix > 0 then
-                 if #data.garage.platePrefix < 4 then
-                     data.garage.platePrefix = string.format("%-4s", data.garage.platePrefix)
-                 end
-                 plate = data.garage.platePrefix:upper() .. string.sub(plate, 5)
-             end
-             
+
+            if data.garage.platePrefix and #data.garage.platePrefix > 0 then
+                if #data.garage.platePrefix < 4 then
+                    data.garage.platePrefix = string.format("%-4s", data.garage.platePrefix)
+                end
+                plate = data.garage.platePrefix:upper() .. string.sub(plate, 5)
+            end
+
             Player.RemoveMoney(data.paymentMethod, tonumber(data.totalPrice))
 
             Vehicles.CreateVehicle({
