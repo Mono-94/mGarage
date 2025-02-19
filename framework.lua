@@ -25,7 +25,7 @@ if not IsDuplicityVersion() then -- client side
 
     function Core:GetPlayerJob()
         if Core.FrameWork == "esx" then
-            local Job = ESX.PlayerData.job
+            local Job = ESX.PlayerData.job or LocalPlayer.state.job
             return { name = Job.name, grade = Job.grade, gradeName = Job.grade_name }
         elseif Core.FrameWork == "ox" then
 
