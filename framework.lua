@@ -17,6 +17,7 @@ elseif Core.FrameWork == 'ox' then
 end
 
 if not IsDuplicityVersion() then -- client side
+
     if Core.FrameWork == "esx" then
         RegisterNetEvent('esx:setJob', function(job)
             ESX.PlayerData.job = job
@@ -25,7 +26,7 @@ if not IsDuplicityVersion() then -- client side
 
     function Core:GetPlayerJob()
         if Core.FrameWork == "esx" then
-            local Job = ESX.PlayerData.job or LocalPlayer.state.job
+            local Job =  ESX.GetPlayerData().job 
             return { name = Job.name, grade = Job.grade, gradeName = Job.grade_name }
         elseif Core.FrameWork == "ox" then
 
@@ -48,7 +49,7 @@ if not IsDuplicityVersion() then -- client side
 
     function Core:GetPlayerMetadata()
         if Core.FrameWork == "esx" then
-            return ESX.PlayerData.metadata
+            return  ESX.GetPlayerData().metadata
         elseif Core.FrameWork == "ox" then
 
         elseif Core.FrameWork == "standalone" then
