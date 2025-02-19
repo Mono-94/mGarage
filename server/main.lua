@@ -102,6 +102,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 end
 
                 Vehicle.StoreVehicle(data.name, data.props)
+
                 return true
             else
                 Player.Notify({
@@ -297,11 +298,6 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 type = 'error',
             })
             retval = false
-        end
-    elseif action == 'setBlip' then
-        local VehBlip = Vehicles.GetVehicleByPlate(data.plate)
-        if VehBlip then
-            retval = GetEntityCoords(VehBlip.entity)
         end
     elseif action == 'spawncustom' then
         local coords = SpawnClearArea({ coords = data.garage.spawnpos, distance = 2.0, player = source })

@@ -13,7 +13,7 @@ function OpenGarage(data)
     lastData = data
 
     local SendData = {}
-    
+
     local PlayerJob = Core:GetPlayerJob()
 
     if data.garagetype == 'impound' or data.garagetype == 'garage' then
@@ -56,8 +56,6 @@ function OpenGarage(data)
             end
         end)
     elseif data.garagetype == 'custom' then
-
-  
         for k, v in pairs(data.defaultCars) do
             local isValid = true
             local isModelValid = IsModelValid(v.model)
@@ -76,7 +74,8 @@ function OpenGarage(data)
                     end
                 end
             else
-                lib.print.warn(('vehicle model %s is not valid at Garage Name %s'):format(v.model:upper(), data.name:upper()))
+                lib.print.warn(('vehicle model %s is not valid at Garage Name %s'):format(v.model:upper(),
+                    data.name:upper()))
                 isValid = false
             end
 
@@ -107,15 +106,15 @@ function SaveCar(data)
         return false
     end
 
-     local IsTrailer, trailerEntity = GetVehicleTrailerVehicle(data.entity)
-     if IsTrailer then
-         local trailer = data
-         trailer.props = json.encode(lib.getVehicleProperties(trailerEntity))
-         trailer.vehmodel = GetDisplayNameFromVehicleModel(GetEntityModel(trailerEntity))
-         trailer.entity = VehToNet(trailerEntity)
-         trailer.seats = GetVehicleMaxNumberOfPassengers(data.entity)
-         ServerCallBack('saveCar', trailer, 0)
-     end
+    local IsTrailer, trailerEntity = GetVehicleTrailerVehicle(data.entity)
+    if IsTrailer then
+        local trailer = data
+        trailer.props = json.encode(lib.getVehicleProperties(trailerEntity))
+        trailer.vehmodel = GetDisplayNameFromVehicleModel(GetEntityModel(trailerEntity))
+        trailer.entity = VehToNet(trailerEntity)
+        trailer.seats = GetVehicleMaxNumberOfPassengers(data.entity)
+        ServerCallBack('saveCar', trailer, 0)
+    end
 
 
     data.props = json.encode(lib.getVehicleProperties(data.entity))
@@ -134,57 +133,22 @@ function SaveCar(data)
     end
 end
 
-local blip    = nil
-local timer
-
-local blipcar = function(coords, plate)
-    if blip and DoesBlipExist(blip) then
-        RemoveBlip(blip)
-        SetBlipRoute(blip, false)
-        timer:forceEnd(false)
-    end
-
-    blip = AddBlipForCoord(coords.x, coords.y, coords.z)
-
-    SetBlipSprite(blip, 523)
-    SetBlipDisplay(blip, 2)
-    SetBlipScale(blip, 1.0)
-    SetBlipColour(blip, 49)
-    SetBlipAsShortRange(blip, false)
-    BeginTextCommandSetBlipName("STRING")
-    AddTextComponentString('Vehicle - ' .. plate)
-    EndTextCommandSetBlipName(blip)
-    SetBlipRoute(blip, true)
-
-    timer = lib.timer(Config.ClearTimeBlip, function()
-        SetBlipRoute(blip, false)
-        RemoveBlip(blip)
-    end, true)
-
-    if blip then
-        Config.Notify({
-            title = 'Garage',
-            description = locale('setBlip'),
-            type = 'warning',
-        })
-        return true
-    end
-end
-
-
 RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
     local retval = nil
+    if data.action == 'setBlip' then
+        local marked = Vehicles.BlipOwnerCar(data.data.plate)
+        cb(marked)
+        return
+    end
 
     retval = ServerCallBack(data.action, data.data)
 
-    if data.action == 'setBlip' then
-        blipcar(retval, data.data.plate)
-    elseif data.action == 'keys' then
+    if data.action == 'keys' then
         Vehicles.VehicleKeysMenu(data.plate, function()
             OpenGarage(lastData)
         end)
     end
-
+    
     cb(retval)
 end)
 
