@@ -368,7 +368,6 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
         local PlayerMoney = Player.getMoney(data.paymentMethod)
 
-
         if PlayerMoney.money >= tonumber(data.totalPrice) then
             local plate = Vehicles.GeneratePlate()
 
@@ -401,7 +400,6 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         else
             retval = false
         end
-        retval = false
     elseif action == 'changeName' then
         local Vehicle = Vehicles.GetVehicleByPlate(data.vehicle.plate)
 

@@ -142,13 +142,13 @@ RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
     end
 
     retval = ServerCallBack(data.action, data.data)
-
+print(retval)
     if data.action == 'keys' then
         Vehicles.VehicleKeysMenu(data.plate, function()
             OpenGarage(lastData)
         end)
     end
-    
+
     cb(retval)
 end)
 
