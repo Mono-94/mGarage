@@ -3,9 +3,14 @@ Core = require 'framework'
 local query = {
     ['esx'] = {
         queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1',
-        queryStore2 = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
-        queryImpound = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, metadata = ? WHERE `plate` = ?',
-        setImpound = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
+        queryStore2 =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
+        queryImpound =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, metadata = ? WHERE `plate` = ?',
+        setImpound =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
+        storeAllVehicles = 'UPDATE owned_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0)',
+
     },
 }
 
@@ -475,6 +480,14 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
     return retval
 end)
 
+
+AddEventHandler("onResourceStart", function(Resource)
+    if Resource == 'mGarage' then
+        if not Vehicles.Config.persistent then
+            MySQL.update(Querys.storeAllVehicles)
+        end
+    end
+end)
 
 -- Vehicle deleted? send to impound
 AddEventHandler('entityRemoved', function(entity)
