@@ -3,17 +3,31 @@ Core = require 'framework'
 local query = {
     ['esx'] = {
         queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1',
-        queryStore2 =
-        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
-        queryImpound =
-        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `coords` = NULL, metadata = ? WHERE `plate` = ?',
-        setImpound =
-        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `coords` = NULL, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
+        queryStore2 = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
+        queryImpound = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, metadata = ? WHERE `plate` = ?',
+        setImpound = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
     },
 }
 
-
 local Querys = query[Core.FrameWork]
+
+local VehicleTypes = {
+    ['car'] = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
+    ['boat'] = { 'submarine', 'submarinecar', 'boat' },
+    ['air'] = { 'blimp', 'heli', 'plane' },
+}
+
+local compare = function(tbl1, tbl2)
+    for _, str1 in ipairs(tbl1) do
+        for _, str2 in ipairs(tbl2) do
+            if str1 == str2 then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 
 lib.callback.register('mGarage:Interact', function(source, action, data, vehicle)
     local retval = nil
@@ -29,8 +43,9 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             lib.array.forEach(PlyVehicles, function(row)
                 if (data.isShared or data.name == row.parking) then
                     row.isOwner = row.owner == identifier
+
                     if (data.garagetype == 'garage' and (not row.pound or row.pound == 0)) or data.garagetype == 'impound' then
-                        if data.isShared or (type(data.carType) == 'table' and lib.table.contains(data.carType, row.type)) or data.carType == row.type then
+                        if type(data.carType) == 'table' and lib.table.contains(data.carType, row.type) or data.carType == row.type or compare(data.carType, VehicleTypes[row.type]) then
                             table.insert(vehicles, row)
                         end
                     end
@@ -115,7 +130,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         else
             data.plate = GetVehicleNumberPlateText(entity)
 
-            local row = MySQL.single.await(Querys.queryStore1, { data.plate })
+            local row = Vehicles.GetVehicleByPlate(data.plate, true)
 
             if not row then
                 Player.Notify({
@@ -132,7 +147,9 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 end
             end
 
-            if row and row.owner == identifier or row.keys and row.keys[identifier] then
+            local metdata = json.decode(row.metadata)
+
+            if row and row.owner == identifier or metdata.keys and metdata.keys[identifier] then
                 MySQL.update(Querys.queryStore2, { data.name, data.props, VehicleType, data.plate },
                     function(affectedRows)
                         if affectedRows then
@@ -550,12 +567,6 @@ function SpawnClearArea(data)
 
     return selectedCoords or false
 end
-
-local VehicleTypes = {
-    ['car'] = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
-    ['boat'] = { 'submarine', 'submarinecar', 'boat' },
-    ['air'] = { 'blimp', 'heli', 'plane' },
-}
 
 function GetDefaultImpound(type)
     for vehicleType, types in pairs(VehicleTypes) do
