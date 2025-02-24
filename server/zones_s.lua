@@ -25,7 +25,7 @@ lib.callback.register('mGarage:GarageZones', function(source, action, data)
 
     local player = Core:Player(source)
 
-    if not player.isAdmin() then return false end
+    if Core.FrameWork ~= 'qbx' and not player.isAdmin() then return false end
 
     if action == 'create' then
         local zonaExist = MySQL.scalar.await(QueryZone.Exist, { data.name })

@@ -2,18 +2,19 @@ Core = {}
 
 local FrameWorks = {
     esx = (GetResourceState("es_extended") == "started" and 'esx'),
-    ox = (GetResourceState("ox_core") == "started" and 'ox')
+    ox = (GetResourceState("ox_core") == "started" and 'ox'),
+    qbx = (GetResourceState("qbx_core") == "started" and 'qbx')
 }
 
-Core.FrameWork = FrameWorks.esx or FrameWorks.ox or 'standalone'
+Core.FrameWork = FrameWorks.esx or FrameWorks.ox or FrameWorks.qbx or 'standalone'
 
-ESX, OX = nil, nil
+ESX, OX, QBX = nil, nil, nil
 
 
 if Core.FrameWork == "esx" then
     ESX = exports["es_extended"]:getSharedObject()
-elseif Core.FrameWork == 'ox' then
-
+elseif Core.FrameWork == 'qbx' then
+    lib.require('@qbx_core.modules.playerdata')
 end
 
 if not IsDuplicityVersion() then -- client side
@@ -29,6 +30,14 @@ if not IsDuplicityVersion() then -- client side
             return { name = Job.name, grade = Job.grade, gradeName = Job.grade_name }
         elseif Core.FrameWork == "ox" then
 
+        elseif Core.FrameWork == "qbx" then
+            local Job = QBX.PlayerData.job
+            
+            return {
+                name = Job.name,
+                grade = tonumber(Job.grade.level),
+                gradeName = Job.grade.name
+            }
         elseif Core.FrameWork == "standalone" then
             -- Your custom logic for standalone framework
             return { name = '', grade = '', gradeName = '' }
@@ -40,6 +49,8 @@ if not IsDuplicityVersion() then -- client side
             return LocalPlayer.state.group
         elseif Core.FrameWork == "ox" then
 
+        elseif Core.FrameWork == "qbx" then
+            return true
         elseif Core.FrameWork == "standalone" then
             -- Your custom logic for standalone framework
             return ''
@@ -51,6 +62,8 @@ if not IsDuplicityVersion() then -- client side
             return ESX.GetPlayerData().metadata
         elseif Core.FrameWork == "ox" then
 
+        elseif Core.FrameWork == "qbx" then
+            return QBX.PlayerData.metadata
         elseif Core.FrameWork == "standalone" then
             -- Your custom logic for standalone frameworkr
             return {}
@@ -102,6 +115,8 @@ else -- server side
                 return ESX.GetPlayerFromId(src)
             elseif Core.FrameWork == "ox" then
 
+            elseif Core.FrameWork == "qbx" then
+                return exports.qbx_core:GetPlayer(src)
             elseif Core.FrameWork == "standalone" then
                 -- Your custom logic for standalone frameworkr
             end
@@ -117,6 +132,8 @@ else -- server side
                 return Player.identifier
             elseif Core.FrameWork == "ox" then
 
+            elseif Core.FrameWork == "qbx" then
+                return Player.PlayerData.license
             elseif Core.FrameWork == "standalone" then
                 return GetPlayerIdentifierByType(src, 'license')
             end
@@ -129,6 +146,8 @@ else -- server side
                 return Player.getName()
             elseif Core.FrameWork == "ox" then
 
+            elseif Core.FrameWork == "qbx" then
+                return ('%s %s'):format(Player.PlayerData.charinfo.firstname, Player.PlayerData.charinfo.lastname)
             elseif Core.FrameWork == "standalone" then
                 return GetPlayerName(src)
             end
@@ -140,6 +159,10 @@ else -- server side
                 local money = Player.getAccount(account)
                 return { money = money.money }
             elseif Core.FrameWork == "ox" then
+
+            elseif Core.FrameWork == "qbx" then
+                if account == 'money' then account = 'cash' end
+                return { money = Player.PlayerData.money[account] }
             elseif Core.FrameWork == "standalone" then
                 return { money = 0 }
             end
@@ -150,16 +173,21 @@ else -- server side
                 return Player.removeAccountMoney(account, amount)
             elseif Core.FrameWork == "ox" then
 
+            elseif Core.FrameWork == "qbx" then
+                if account == 'money' then account = 'cash' end
+                return exports.qbx_core:RemoveMoney(src, account, amount, 'mGarage')
             elseif Core.FrameWork == "standalone" then
                 return true
             end
         end
-
+        --- need ACE permisiones
         self.isAdmin = function()
             if Core.FrameWork == "esx" then
                 return (Player.getGroup() == 'admin')
             elseif Core.FrameWork == "ox" then
 
+            elseif Core.FrameWork == "qbx" then
+                return true
             elseif Core.FrameWork == "standalone" then
                 return false
             end
@@ -183,6 +211,12 @@ else -- server side
                 return { name = job.name, grade = job.grade, gradeName = job.grade_name }
             elseif Core.FrameWork == "ox" then
 
+            elseif Core.FrameWork == "qbx" then
+                return {
+                    name = Player.PlayerData.job.name,
+                    grade = tonumber(Player.PlayerData.job.grade.level),
+                    gradeName = Player.PlayerData.job.grade.name
+                }
             elseif Core.FrameWork == "standalone" then
                 return { name = '', grade = '', gradeName = '' }
             end
@@ -195,6 +229,8 @@ else -- server side
                 return Player.getMeta(key)
             elseif Core.FrameWork == "ox" then
 
+            elseif Core.FrameWork == "qbx" then
+                return exports.qbx_core:GetMetadata(Player.PlayerData.citizenid, key)
             elseif Core.FrameWork == "standalone" then
                 return {}
             end
@@ -204,9 +240,11 @@ else -- server side
 
         self.setMeta = function(key, data)
             if Core.FrameWork == "esx" then
-                Player.setMeta(key, data)
+                return Player.setMeta(key, data)
             elseif Core.FrameWork == "ox" then
 
+            elseif Core.FrameWork == "qbx" then
+                return exports.qbx_core:SetMetadata(Player.PlayerData.citizenid, key, data)
             elseif Core.FrameWork == "standalone" then
 
             end
@@ -219,6 +257,8 @@ else -- server side
                 Player.clearMeta(key)
             elseif Core.FrameWork == "ox" then
 
+            elseif Core.FrameWork == "qbx" then
+                exports.qbx_core:SetMetadata(Player.PlayerData.citizenid, key, nil)
             elseif Core.FrameWork == "standalone" then
 
             end
@@ -243,6 +283,8 @@ else -- server side
             end)
         elseif Core.FrameWork == "ox" then
 
+        elseif Core.FrameWork == "qbx" then
+
         elseif Core.FrameWork == "standalone" then
             return true
         end
@@ -255,6 +297,8 @@ else -- server side
                 callback(sourcePlayer, xPlayer, isNew)
             end)
         elseif Core.FrameWork == "ox" then
+
+        elseif Core.FrameWork == "qbx" then
 
         elseif Core.FrameWork == "standalone" then
 

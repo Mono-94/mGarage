@@ -306,7 +306,9 @@ RegisterNuiCallback('mGarage:ValidModel', function(model, cb)
 end)
 
 RegisterSafeEvent('mGarage:editcreate', function()
-    if Core:PlayerGroup() == Config.AdminGroup then SendZones(true) end
+    if Core.FrameWork == 'qbx' or Core:PlayerGroup() == Config.AdminGroup then 
+        SendZones(true)
+    end
 end)
 
 
