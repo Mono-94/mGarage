@@ -85,7 +85,7 @@ end)
 
 lib.addCommand('mgarage', {
     help = '[ mGarage ] Create | Edit  GARAGES',
-    restricted = 'group.admin'
+    restricted = Config.CommandGroup
 }, function(source)
     local Player = Core:Player(source)
     if not Player.isAdmin() then return end
