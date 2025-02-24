@@ -3,7 +3,7 @@ Config                = {}
 Config.Debug          = false
 
 -- To edit/create garages
-Config.AdminGroup     = 'admin'
+Config.CommandGroup = 'group.admin'
 
 -- Start defaultGarages.lua
 Config.DefaultGarages = true
@@ -18,7 +18,7 @@ Config.BlipDefault          = {
     color = 0,
     size = 0.5,
     stackBlips = false,
-    impound = 'Impound', 
+    impound = 'Impound',
     garage = 'Garage',
     custom = 'Garage',
     rent = 'Rent a Car',
