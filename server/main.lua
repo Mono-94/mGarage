@@ -3,17 +3,22 @@ Core = require 'framework'
 local query = {
     ['esx'] = {
         queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1',
-        queryStore2 = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
-        queryImpound ='UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, metadata = ? WHERE `plate` = ?',
-        setImpound ='UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
+        queryStore2 =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
+        queryImpound =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, metadata = ? WHERE `plate` = ?',
+        setImpound =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
         storeAllVehicles = 'UPDATE owned_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0)',
     },
 
     ['qbx'] = {
         queryStore1 = 'SELECT `license`, `keys` FROM `player_vehicles` WHERE `plate` = ? LIMIT 1',
-        queryStore2 ='UPDATE `player_vehicles` SET `garage` = ?, `stored` = 1, `mods` = ?, type = ? WHERE `plate` = ? ',
-        queryImpound ='UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, metadata = ? WHERE `plate` = ?',
-        setImpound ='UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
+        queryStore2 = 'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 1, `mods` = ?, type = ? WHERE `plate` = ? ',
+        queryImpound =
+        'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, metadata = ? WHERE `plate` = ?',
+        setImpound =
+        'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
         storeAllVehicles = 'UPDATE player_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0)',
     },
 }
@@ -343,16 +348,15 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             end
             plate = platePrefix:upper() .. string.sub(plate, 5)
         end
-
         Vehicles.CreateVehicle({
-            vehicle  = { model = data.vehicle.model, plate = plate, fuelLevel = 100 },
+            vehicle  = { model = data.vehicle.model, fuelLevel = 100 },
+            plate    = plate,
             job      = (data.garage.job == false) and nil or data.garage.job,
             source   = source,
-            intocar  = data.garage.intocar and source,
+            intocar  = data.garage.intocar,
             owner    = identifier,
-            keys     = { [identifier] = identifier },
             coords   = coords,
-            metadata = { customGarage = data.garage.name },
+            metadata = { customGarage = data.garage.name, keys = { [identifier] = identifier }, },
         }, function(VehicleData, Vehicle)
             if Vehicles.Config.ItemKeys then
                 Vehicles.ItemCarKeys(source, 'add', VehicleData.plate)
@@ -409,8 +413,9 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             Player.RemoveMoney(data.paymentMethod, tonumber(data.totalPrice))
 
             Vehicles.CreateVehicle({
-                vehicle   = { model = data.vehicle.model, plate = plate, fuelLevel = 100 },
+                vehicle   = { model = data.vehicle.model, fuelLevel = 100 },
                 job       = (data.garage.job == false) and nil or data.garage.job,
+                plate     = plate,
                 source    = source,
                 intocar   = data.garage.intocar,
                 owner     = identifier,
