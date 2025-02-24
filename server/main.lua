@@ -2,29 +2,24 @@ Core = require 'framework'
 
 local query = {
     ['esx'] = {
-        queryStore1 = 'SELECT `owner`, `keys` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1',
-        queryStore2 =
-        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? WHERE `plate` = ? ',
-        queryImpound =
-        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, metadata = ? WHERE `plate` = ?',
-        setImpound =
-        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
+        storeVehicle = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ? TRIM(`plate`) = TRIM(?) ',
+        impoundVehicle = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
         storeAllVehicles = 'UPDATE owned_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0)',
+        updateMetadata = 'UPDATE owned_vehicles SET metadata = ? WHERE TRIM(`plate`) = TRIM(?)',
+        selectMetadata = 'SELECT `metadata` FROM `owned_vehicles` TRIM(`plate`) = TRIM(?) LIMIT 1'
     },
 
     ['qbx'] = {
-        queryStore1 = 'SELECT `license`, `keys` FROM `player_vehicles` WHERE `plate` = ? LIMIT 1',
-        queryStore2 = 'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 1, `mods` = ?, type = ? WHERE `plate` = ? ',
-        queryImpound =
-        'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, metadata = ? WHERE `plate` = ?',
-        setImpound =
-        'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
+        storeVehicle = 'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 1, `mods` = ?, type = ? TRIM(`plate`) = TRIM(?) ',
+        impoundVehicle ='UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
         storeAllVehicles = 'UPDATE player_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0)',
+        updateMetadata = 'UPDATE player_vehicles SET metadata = ? WHERE TRIM(`plate`) = TRIM(?)',
+        selectMetadata = 'SELECT `metadata` FROM `player_vehicles` TRIM(`plate`) = TRIM(?) LIMIT 1'
     },
 }
 
-
 local Querys = query[Core.FrameWork]
+
 
 local VehicleTypes = {
     ['car'] = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
@@ -32,7 +27,7 @@ local VehicleTypes = {
     ['air'] = { 'blimp', 'heli', 'plane' },
 }
 
-local compare = function(tbl1, tbl2)
+local function compare(tbl1, tbl2)
     for _, str1 in ipairs(tbl1) do
         for _, str2 in ipairs(tbl2) do
             if str1 == str2 then
@@ -58,7 +53,6 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             lib.array.forEach(PlyVehicles, function(row)
                 if (data.isShared or data.name == row.parking) then
                     row.isOwner = row.owner == identifier
-
                     if (data.garagetype == 'garage' and (not row.pound or row.pound == 0)) or data.garagetype == 'impound' then
                         if type(data.carType) == 'table' and lib.table.contains(data.carType, row.type) or data.carType == row.type or compare(data.carType, VehicleTypes[row.type]) then
                             table.insert(vehicles, row)
@@ -165,7 +159,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             local metdata = json.decode(row.metadata)
 
             if row and row.owner == identifier or metdata.keys and metdata.keys[identifier] then
-                MySQL.update(Querys.queryStore2, { data.name, data.props, VehicleType, data.plate },
+                MySQL.update(Querys.storeVehicle, { data.name, data.props, VehicleType, data.plate },
                     function(affectedRows)
                         if affectedRows then
                             if Vehicles.Config.ItemKeys then
@@ -218,7 +212,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
                 metadata.pound = infoimpound
 
-                MySQL.update(Querys.queryImpound, { data.garage, json.encode(metadata), plate })
+                MySQL.update(Querys.impoundVehicle, { data.garage, json.encode(metadata), plate })
 
                 DeleteEntity(entity)
             else
@@ -311,8 +305,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             if metadata.pound then
                 if metadata.pound.endPound then
                     metadata.pound.endPound = nil
-                    MySQL.update('UPDATE owned_vehicles SET metadata = ? WHERE plate = ?',
-                        { json.encode(metadata), data })
+                    MySQL.update(Querys.updateMetadata, { json.encode(metadata), data })
                     retval = true
                     Player.Notify({ title = 'Garage Unpound', description = locale('ImpoundOption11'), type = 'success', })
                 else
@@ -348,6 +341,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             end
             plate = platePrefix:upper() .. string.sub(plate, 5)
         end
+        
         Vehicles.CreateVehicle({
             vehicle  = { model = data.vehicle.model, fuelLevel = 100 },
             plate    = plate,
@@ -439,9 +433,8 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             Vehicle.setName(data.newName)
             retval = true
         else
-            local row = MySQL.single.await('SELECT `metadata` FROM `owned_vehicles` WHERE `plate` = ? LIMIT 1', {
-                data.vehicle.plate
-            })
+            local row = MySQL.single.await(Querys.selectMetadata, {data.vehicle.plate })
+           
             if row then
                 local metadata = json.decode(row.metadata)
                 if not metadata then
@@ -450,8 +443,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 if metadata then
                     metadata.vehname = data.newName
                     local updatedMetadata = json.encode(metadata)
-                    MySQL.update('UPDATE `owned_vehicles` SET `metadata` = ? WHERE `plate` = ?',
-                        { updatedMetadata, data.vehicle.plate })
+                    MySQL.update(Querys.updateMetadata, { updatedMetadata, data.vehicle.plate })
                     retval = true
                 else
                     retval = false
@@ -459,6 +451,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             else
                 retval = false
             end
+
         end
     elseif action == 'cleanName' then
         local Vehicle = Vehicles.GetVehicleByPlate(data.vehicle.plate)
@@ -475,8 +468,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 if metadata then
                     metadata.vehname = nil
                     local updatedMetadata = json.encode(metadata)
-                    MySQL.update('UPDATE `owned_vehicles` SET `metadata` = ? WHERE `plate` = ?',
-                        { updatedMetadata, data.vehicle.plate })
+                    MySQL.update(Querys.updateMetadata, { updatedMetadata, data.vehicle.plate })
                     retval = true
                 else
                     retval = false
@@ -521,7 +513,7 @@ AddEventHandler('entityRemoved', function(entity)
                     date = os.date("%Y/%m/%d %H:%M"),
                 }
 
-                MySQL.update(Querys.setImpound, { impound, json.encode(vehicle.metadata), plate })
+                MySQL.update(Querys.impoundVehicle, { impound, json.encode(vehicle.metadata), plate })
 
                 Vehicles.DeleteFromTable(entity)
             end
