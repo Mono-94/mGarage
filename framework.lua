@@ -131,7 +131,7 @@ else -- server side
             elseif Core.FrameWork == "ox" then
 
             elseif Core.FrameWork == "qbx" then
-                return Player.PlayerData.license
+                return Player.PlayerData.citizenid
             elseif Core.FrameWork == "standalone" then
                 return GetPlayerIdentifierByType(src, 'license')
             end
