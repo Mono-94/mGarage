@@ -71,7 +71,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             return false
         end
 
-        Vehicles.SpawnVehicleId({ id = data.vehicleid, coords = coords, source = source, intocar = data.garage.intocar },
+        Vehicles.CreateVehicleId({ id = data.vehicleid, coords = coords, source = source, intocar = data.garage.intocar },
             function(vehicleData, Vehicle)
                 if vehicleData and Vehicle then
                     if Vehicles.Config.ItemKeys then
