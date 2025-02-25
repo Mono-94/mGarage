@@ -6,7 +6,7 @@ local query = {
         impoundVehicle = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
         storeAllVehicles = 'UPDATE owned_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0)',
         updateMetadata = 'UPDATE owned_vehicles SET metadata = ? WHERE TRIM(`plate`) = TRIM(?)',
-        selectMetadata = 'SELECT `metadata` FROM `owned_vehicles` TRIM(`plate`) = TRIM(?) LIMIT 1'
+        selectMetadata = 'SELECT `metadata` FROM `owned_vehicles` WHERE TRIM(`plate`) = TRIM(?) LIMIT 1'
     },
 
     ['qbx'] = {
@@ -14,7 +14,7 @@ local query = {
         impoundVehicle ='UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
         storeAllVehicles = 'UPDATE player_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0)',
         updateMetadata = 'UPDATE player_vehicles SET metadata = ? WHERE TRIM(`plate`) = TRIM(?)',
-        selectMetadata = 'SELECT `metadata` FROM `player_vehicles` TRIM(`plate`) = TRIM(?) LIMIT 1'
+        selectMetadata = 'SELECT `metadata` FROM `player_vehicles` WHERE TRIM(`plate`) = TRIM(?) LIMIT 1'
     },
 }
 
