@@ -10,7 +10,6 @@ Core.FrameWork = FrameWorks.esx or FrameWorks.ox or FrameWorks.qbx or 'standalon
 
 ESX, OX, QBX = nil, nil, nil
 
-
 if Core.FrameWork == "esx" then
     ESX = exports["es_extended"]:getSharedObject()
 elseif Core.FrameWork == 'qbx' then
@@ -126,7 +125,6 @@ else -- server side
 
         if not Player then return false end
 
-
         self.GetIdentifier = function()
             if Core.FrameWork == "esx" then
                 return Player.identifier
@@ -139,7 +137,6 @@ else -- server side
             end
             return false
         end
-
 
         self.getName = function()
             if Core.FrameWork == "esx" then
@@ -203,7 +200,6 @@ else -- server side
         self.Notify = function(data)
             self.clientEvent('mGarage:notify', data)
         end
-
 
         self.GetJob = function()
             if Core.FrameWork == "esx" then
