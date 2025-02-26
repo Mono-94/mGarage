@@ -10,6 +10,8 @@ local lastData = {}
 function OpenGarage(data)
     local VehiclesData = ServerCallBack('get', data)
 
+    if not VehiclesData then return false end
+
     lastData = data
 
     local SendData = {}
@@ -127,11 +129,7 @@ function SaveCar(data)
         return false
     end
 
-    if data.garagetype == 'custom' then
-        ServerCallBack('saveCustomCar', data, 500)
-    else
-        ServerCallBack('saveCar', data, 500)
-    end
+    ServerCallBack('saveCar', data, 500)
 end
 
 RegisterNUICallback('mGarage:PlyInteract', function(data, cb)

@@ -2,16 +2,20 @@ Core = require 'framework'
 
 local query = {
     ['esx'] = {
-        storeVehicle = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ?  WHERE TRIM(`plate`) = TRIM(?) ',
-        impoundVehicle = 'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
+        storeVehicle =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ?  WHERE TRIM(`plate`) = TRIM(?) ',
+        impoundVehicle =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
         storeAllVehicles = 'UPDATE owned_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0)',
         updateMetadata = 'UPDATE owned_vehicles SET metadata = ? WHERE TRIM(`plate`) = TRIM(?)',
         selectMetadata = 'SELECT `metadata` FROM `owned_vehicles` WHERE TRIM(`plate`) = TRIM(?) LIMIT 1'
     },
 
     ['qbx'] = {
-        storeVehicle = 'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 1, `mods` = ?, type = ?  WHERE TRIM(`plate`) = TRIM(?) ',
-        impoundVehicle ='UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
+        storeVehicle =
+        'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 1, `mods` = ?, type = ?  WHERE TRIM(`plate`) = TRIM(?) ',
+        impoundVehicle =
+        'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
         storeAllVehicles = 'UPDATE player_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0)',
         updateMetadata = 'UPDATE player_vehicles SET metadata = ? WHERE TRIM(`plate`) = TRIM(?)',
         selectMetadata = 'SELECT `metadata` FROM `player_vehicles` WHERE TRIM(`plate`) = TRIM(?) LIMIT 1'
@@ -71,7 +75,8 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             return false
         end
 
-        Vehicles.CreateVehicleId({ id = data.vehicleid, coords = coords, source = source, intocar = data.garage.intocar },
+        Vehicles.CreateVehicleId(
+            { id = data.vehicleid, coords = coords, source = source, intocar = data.garage.intocar },
             function(vehicleData, Vehicle)
                 if vehicleData and Vehicle then
                     if Vehicles.Config.ItemKeys then
@@ -98,22 +103,29 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
         if Vehicle then
             local metadata = Vehicle.GetMetadata()
+            local job = Player.GetJob()
 
-            if metadata.customGarage then
-                if Vehicles.Config.ItemKeys then
-                    Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
+            if data.job and (not data.job == Vehicle.job) then
+                return false
+            end
+
+            if data.garagetype == 'custom' and metadata.customGarage and data.name == metadata.customGarage then
+                if data.job and not job.name == Vehicle.job or not data.job == Vehicle.job then return false end
+                if metadata and metadata.customGarage and data.name == metadata.customGarage then
+                    if Vehicles.Config.ItemKeys then
+                        Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
+                    end
+                    local left = LeftCar(entity, data.seats)
+
+                    if left then Citizen.Wait(2000) end
+                    return Vehicle.DeleteVehicle(false)
                 end
-
-                return Vehicle.DeleteVehicle(false)
+            elseif data.garagetype == 'custom' and not metadata.customGarage then
+                return false
             end
 
             if type(Vehicle.keys) ~= 'table' then
                 Vehicle.keys = json.decode(Vehicle.keys)
-            end
-
-
-            if data.job and (not data.job == Vehicle.job) then
-                return false
             end
 
             if Vehicle.owner == identifier or Vehicle.keys and Vehicle.keys[identifier] then
@@ -341,7 +353,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             end
             plate = platePrefix:upper() .. string.sub(plate, 5)
         end
-        
+
         Vehicles.CreateVehicle({
             vehicle  = { model = data.vehicle.model, fuelLevel = 100 },
             plate    = plate,
@@ -358,31 +370,6 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         end)
 
         return true
-    elseif action == 'saveCustomCar' then
-        local entity = NetworkGetEntityFromNetworkId(data.entity)
-        local Vehicle = Vehicles.GetVehicle(entity)
-        if Vehicle then
-            local metadata = Vehicle.GetMetadata('customGarage')
-            local job = Player.GetJob()
-
-            if metadata == data.name and Vehicle.owner == identifier or job.name == Vehicle.job then
-                local left = LeftCar(entity, data.seats)
-
-                if left then Citizen.Wait(2000) end
-
-                Vehicle.DeleteVehicle(false)
-
-                if Vehicles.Config.ItemKeys then
-                    Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
-                end
-
-                retval = true
-            else
-                retval = false
-            end
-        else
-            retval = false
-        end
     elseif action == 'spawnrent' then
         local coords = SpawnClearArea({ coords = data.garage.spawnpos, distance = 2.0, player = source })
 
@@ -433,8 +420,8 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             Vehicle.setName(data.newName)
             retval = true
         else
-            local row = MySQL.single.await(Querys.selectMetadata, {data.vehicle.plate })
-           
+            local row = MySQL.single.await(Querys.selectMetadata, { data.vehicle.plate })
+
             if row then
                 local metadata = json.decode(row.metadata)
                 if not metadata then
@@ -451,7 +438,6 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             else
                 retval = false
             end
-
         end
     elseif action == 'cleanName' then
         local Vehicle = Vehicles.GetVehicleByPlate(data.vehicle.plate)
@@ -491,6 +477,7 @@ AddEventHandler("onResourceStart", function(Resource)
     end
 end)
 
+
 -- Vehicle deleted? send to impound
 AddEventHandler('entityRemoved', function(entity)
     if Config.ImpoundVehicledelete then
@@ -498,11 +485,14 @@ AddEventHandler('entityRemoved', function(entity)
         if entityType == 2 then
             if Vehicles.save() then return end
 
-            local impound = GetDefaultImpound(GetVehicleType(entity))
+
             local plate = GetVehicleNumberPlateText(entity)
             local vehicle = Vehicles.GetVehicleByPlate(plate, true)
 
             if vehicle and vehicle.stored == 0 and not vehicle.pound then
+                local impound = GetDefaultImpound(GetVehicleType(entity))
+
+
                 vehicle.metadata = json.decode(vehicle.metadata)
 
                 if vehicle.metadata.RoutingBucket then return end
