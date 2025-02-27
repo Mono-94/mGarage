@@ -191,6 +191,7 @@ function CopyCoords(action, entityType, textui, cb, data)
         DisablePlayerFiring(ped, false)
         break
       end
+      
       if not EditGarageUI then
         deleteAllEntities()
         lib.hideTextUI()

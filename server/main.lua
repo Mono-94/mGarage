@@ -463,6 +463,29 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 retval = false
             end
         end
+    elseif action == 'setFav' then
+        local VehicleEntity = Vehicles.GetVehicleByPlate(data.plate)
+
+        if VehicleEntity then
+            -- Obtener el valor actual y alternarlo
+            local currentFav = VehicleEntity.GetMetadata('fav') or false
+            local newFav = not currentFav
+
+            VehicleEntity.SetMetadata('fav', newFav)
+            retval = { fav = newFav }
+        else
+            local Vehicle = Vehicles.GetVehicleByPlate(data.plate, true)
+            if Vehicle then
+                local metadata = json.decode(Vehicle.metadata)
+
+                -- Obtener el valor actual y alternarlo
+                local currentFav = metadata.fav or false
+                metadata.fav = not currentFav
+
+                retval = { fav = metadata.fav }
+                MySQL.update(Querys.updateMetadata, { json.encode(metadata), data.plate })
+            end
+        end
     end
 
     return retval
