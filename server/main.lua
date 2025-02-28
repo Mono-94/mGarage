@@ -58,7 +58,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 if (data.isShared or data.name == row.parking) then
                     row.isOwner = row.owner == identifier
                     if (data.garagetype == 'garage' and (not row.pound or row.pound == 0)) or data.garagetype == 'impound' then
-                        if type(data.carType) == 'table' and lib.table.contains(data.carType, row.type) or data.carType == row.type or compare(data.carType, VehicleTypes[row.type]) then
+                        if type(data.carType) == 'table' and lib.table.contains(data.carType, row.type) or data.carType == row.type or VehicleTypes[row.type] and compare(data.carType, VehicleTypes[row.type]) then
                             table.insert(vehicles, row)
                         end
                     end
@@ -507,13 +507,13 @@ AddEventHandler('entityRemoved', function(entity)
         local entityType = GetEntityType(entity)
         if entityType == 2 then
             if Vehicles.save() then return end
-
+            local type = GetVehicleType(entity)
 
             local plate = GetVehicleNumberPlateText(entity)
             local vehicle = Vehicles.GetVehicleByPlate(plate, true)
 
             if vehicle and vehicle.stored == 0 and not vehicle.pound then
-                local impound = GetDefaultImpound(GetVehicleType(entity))
+                local impound = GetDefaultImpound(type)
 
 
                 vehicle.metadata = json.decode(vehicle.metadata)
