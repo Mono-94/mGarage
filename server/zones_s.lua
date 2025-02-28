@@ -89,5 +89,5 @@ lib.addCommand('mgarage', {
 }, function(source)
     local Player = Core:Player(source)
     if not Player.isAdmin() then return end
-    Player.clientEvent('mGarage:editcreate')
+    Player.clientEvent('mGarage:editcreate', true)
 end)
