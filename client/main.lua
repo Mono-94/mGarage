@@ -110,13 +110,12 @@ function SaveCar(data)
 
     local IsTrailer, trailerEntity = GetVehicleTrailerVehicle(data.entity)
 
-
     if IsTrailer then
         local trailer = data
         trailer.props = json.encode(lib.getVehicleProperties(trailerEntity))
         trailer.vehmodel = GetDisplayNameFromVehicleModel(GetEntityModel(trailerEntity))
         trailer.entity = VehToNet(trailerEntity)
-        trailer.seats = GetVehicleMaxNumberOfPassengers(data.entity)
+        trailer.seats = GetVehicleMaxNumberOfPassengers(trailerEntity)
         ServerCallBack('saveCar', trailer, 0)
     end
 

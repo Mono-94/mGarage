@@ -305,7 +305,7 @@ RegisterNuiCallback('mGarage:ValidModel', function(model, cb)
     end
 end)
 
-RegisterSafeEvent('mGarage:editcreate',  SendZones)
+RegisterSafeEvent('mGarage:editcreate', SendZones)
 
 
 AddEventHandler('onResourceStop', function(name)
