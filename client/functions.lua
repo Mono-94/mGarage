@@ -89,8 +89,9 @@ function RegisterSafeEvent(eventName, funct)
 end
 
 function SetBlip(data)
+  local name = data.name
   if Config.BlipDefault.stackBlips then
-    data.name = data.rent and Config.BlipDefault.rent or Config.BlipDefault[data.garagetype]
+    name = data.rent and Config.BlipDefault.rent or Config.BlipDefault[data.garagetype]
   end
   local entity = AddBlipForCoord(data.actioncoords.x, data.actioncoords.y, data.actioncoords.z)
   SetBlipSprite(entity, data.blipsprite or Config.BlipDefault.sprite)
@@ -99,7 +100,7 @@ function SetBlip(data)
   SetBlipColour(entity, data.blipcolor or Config.BlipDefault.color)
   SetBlipAsShortRange(entity, true)
   BeginTextCommandSetBlipName("STRING")
-  AddTextComponentString(data.name)
+  AddTextComponentString(name)
   EndTextCommandSetBlipName(entity)
   return entity
 end
