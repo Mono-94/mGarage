@@ -128,3 +128,51 @@ function SetProp(data)
   SetEntityHeading(entity, data.actioncoords.w / 2)
   return entity
 end
+
+local blipImpound = nil
+local timerImpound
+
+function BlipImpound(coords, name)
+  if blipImpound and DoesBlipExist(blipImpound) then
+    RemoveBlip(blipImpound)
+    SetBlipRoute(blipImpound, false)
+    timerImpound:forceEnd(false)
+  end
+
+
+  blipImpound = AddBlipForCoord(coords.x, coords.y, coords.z)
+  SetBlipSprite(blipImpound, 523)
+  SetBlipDisplay(blipImpound, 2)
+  SetBlipScale(blipImpound, 1.0)
+  SetBlipColour(blipImpound, 47)
+  SetBlipAsShortRange(blipImpound, false)
+  BeginTextCommandSetBlipName("STRING")
+  AddTextComponentString(('%s'):format(name))
+  EndTextCommandSetBlipName(blipImpound)
+  SetBlipRoute(blipImpound, true)
+
+  timerImpound = lib.timer(60000 * 1, function()
+    SetBlipRoute(blipImpound, false)
+    RemoveBlip(blipImpound)
+  end, true)
+
+  Citizen.CreateThread(function(threadId)
+    local ped = cache.ped
+    while true do
+      Wait(3000)
+      local pedCoords = GetEntityCoords(ped)
+      local distance = #(vec3(pedCoords.x, pedCoords.y, pedCoords.z) - vec3(coords.x, coords.y, coords.z))
+
+      if distance <= 50.0 then
+        RemoveBlip(blipImpound)
+        SetBlipRoute(blipImpound, false)
+        timerImpound:forceEnd(false)
+        break
+      end
+    end
+  end)
+
+  if blipImpound then
+    return true
+  end
+end
