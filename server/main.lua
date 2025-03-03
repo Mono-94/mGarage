@@ -42,6 +42,11 @@ local function compare(tbl1, tbl2)
     return false
 end
 
+local function checkType(garageType, vehicleType)
+    return type(garageType) == 'table' and lib.table.contains(garageType, vehicleType) or
+        garageType == vehicleType or VehicleTypes[vehicleType] and compare(garageType, VehicleTypes[vehicleType])
+end
+
 
 lib.callback.register('mGarage:Interact', function(source, action, data, vehicle)
     local retval = nil
@@ -55,10 +60,22 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
         if PlyVehicles then
             lib.array.forEach(PlyVehicles, function(row)
-                if (data.isShared or data.name == row.parking) then
-                    row.isOwner = row.owner == identifier
-                    if (data.garagetype == 'garage' and (not row.pound or row.pound == 0)) or data.garagetype == 'impound' then
-                        if type(data.carType) == 'table' and lib.table.contains(data.carType, row.type) or data.carType == row.type or VehicleTypes[row.type] and compare(data.carType, VehicleTypes[row.type]) then
+                local vehType = checkType(data.carType, row.type)
+                if not vehType then return end
+
+                row.isOwner = row.owner == identifier
+
+                if data.showPound then
+                    table.insert(vehicles, row)
+                else
+                    local shared = data.isShared or data.name == row.parking
+
+                    if data.garagetype == 'garage' and shared then
+                        if not row.pound or row.pound == 0 then
+                            table.insert(vehicles, row)
+                        end
+                    elseif data.garagetype == 'impound' and shared then
+                        if row.pound then
                             table.insert(vehicles, row)
                         end
                     end
@@ -273,7 +290,8 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
                 if ImpVeh.coords and type(ImpVeh) == 'table' then
                     Player.RemoveMoney(data.paymentMethod, infoimpound.price)
-
+                    ImpVeh.intocar = data.garage.intocar
+                    ImpVeh.source = source
                     Vehicles.CreateVehicle(ImpVeh, function(VehData, Vehicle)
                         if Vehicles.Config.ItemKeys then
                             Vehicles.ItemCarKeys(source, 'add', VehData.metadata.fakeplate or VehData.plate)
@@ -500,10 +518,8 @@ AddEventHandler("onResourceStart", function(Resource)
     end
 end)
 
-
--- Vehicle deleted? send to impound
-AddEventHandler('entityRemoved', function(entity)
-    if Config.ImpoundVehicledelete then
+if Config.ImpoundVehicledelete then
+    local function HandleDeleteEvent(entity)
         local entityType = GetEntityType(entity)
         if entityType == 2 then
             if Vehicles.save() then return end
@@ -512,9 +528,9 @@ AddEventHandler('entityRemoved', function(entity)
             local plate = GetVehicleNumberPlateText(entity)
             local vehicle = Vehicles.GetVehicleByPlate(plate, true)
 
+
             if vehicle and vehicle.stored == 0 and not vehicle.pound then
                 local impound = GetDefaultImpound(type)
-
 
                 vehicle.metadata = json.decode(vehicle.metadata)
 
@@ -532,7 +548,10 @@ AddEventHandler('entityRemoved', function(entity)
             end
         end
     end
-end)
+    -- Vehicle deleted? send to impound
+    AddEventHandler('entityRemoved', HandleDeleteEvent)
+end
+
 
 function LeftCar(entity, seats)
     local players = 0
