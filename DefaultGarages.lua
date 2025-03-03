@@ -1,8 +1,8 @@
 ---@class DefaultGarages
 ---@field name string
----@field garagetype string
+---@field garagetype string "garage"|"impound"|"custom"
 ---@field debug boolean
----@field zoneType string
+---@field zoneType string "target"|"textui"|"radial"
 ---@field prop boolean
 ---@field job string|boolean
 ---@field blip boolean
@@ -19,10 +19,12 @@
 ---@field points vector3[]
 ---@field spawnpos vector4[]
 ---@field rent boolean
+---@field showPund? boolean
 local DefaultGarages = {
     {
         name = 'Pillbox Hill',
         garagetype = 'garage',
+        showPund = true,
         debug = false,
         zoneType = 'target',
         prop = false,
@@ -118,7 +120,7 @@ local DefaultGarages = {
         job = nil,
         society = nil,
         blip = true,
-        intocar = false,
+        intocar = true,
         isShared = false,
         carType = { 'automobile', 'bike' },
         defaultCars = false,
