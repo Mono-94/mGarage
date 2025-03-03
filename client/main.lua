@@ -7,6 +7,8 @@ end
 local lastData = {}
 
 
+
+
 function OpenGarage(data)
     local VehiclesData = ServerCallBack('get', data)
 
@@ -45,16 +47,7 @@ function OpenGarage(data)
 
                 row.mileage = row.mileage / 100
 
-                if data.garagetype == 'impound' then
-                    if row.pound and row.stored == 0 then
-                        row.infoimpound = json.encode(row.metadata.pound)
-                        table.insert(SendData, row)
-                    end
-                else
-                    if not data.pound then
-                        table.insert(SendData, row)
-                    end
-                end
+                table.insert(SendData, row)
             end
         end)
     elseif data.garagetype == 'custom' then
@@ -92,6 +85,8 @@ function OpenGarage(data)
     if #SendData <= 0 or not SendData then
         return Config.Notify({ title = data.name, description = locale('noVehicles') })
     end
+
+    lib.setClipboard(json.encode(SendData, { indent = true }))
 
     SendNUI('garage', { vehicles = SendData, garage = data })
     ShowNui('setVisibleGarage', true)
@@ -138,14 +133,23 @@ RegisterNUICallback('mGarage:PlyInteract', function(data, cb)
         cb(marked)
         return
     end
-
-    retval = ServerCallBack(data.action, data.data)
+    if data.action == 'blipImpound' then
+        local garage = GetGaragesData().all[data.data.parking]
+        BlipImpound(garage.actioncoords, garage.name)
+        cb(true)
+        return
+    end
 
     if data.action == 'keys' then
         Vehicles.VehicleKeysMenu(data.plate, function()
             OpenGarage(lastData)
         end)
+        cb(true)
+        return
     end
+
+    retval = ServerCallBack(data.action, data.data)
+
 
     cb(retval)
 end)
@@ -236,3 +240,39 @@ exports('UnpoundVehicle', UnpoundVehicle)
 exports('ImpoundVehicle', ImpoundVehicle)
 exports('OpenGarage', OpenGarage)
 exports('SaveCar', SaveCar)
+
+
+if Config.Debug then
+    RegisterCommand('og', function()
+        local GarageZones = GetGaragesData()
+        local options = {}
+
+        for k, v in pairs(GarageZones.all) do
+            print(k, v.garagetype)
+
+            table.insert(options, { value = k, label = k })
+        end
+
+
+        local input = lib.inputDialog('Open Garage', {
+            { type = 'select', label = 'Open Garage', icon = 'warehouse', options = options, required = true },
+
+        })
+
+        if not input then return end
+        local garage = GarageZones.all[input[1]]
+        local ped = PlayerPedId()
+        local coords, heading = GetEntityCoords(ped), GetEntityHeading(ped)
+
+        OpenGarage({
+            name = garage.name,
+            garagetype = garage.garagetype,
+            intocar = true,
+            showPund = garage.showPund,
+            carType = garage.carType,
+            spawnpos = {
+                vec4(coords.x, coords.y, coords.z, heading),
+            }
+        })
+    end)
+end
