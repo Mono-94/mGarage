@@ -19,12 +19,12 @@
 ---@field points vector3[]
 ---@field spawnpos vector4[]
 ---@field rent boolean
----@field showPund? boolean
+---@field showPound? boolean
 local DefaultGarages = {
     {
         name = 'Pillbox Hill',
         garagetype = 'garage',
-        showPund = true,
+        showPound = true,
         debug = false,
         zoneType = 'target',
         prop = false,
