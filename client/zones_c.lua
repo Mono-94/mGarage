@@ -3,8 +3,6 @@ local ZoneData = {}
 local PolyZone = {}
 local DefaultGarages = require 'DefaultGarages'
 
-
-
 local SendZones = function(show)
     local filteredData = {}
     for _, v in pairs(ZoneData) do
@@ -324,14 +322,16 @@ end)
 ---@param count? boolean
 ---@return integer|table
 function GetGaragesData(count)
-    local Garages = { impound = {}, garage = {}, custom = {}, totalGarges = 0 }
-    for k, v in pairs(ZoneData) do
+    local garagesdata <const> = ZoneData
+    local Garages = { impound = {}, garage = {}, custom = {}, totalGarges = 0, all = {} }
+    for k, v in pairs(garagesdata) do
         if v ~= nil then
             Garages.totalGarges = Garages.totalGarges + 1
             if v.job then
                 v.jobname = ('%s, Job: %s'):format(v.name, v.job)
             end
             table.insert(Garages[v.garagetype], v)
+            Garages.all[v.name] = v
         end
     end
     return count and Garages.totalGarges or Garages
