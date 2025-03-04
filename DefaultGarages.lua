@@ -278,9 +278,9 @@ local DefaultGarages = {
         carType = { 'automobile', 'bicycle', 'bike', 'quadbike', 'trailer', 'amphibious_quadbike', 'amphibious_automobile' },
         platePrefix = 'LSPD',
         rent = false,
-        defaultCars = {
-            { model = 'police',  grades = { 1, 2, 3, 4 }, price = false },
-            { model = 'police2', grades = { 'boss' }, price = false },
+        defaultCars = {                                        --- old method | funcional only number 
+            { model = 'police',  mingrade = 4, price = false , grades= {1,2,3,4}},
+            { model = 'police2', mingrade = 1, price = false },
         },
         actioncoords = vec4(457.27026367188, -1007.4309082031, 27.297456741333, 195.85415649414),
         npchash = 'csb_trafficwarden',
