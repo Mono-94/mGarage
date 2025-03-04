@@ -64,20 +64,19 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 if not vehType then return end
 
                 row.isOwner = row.owner == identifier
+                local shared = data.isShared or data.name == row.parking
 
-                if data.showPound then
-                    table.insert(vehicles, row)
-                else
-                    local shared = data.isShared or data.name == row.parking
-
-                    if data.garagetype == 'garage' and shared then
-                        if not row.pound or row.pound == 0 then
-                            table.insert(vehicles, row)
-                        end
-                    elseif data.garagetype == 'impound' and shared then
-                        if row.pound then
-                            table.insert(vehicles, row)
-                        end
+                if data.garagetype == 'garage' and data.showPound then
+                    if row.pound or row.pound == 1 or shared then
+                        table.insert(vehicles, row)
+                    end
+                elseif data.garagetype == 'garage' and shared and not data.showPound then
+                    if not row.pound or row.pound == 0 then
+                        table.insert(vehicles, row)
+                    end
+                elseif data.garagetype == 'impound' and shared then
+                    if row.pound then
+                        table.insert(vehicles, row)
                     end
                 end
             end)

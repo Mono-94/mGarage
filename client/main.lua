@@ -10,10 +10,6 @@ local lastData = {}
 
 
 function OpenGarage(data)
-    local VehiclesData = ServerCallBack('get', data)
-
-    if not VehiclesData then return false end
-
     lastData = data
 
     local SendData = {}
@@ -21,6 +17,10 @@ function OpenGarage(data)
     local PlayerJob = Core:GetPlayerJob()
 
     if data.garagetype == 'impound' or data.garagetype == 'garage' then
+        local VehiclesData = ServerCallBack('get', data)
+
+        if not VehiclesData then return false end
+
         lib.array.forEach(VehiclesData, function(row)
             if not row.private then
                 local props = json.decode(row.vehicle)
@@ -54,19 +54,21 @@ function OpenGarage(data)
         for k, v in pairs(data.defaultCars) do
             local isValid = true
             local isModelValid = IsModelValid(v.model)
+
             if isModelValid then
-                if type(v.grades) == 'table' then
-                    local grade = lib.table.contains(v.grades, PlayerJob.grade)
-                    local gradeName = lib.table.contains(v.grades, PlayerJob.gradeName)
-                    if not grade and not gradeName then
+                --- transform old grades to new mingrade
+                if v.grades and type(v.grades) == 'table' and #v.grades >= 1 and data.job then
+                    local maxGrade = math.max(table.unpack(v.grades))
+                    v.mingrade = maxGrade
+                end
+
+                if type(v.mingrade) == 'number' and data.job then
+                    local grade = PlayerJob.grade >= v.mingrade
+                    if not grade then
                         isValid = false
                     end
-                elseif type(v.grades) == 'number' then
-                    local grade = v.grades == PlayerJob.grade
-                    local gradeName = v.grades == PlayerJob.gradeName
-                    if not grade and not gradeName then
-                        isValid = false
-                    end
+                else
+                    isValid = true
                 end
             else
                 lib.print.warn(('vehicle model %s is not valid at Garage Name %s'):format(v.model:upper(),
@@ -76,7 +78,9 @@ function OpenGarage(data)
 
             if isValid then
                 v.parking = data.name
-                v.vehlabel = Vehicles.GetVehicleLabel(v.model)
+                if not v.vehlabel then
+                    v.vehlabel = Vehicles.GetVehicleLabel(v.model)
+                end
                 table.insert(SendData, v)
             end
         end
@@ -85,8 +89,6 @@ function OpenGarage(data)
     if #SendData <= 0 or not SendData then
         return Config.Notify({ title = data.name, description = locale('noVehicles') })
     end
-
-    lib.setClipboard(json.encode(SendData, { indent = true }))
 
     SendNUI('garage', { vehicles = SendData, garage = data })
     ShowNui('setVisibleGarage', true)
