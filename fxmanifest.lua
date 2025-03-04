@@ -2,7 +2,7 @@ fx_version 'cerulean'
 
 game 'gta5'
 
-version '2.0.3'
+version '2.0.4'
 
 use_experimental_fxv2_oal 'yes'
 
