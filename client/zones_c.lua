@@ -230,7 +230,6 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
     local retval
     usePromise = nil
     if data.action == 'create' then
-        print(json.encode(data.data, { indent = true }))
         retval = ZonesCallBack('create', data.data)
     elseif data.action == 'zone' then
         ToggleMenu(true, 'zone')

@@ -250,8 +250,6 @@ if Config.Debug then
         local options = {}
 
         for k, v in pairs(GarageZones.all) do
-            print(k, v.garagetype)
-
             table.insert(options, { value = k, label = k })
         end
 
