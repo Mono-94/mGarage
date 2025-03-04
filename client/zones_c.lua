@@ -7,12 +7,6 @@ local SendZones = function(show)
     local filteredData = {}
     for _, v in pairs(ZoneData) do
         if v ~= nil then
-            if v.defaultCars then
-                for _, vehicle in pairs(v.defaultCars) do
-                    vehicle.vehlabel = Vehicles.GetVehicleLabel(vehicle.model)
-                end
-            end
-
             table.insert(filteredData, v)
         end
     end
@@ -236,6 +230,7 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
     local retval
     usePromise = nil
     if data.action == 'create' then
+        print(json.encode(data.data, { indent = true }))
         retval = ZonesCallBack('create', data.data)
     elseif data.action == 'zone' then
         ToggleMenu(true, 'zone')
@@ -289,16 +284,20 @@ end)
 
 
 RegisterNuiCallback('mGarage:ValidModel', function(model, cb)
+    local valid = {}
     if model then
-        local valid = IsModelValid(model)
-        if not valid then
+        valid.valid = IsModelValid(model)
+        if not valid.valid then
             Config.Notify({
                 title = 'mGarage',
                 icon = 'car',
                 description = ('Invalid model: %s'):format(model),
                 type = 'error',
             })
+        else
+            valid.vehlabel = Vehicles.GetVehicleLabel(model)
         end
+
         cb(valid)
     end
 end)
