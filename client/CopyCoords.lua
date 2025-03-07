@@ -1,72 +1,142 @@
 if Config.Debug then
-  RegisterCommand('ccoords', function(source, args, raw)
-    CopyCoords('multi', 'ped', true, function(table, tableString)
-      print(json.encode(table, { indent = true }))
-      print(tableString)
-      lib.setClipboard(tableString)
-    end, { carModel = 'adder', propModel = 'prop_bin_05a' })
+  RegisterCommand("crds", function(_, args)
+    local input = lib.inputDialog('mCoords', {
+      {
+        type = 'select',
+        required = true,
+        label = 'Type',
+        default = 'single',
+        options = {
+          { label = 'Single coords',   value = 'single' },
+          { label = 'Multiple coords', value = 'multi' }
+        }
+      },
+      {
+        type = 'select',
+        required = true,
+        label = 'Name',
+        default = 'none',
+        options = {
+          { label = 'None',    value = 'none' },
+          { label = 'Ped',     value = 'ped' },
+          { label = 'Vehicle', value = 'car' },
+          { label = 'Prop',    value = 'prop' },
+        }
+      },
+      {
+        type = 'checkbox',
+        label = 'Text UI',
+        checked = true
+      },
+      {
+        type = 'checkbox',
+        label = 'Switch',
+        checked = true
+      },
+      {
+        type = 'input',
+        label = 'Car Model',
+        default = 'toros'
+      },
+      {
+        type = 'input',
+        label = 'Prop Model',
+        default = 'prop_parkingpay'
+      }
+    })
+
+    if not input then return end
+
+    CopyCoords(input[1], input[2], function(table, tableString)
+      if table or tableString then
+        print(table, tableString)
+      end
+    end, { textui = input[3], switch = input[4], carModel = input[5], propModel = input[6] })
   end)
 end
 
+local mCoords = {}
+
+function mCoords:CreateTable()
+  mCoords.viewEntity = nil
+  mCoords.CoordsTable = {}
+  mCoords.ped = nil
+  mCoords.plyCoords = nil
+  mCoords.hit = false
+  mCoords.coords = {}
+  mCoords.finalHeight = nil
+  mCoords.ActiveEntity = nil
+  mCoords.switch = true
+  mCoords.PedHed = 0.0
+  mCoords.carModel = 'toros'
+  mCoords.propModel = 'prop_parkingpay'
+end
+
+mCoords.setEntity = {
+  ped = function()
+    local entity = ClonePed(mCoords.ped, false, false, true)
+    SetEntityCollision(entity, false, true)
+    FreezeEntityPosition(entity, true)
+    return entity
+  end,
+  car = function()
+    lib.requestModel(mCoords.carModel)
+    local entity = CreateVehicle(mCoords.carModel, 0, 0, 0, 0, false, false)
+    SetEntityCollision(entity, false, true)
+    -- FreezeEntityPosition(entity, true)
+    return entity
+  end,
+  prop = function()
+    lib.requestModel(mCoords.propModel)
+    local entity = CreateObject(mCoords.propModel, 0, 0, 0, 0, false, false)
+    SetEntityCollision(entity, false, true)
+    FreezeEntityPosition(entity, true)
+    return entity
+  end,
+  none = function()
+    return nil
+  end
+}
 
 ---Copy Coords
 ---@class CopyCoords
----@param action string
----@param entityType string
----@param textui boolean
+---@param action string "single" | "multi"
+---@param entityType string "ped" | "car" | "prop" | "none"
 ---@param cb function
----@param data? table
-function CopyCoords(action, entityType, textui, cb, data)
-  local viewEntity
-  local CoordsTable = {}
-  local ped = cache.ped
-  local plyCoords = GetEntityCoords(ped)
-  local hit, coords = false, {}
-  local close = false
-  local finalHeight = nil
-  local ActiveEntity = nil
-  local PedHed = 0.0
+---@param options? table
+function CopyCoords(action, entityType, cb, options)
+  mCoords:CreateTable()
 
-  local carModel = data and data.carModel or 'toros'
-  local propModel = data and data.propModel or 'prop_parkingpay'
-
-  if textui then
-    lib.showTextUI(locale('TextUiCoords'))
+  local text = function()
+    if options and options.textui then
+      if action == 'multi' then
+        lib.showTextUI(locale('copy_coords_multi_textui', action:upper(), entityType, #mCoords.CoordsTable))
+      else
+        lib.showTextUI(locale('copy_coords_singe_textui', action:upper(), entityType))
+      end
+    end
   end
 
-  local entityCreators = {
-    ped = function()
-      local entity = ClonePed(ped, false, false, true)
-      SetEntityCollision(entity, false, true)
-      FreezeEntityPosition(entity, true)
-      return entity
-    end,
-    car = function()
-      lib.requestModel(carModel)
-      local entity = CreateVehicle(carModel, 0, 0, 0, 0, false, false)
-      SetEntityCollision(entity, false, true)
-      FreezeEntityPosition(entity, true)
-      return entity
-    end,
-    prop = function()
-      lib.requestModel(propModel)
-      local entity = CreateObject(propModel, 0, 0, 0, 0, false, false)
-      SetEntityCollision(entity, false, true)
-      FreezeEntityPosition(entity, true)
-      return entity
-    end,
-    none = function()
-      return nil
-    end
-  }
+
+  if options then
+    mCoords.switch = options.switch
+    mCoords.propModel = options.propModel
+    mCoords.carModel = options.carModel
+  end
+
+
+  text()
+
+  mCoords.ped = cache.ped
+  mCoords.plyCoords = GetEntityCoords(mCoords.ped)
 
   local function cloneEntity()
-    if ActiveEntity then
-      DeleteEntity(ActiveEntity)
+    if mCoords.ActiveEntity then
+      DeleteEntity(mCoords.ActiveEntity)
     end
-    ActiveEntity = entityCreators[entityType]()
-    viewEntity = ActiveEntity
-    return ActiveEntity
+    mCoords.ActiveEntity = mCoords.setEntity[entityType]()
+    mCoords.viewEntity = mCoords.ActiveEntity
+    return mCoords.ActiveEntity
   end
 
 
@@ -74,7 +144,7 @@ function CopyCoords(action, entityType, textui, cb, data)
     if entityType == 'none' then
       return nil
     end
-    local newEntity = entityCreators[entityType]()
+    local newEntity = mCoords.setEntity[entityType]()
     SetEntityCoords(newEntity, coord.x, coord.y, coord.z, 0, 0, 0, false)
     SetEntityHeading(newEntity, coord.w)
     FreezeEntityPosition(newEntity, true)
@@ -84,20 +154,23 @@ function CopyCoords(action, entityType, textui, cb, data)
 
 
   local function undoLastCoord()
-    if action == 'multi' and #CoordsTable > 0 then
-      local lastCoord = CoordsTable[#CoordsTable]
+    if action == 'multi' and # mCoords.CoordsTable > 0 then
+      local lastCoord = mCoords.CoordsTable[#mCoords.CoordsTable]
       if DoesEntityExist(lastCoord.ent) then
         DeleteEntity(lastCoord.ent)
       end
-      table.remove(CoordsTable, #CoordsTable)
+      table.remove(mCoords.CoordsTable, #mCoords.CoordsTable)
+      if options?.textui then
+        text()
+      end
     end
   end
 
   local function deleteAllEntities()
-    if DoesEntityExist(ActiveEntity) then
-      DeleteEntity(ActiveEntity)
+    if DoesEntityExist(mCoords.ActiveEntity) then
+      DeleteEntity(mCoords.ActiveEntity)
     end
-    for _, v in pairs(CoordsTable) do
+    for _, v in pairs(mCoords.CoordsTable) do
       if DoesEntityExist(v.ent) then
         DeleteEntity(v.ent)
       end
@@ -106,12 +179,11 @@ function CopyCoords(action, entityType, textui, cb, data)
 
   local function toVector4Table()
     local toCopy = {}
-    for _, v in ipairs(CoordsTable) do
+    for _, v in ipairs(mCoords.CoordsTable) do
       local vecStr = ("vec4(%s,%s,%s,%s)"):format(v.x, v.y, v.z, v.w)
       table.insert(toCopy, vecStr)
     end
-    local formattedStr = "{\n" .. table.concat(toCopy, ",\n") .. "\n}"
-    return formattedStr
+    return ('{\n%s\n}'):format(table.concat(toCopy, ',\n'))
   end
 
   local function switchEntity()
@@ -124,85 +196,101 @@ function CopyCoords(action, entityType, textui, cb, data)
     else
       entityType = 'ped'
     end
+    if options?.textui then
+      text()
+    end
     cloneEntity()
   end
 
   cloneEntity()
 
-  Citizen.CreateThread(function()
-    while not close do
-      plyCoords = GetEntityCoords(ped)
-      hit, coords = PlayCam(60.0)
 
-      DisablePlayerFiring(ped, true)
+  -- disable melee attack
+  SetPedConfigFlag(mCoords.ped, 122, true)
+
+
+  Citizen.CreateThread(function()
+    while true do
+      mCoords.plyCoords = GetEntityCoords(mCoords.ped)
+      mCoords.hit, mCoords.coords = PlayCam(60.0)
+
       DisableControlAction(0, 140, true)
       DisableControlAction(0, 25, true)
       DisableControlAction(1, 25, true)
-      if hit and coords and coords.z then
-        local retval, height = GetWaterHeight(coords.x, coords.y, coords.z)
-        local terrainHeight = retval and math.abs(height - coords.z) >= 1.0 and height or coords.z
-        local displayHeight = finalHeight ~= nil and finalHeight or terrainHeight
 
-        if viewEntity then
-          SetEntityCoords(viewEntity, coords.x, coords.y, displayHeight, 0.0, 0.0, 0.0, false)
-          SetEntityHeading(viewEntity, PedHed)
+      if mCoords.hit and mCoords.coords and mCoords.coords.z then
+        local retval, height = GetWaterHeight(mCoords.coords.x, mCoords.coords.y, mCoords.coords.z)
+        local terrainHeight = retval and math.abs(height - mCoords.coords.z) >= 1.0 and height or
+            mCoords.coords.z
+        local displayHeight = mCoords.finalHeight ~= nil and mCoords.finalHeight or terrainHeight
+
+        if mCoords.viewEntity then
+          SetEntityCoords(mCoords.viewEntity, mCoords.coords.x, mCoords.coords.y, displayHeight, 0.0, 0.0, 0.0,
+            false)
+          SetEntityHeading(mCoords.viewEntity, mCoords.PedHed)
         end
-        DrawLine(plyCoords.x, plyCoords.y, plyCoords.z, coords.x, coords.y, displayHeight + 0.1, 250, 250, 250, 100)
-        DrawMarker(2, coords.x, coords.y, displayHeight + 0.2, 0.0, 0.0, 0.0, 180.0, 0.0, 0.0, 0.3, 0.3, 0.3, 250, 250,
-          250, 100, false, true, 2, false, nil, nil, false)
+
+        DrawLine(mCoords.plyCoords.x, mCoords.plyCoords.y, mCoords.plyCoords.z, mCoords.coords.x,
+          mCoords.coords.y, displayHeight + 0.1, 250, 250, 250, 100)
+        DrawMarker(2, mCoords.coords.x, mCoords.coords.y, displayHeight + 0.2, 0.0, 0.0, 0.0, 180.0, 0.0, 0.0,
+          0.3, 0.3, 0.3, 250, 250, 250, 100, false, true, 2, false, nil, nil, false)
       end
 
       if IsControlPressed(0, 14) then          -- scroll wheel
-        PedHed = PedHed + 3.89
+        mCoords.PedHed = mCoords.PedHed + 3.89
       elseif IsControlPressed(0, 15) then      -- scroll wheel
-        PedHed = PedHed - 3.89
+        mCoords.PedHed = mCoords.PedHed - 3.89
       elseif IsControlPressed(0, 172) then     -- Arrow Up
-        finalHeight = (finalHeight or coords.z) + 0.1
+        mCoords.finalHeight = (mCoords.finalHeight or mCoords.coords.z) + 0.1
       elseif IsControlPressed(0, 173) then     -- Arrow Down
-        finalHeight = (finalHeight or coords.z) - 0.1
-      elseif IsControlJustReleased(0, 45) then -- R
-        finalHeight = nil
-      elseif IsControlJustReleased(0, 38) then -- E
-        PedHed = GetEntityHeading(viewEntity)
+        mCoords.finalHeight = (mCoords.finalHeight or mCoords.coords.z) - 0.1
+      elseif IsControlJustReleased(0, 44) then -- R
+        mCoords.finalHeight = nil
+      elseif IsControlJustReleased(0, 69) then -- left click
+        mCoords.PedHed = GetEntityHeading(mCoords.viewEntity)
+        local newCoords = {
+          x = mCoords.coords.x,
+          y = mCoords.coords.y,
+          z = mCoords.finalHeight or mCoords.coords.z,
+          w = mCoords.PedHed
+        }
         if action == 'multi' then
-          local newCoords = { x = coords.x, y = coords.y, z = finalHeight or coords.z, w = PedHed }
           local ent = inCoords(newCoords)
           newCoords.ent = ent
-          table.insert(CoordsTable, newCoords)
+          table.insert(mCoords.CoordsTable, newCoords)
+          if options?.textui then
+            text()
+          end
         else
-          local newCoords = { x = coords.x, y = coords.y, z = finalHeight or coords.z, w = PedHed }
-          table.insert(CoordsTable, newCoords)
           cb(newCoords, toVector4Table())
           deleteAllEntities()
           lib.hideTextUI()
-          DisablePlayerFiring(ped, false)
+          SetPedConfigFlag(mCoords.ped, 122, false)
           break
         end
-      elseif IsControlJustReleased(0, 177) and action == 'multi' then --  BackSpace
+      elseif IsControlJustReleased(0, 70) and action == 'multi' then  --  right click
         undoLastCoord()
-      elseif IsControlJustReleased(0, 47) then                        -- G
+      elseif IsControlJustReleased(0, 47) and mCoords.switch then     -- G
         switchEntity()
       elseif IsControlJustReleased(0, 191) and action == 'multi' then -- Enter
         deleteAllEntities()
-        cb(CoordsTable, toVector4Table())
-        if textui then
-          lib.hideTextUI()
-        end
-        DisablePlayerFiring(ped, false)
+        cb(mCoords.CoordsTable, toVector4Table())
+        lib.hideTextUI()
+        SetPedConfigFlag(mCoords.ped, 122, false)
         break
-      end
-      
-      if not EditGarageUI then
+      elseif IsControlPressed(0, 194) then -- Backspace
         deleteAllEntities()
         lib.hideTextUI()
-        DisablePlayerFiring(ped, false)
+        SetPedConfigFlag(mCoords.ped, 122, false)
+        cb(false, false)
         break
       end
 
-      for i, point in ipairs(CoordsTable) do
-        DrawText3D(("Point ~g~%s"):format(i), point, 2)
+      if action == 'multi' then
+        for i, point in ipairs(mCoords.CoordsTable) do
+          DrawText3D(("[ ~g~%s ~w~]"):format(i), point, 2)
+        end
       end
-
 
       Citizen.Wait(0)
     end
