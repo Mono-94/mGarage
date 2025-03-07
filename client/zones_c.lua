@@ -1,6 +1,7 @@
 local Target = exports.ox_target
 local ZoneData = {}
 local PolyZone = {}
+local Blips = {}
 local DefaultGarages = require 'DefaultGarages'
 
 local SendZones = function(show)
@@ -26,8 +27,8 @@ local DeleteZone = function(id)
         DeleteEntity(ZoneData[id].targetEntity)
     end
 
-    if DoesBlipExist(ZoneData[id].blipEntity) then
-        RemoveBlip(ZoneData[id].blipEntity)
+    if DoesBlipExist(Blips[id]) then
+        RemoveBlip(Blips[id])
     end
 
     Target:removeGlobalVehicle({ 'mGarage:SaveTarget' .. ZoneData[id].name })
@@ -37,7 +38,7 @@ local DeleteZone = function(id)
 
     ZoneData[id] = nil
 
-    SendZones()
+  --  SendZones()
 
     if not ZoneData[id] then
         return true
@@ -61,9 +62,7 @@ function CreateGarage(data)
         return
     end
 
-    if data.blip then
-        data.blipEntity = SetBlip(data)
-    end
+
 
     if data.job and type(data.job) == 'string' and data.job == '' then
         data.job = false
@@ -71,6 +70,10 @@ function CreateGarage(data)
 
     local id = data.id or data.name
 
+    if data.blip then
+        Blips[id] = SetBlip(data)
+        -- data.blipEntity = SetBlip(data)
+    end
 
     PolyZone[id] = lib.zones.poly({
         name = data.name .. '-garage',
@@ -81,11 +84,25 @@ function CreateGarage(data)
         inside = function()
             if data.zoneType == 'textui' and (not data.job or Core:GetPlayerJob().name == data.job) then
                 if IsControlJustReleased(0, 38) then
-                    data.entity = cache.vehicle
-                    if GetPedInVehicleSeat(data.entity, -1) == cache.ped then
-                        SaveCar(data)
+                    if cache.vehicle and GetPedInVehicleSeat(cache.ped, -1) == cache.ped then
+                        -- SaveCar({data})
+                        SaveCar({
+                            name = data.name,
+                            garagetype = data.garagetype,
+                            entity = cache.vehicle,
+                            carType = data.carType
+                        })
                     else
-                        OpenGarage(data)
+                        --  OpenGarage(data)
+                        OpenGarage({
+                            name = data.name,
+                            garagetype = data.garagetype,
+                            intocar = data.intocar,
+                            carType = data.carType,
+                            spawnpos = data.spawnpos,
+                            showPound = data.showPound,
+                            isShared = data.isShared,
+                        })
                     end
                 end
             end
@@ -108,7 +125,16 @@ function CreateGarage(data)
                         icon = "fa-solid fa-warehouse",
                         distance = Config.TargetDistance,
                         onSelect = function()
-                            OpenGarage(data)
+                            --OpenGarage(data)
+                            OpenGarage({
+                                name = data.name,
+                                garagetype = data.garagetype,
+                                intocar = data.intocar,
+                                carType = data.carType,
+                                spawnpos = data.spawnpos,
+                                showPound = data.showPound,
+                                isShared = data.isShared,
+                            })
                         end
                     },
                 })
@@ -124,7 +150,16 @@ function CreateGarage(data)
                             icon = 'warehouse',
                             label = data.name,
                             onSelect = function()
-                                OpenGarage(data)
+                                -- OpenGarage(data)
+                                OpenGarage({
+                                    name = data.name,
+                                    garagetype = data.garagetype,
+                                    intocar = data.intocar,
+                                    carType = data.carType,
+                                    spawnpos = data.spawnpos,
+                                    showPound = data.showPound,
+                                    isShared = data.isShared,
+                                })
                             end
                         },
                         {
@@ -132,7 +167,15 @@ function CreateGarage(data)
                             icon = 'warehouse',
                             label = locale('TargetSaveCar'),
                             onSelect = function()
-                                SaveCar(data)
+                                if cache.vehicle and GetPedInVehicleSeat(cache.ped, -1) == cache.ped then
+                                    -- SaveCar({data})
+                                    SaveCar({
+                                        name = data.name,
+                                        garagetype = data.garagetype,
+                                        entity = cache.vehicle,
+                                        carType = data.carType
+                                    })
+                                end
                             end
                         }
                     })
@@ -151,8 +194,15 @@ function CreateGarage(data)
                         groups = data.job,
                         distance = Config.TargetDistance,
                         onSelect = function(vehicle)
-                            data.entity = vehicle.entity
-                            SaveCar(data)
+                            -- data.entity = vehicle.entity
+                            -- SaveCar(data)
+
+                            SaveCar({
+                                name = data.name,
+                                garagetype = data.garagetype,
+                                entity = vehicle.entity,
+                                carType = data.carType
+                            })
                         end
                     },
                 })
@@ -178,7 +228,7 @@ function CreateGarage(data)
     ZoneData[id] = data
 
     if not data.default then
-        SendZones()
+   --     SendZones()
     end
 end
 
@@ -196,9 +246,11 @@ RegisterSafeEvent('mGarage:Zone', function(action, data)
 end)
 
 if Config.DefaultGarages and DefaultGarages then
-    lib.array.forEach(DefaultGarages, function(garage)
-        garage.default = true
-        CreateGarage(garage)
+    Citizen.CreateThread(function()
+        lib.array.forEach(DefaultGarages, function(garage)
+            garage.default = true
+            CreateGarage(garage)
+        end)
     end)
 end
 
@@ -227,7 +279,7 @@ end
 local usePromise = nil
 ---@param cb function
 RegisterNuiCallback('mGarage:adm', function(data, cb)
-    local retval
+    local retval = nil
     usePromise = nil
     if data.action == 'create' then
         retval = ZonesCallBack('create', data.data)
@@ -242,30 +294,28 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
             ToggleMenu(false)
         end)
     elseif data.action == 'coords' then
-        ToggleMenu(true, 'coords')
+        ToggleMenu(true, 'singlecoords')
 
         usePromise = promise:new()
 
-        CopyCoords('single', 'ped', false, function(coords)
-            if coords then
-                ToggleMenu(false)
-                retval = coords
-                usePromise:resolve()
-            end
+        CopyCoords('single', 'ped', function(coords)
+            ToggleMenu(false)
+            print(json.encode(coords), type(coords))
+            retval = coords
+            usePromise:resolve(coords)
         end)
     elseif data.action == 'spawn_coords' then
-        ToggleMenu(true, 'coords')
+        ToggleMenu(true, 'multicoords')
 
         usePromise = promise:new()
 
-        CopyCoords('multi', 'car', false, function(coords)
-            if coords then
-                ToggleMenu(false)
-                retval = coords
-                usePromise:resolve()
-            end
+        CopyCoords('multi', 'car', function(coords)
+            ToggleMenu(false)
+            retval = coords
+            usePromise:resolve(coords)
         end)
     elseif data.action == 'update' then
+        print(json.encode(data.data.actioncoords))
         retval = ZonesCallBack('update', data.data)
     elseif data.action == 'delete' then
         retval = ZonesCallBack('delete', data.data, 1500)

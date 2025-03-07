@@ -31,7 +31,7 @@ if not IsDuplicityVersion() then -- client side
 
         elseif Core.FrameWork == "qbx" then
             local Job = QBX.PlayerData.job
-            
+
             return {
                 name = Job.name,
                 grade = tonumber(Job.grade.level),
@@ -138,6 +138,10 @@ else -- server side
             return false
         end
 
+        self.identifier = self.GetIdentifier()
+
+        self.source = src
+
         self.getName = function()
             if Core.FrameWork == "esx" then
                 return Player.getName()
@@ -177,10 +181,11 @@ else -- server side
                 return true
             end
         end
-        --- need ACE permisiones
+
         self.isAdmin = function()
             if Core.FrameWork == "esx" then
-                return (Player.getGroup() == 'admin')
+                local group = Player.getGroup()
+                return group == Config.CommandGroup
             elseif Core.FrameWork == "ox" then
 
             elseif Core.FrameWork == "qbx" then
@@ -262,9 +267,7 @@ else -- server side
             return false
         end
 
-        self.identifier = self.GetIdentifier()
 
-        self.source = src
 
         return self
     end

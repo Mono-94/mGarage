@@ -76,7 +76,7 @@ lib.callback.register('mGarage:GarageZones', function(source, action, data)
             v.blipEntity = nil
             v.entity = nil
         end
-
+        print(json.encode(prevData, { indent = true }))
         local db = MySQL.update.await(QueryZone.Update, { json.encode(prevData), data.id })
         if db then
             player.Notify({

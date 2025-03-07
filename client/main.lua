@@ -94,21 +94,21 @@ function OpenGarage(data)
     ShowNui('setVisibleGarage', true)
 end
 
-function SaveCar(data)
+function SaveCar(save)
     local vehiclePed = GetVehiclePedIsUsing(cache.ped)
 
-    if not DoesEntityExist(data.entity) then
-        data.entity = vehiclePed
+    if not DoesEntityExist(save.entity) then
+        save.entity = vehiclePed
     end
 
-    if not DoesEntityExist(data.entity) then
+    if not DoesEntityExist(save.entity) then
         return false
     end
 
-    local IsTrailer, trailerEntity = GetVehicleTrailerVehicle(data.entity)
+    local IsTrailer, trailerEntity = GetVehicleTrailerVehicle(save.entity)
 
     if IsTrailer then
-        local trailer = data
+        local trailer = save
         trailer.props = json.encode(lib.getVehicleProperties(trailerEntity))
         trailer.vehmodel = GetDisplayNameFromVehicleModel(GetEntityModel(trailerEntity))
         trailer.entity = VehToNet(trailerEntity)
@@ -116,16 +116,16 @@ function SaveCar(data)
         ServerCallBack('saveCar', trailer, 0)
     end
 
-    data.props = json.encode(lib.getVehicleProperties(data.entity))
-    data.vehmodel = GetDisplayNameFromVehicleModel(GetEntityModel(data.entity))
-    data.entity = VehToNet(data.entity)
-    data.seats = GetVehicleMaxNumberOfPassengers(data.entity)
+    save.props = json.encode(lib.getVehicleProperties(save.entity))
+    save.vehmodel = GetDisplayNameFromVehicleModel(GetEntityModel(save.entity))
+    save.entity = VehToNet(save.entity)
+    save.seats = GetVehicleMaxNumberOfPassengers(save.entity)
 
-    if not NetworkDoesNetworkIdExist(data.entity) then
+    if not NetworkDoesNetworkIdExist(save.entity) then
         return false
     end
 
-    ServerCallBack('saveCar', data, 500)
+    ServerCallBack('saveCar', save, 500)
 end
 
 RegisterNUICallback('mGarage:PlyInteract', function(data, cb)

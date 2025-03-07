@@ -7,7 +7,6 @@ local query = {
         impoundVehicle =
         'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
         storeAllVehicles = 'UPDATE owned_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0)',
-        updateMetadata = 'UPDATE owned_vehicles SET metadata = ? WHERE TRIM(`plate`) = TRIM(?)',
         selectMetadata = 'SELECT `metadata` FROM `owned_vehicles` WHERE TRIM(`plate`) = TRIM(?) LIMIT 1'
     },
 
@@ -17,7 +16,6 @@ local query = {
         impoundVehicle =
         'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
         storeAllVehicles = 'UPDATE player_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0)',
-        updateMetadata = 'UPDATE player_vehicles SET metadata = ? WHERE TRIM(`plate`) = TRIM(?)',
         selectMetadata = 'SELECT `metadata` FROM `player_vehicles` WHERE TRIM(`plate`) = TRIM(?) LIMIT 1'
     },
 }
@@ -140,11 +138,8 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 return false
             end
 
-            if type(Vehicle.keys) ~= 'table' then
-                Vehicle.keys = json.decode(Vehicle.keys)
-            end
 
-            if Vehicle.owner == identifier or Vehicle.keys and Vehicle.keys[identifier] then
+            if Vehicle.owner == identifier or Vehicle.metadata.keys and Vehicle.metadata.keys[identifier] then
                 local left = LeftCar(entity, data.seats)
 
                 if left then Citizen.Wait(1000) end
@@ -334,7 +329,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             if metadata.pound then
                 if metadata.pound.endPound then
                     metadata.pound.endPound = nil
-                    MySQL.update(Querys.updateMetadata, { json.encode(metadata), data })
+                    Vehicles.UpdateMetadataPlate(data, metadata)
                     retval = true
                     Player.Notify({ title = 'Garage Unpound', description = locale('ImpoundOption11'), type = 'success', })
                 else
@@ -447,7 +442,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 if metadata then
                     metadata.vehname = data.newName
                     local updatedMetadata = json.encode(metadata)
-                    MySQL.update(Querys.updateMetadata, { updatedMetadata, data.vehicle.plate })
+                    Vehicles.UpdateMetadataPlate(data.vehicle.plate, updatedMetadata)
                     retval = true
                 else
                     retval = false
@@ -471,7 +466,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 if metadata then
                     metadata.vehname = nil
                     local updatedMetadata = json.encode(metadata)
-                    MySQL.update(Querys.updateMetadata, { updatedMetadata, data.vehicle.plate })
+                    Vehicles.UpdateMetadataPlate(data.vehicle.plate, updatedMetadata)
                     retval = true
                 else
                     retval = false
@@ -500,7 +495,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 metadata.fav = not currentFav
 
                 retval = { fav = metadata.fav }
-                MySQL.update(Querys.updateMetadata, { json.encode(metadata), data.plate })
+                Vehicles.UpdateMetadataPlate(data.plate, metadata)
             end
         end
     end

@@ -1,9 +1,9 @@
 Config                = {}
 
-Config.Debug          = false
+Config.Debug          = true
 
 -- To edit/create garages
-Config.CommandGroup = 'group.admin'
+Config.CommandGroup = 'admin'
 
 -- Start defaultGarages.lua
 Config.DefaultGarages = true
@@ -17,7 +17,7 @@ Config.BlipDefault          = {
     sprite = 50,
     color = 0,
     size = 0.5,
-    stackBlips = false,
+    stackBlips = true,
     impound = 'Impound',
     garage = 'Garage',
     custom = 'Garage',

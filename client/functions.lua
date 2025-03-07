@@ -15,10 +15,10 @@ function SendNUI(action, data)
   SendNUIMessage({ action = action, data = data })
 end
 
-function ToggleMenu(toggle, action)
+function ToggleMenu(toggle, action, label)
   if toggle then
     SetNuiFocus(false, false)
-    SendNUI('minimizeMenu', { minimized = true, action = action, })
+    SendNUI('minimizeMenu', { minimized = true, action = action, label = label })
   else
     SetNuiFocus(true, true)
     SendNUI('minimizeMenu', { minimized = false, action = '' })
