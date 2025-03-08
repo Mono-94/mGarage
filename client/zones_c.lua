@@ -31,8 +31,7 @@ local DeleteZone = function(id)
         RemoveBlip(Blips[id])
     end
 
-    Target:removeGlobalVehicle({ 'mGarage:SaveTarget' .. ZoneData[id].name })
-
+    Target:removeGlobalVehicle({('mGarage:SaveTarget'):format(ZoneData[id].name)})
 
     if PolyZone[id] then PolyZone[id]:remove() end
 
@@ -169,7 +168,7 @@ function CreateGarage(data)
             if data.garagetype ~= 'impound' and data.zoneType == 'target' and not data.rent then
                 Target:addGlobalVehicle({
                     {
-                        name = 'mGarage:SaveTarget' .. data.name,
+                        name = ('mGarage:SaveTarget'):format(data.name) ,
                         icon = 'fa-solid fa-road',
                         label = locale('TargetSaveCar'),
                         groups = data.job,
@@ -182,7 +181,7 @@ function CreateGarage(data)
             end
         end,
         onExit = function()
-            exports.ox_target:removeGlobalVehicle({ 'mGarage:SaveTarget' .. data.name })
+            exports.ox_target:removeGlobalVehicle({('mGarage:SaveTarget'):format(data.name)})
 
             if data.zoneType == 'target' then
                 if DoesEntityExist(data.targetEntity) then
