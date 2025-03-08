@@ -38,7 +38,7 @@ local DeleteZone = function(id)
 
     ZoneData[id] = nil
 
-  --  SendZones()
+    SendZones()
 
     if not ZoneData[id] then
         return true
@@ -72,7 +72,27 @@ function CreateGarage(data)
 
     if data.blip then
         Blips[id] = SetBlip(data)
-        -- data.blipEntity = SetBlip(data)
+    end
+
+    local open = function()
+        OpenGarage({
+            name = data.name,
+            garagetype = data.garagetype,
+            intocar = data.intocar,
+            carType = data.carType,
+            spawnpos = data.spawnpos,
+            showPound = data.showPound,
+            isShared = data.isShared,
+        })
+    end
+
+    local save = function(entity)
+        SaveCar({
+            name = data.name,
+            garagetype = data.garagetype,
+            entity = entity,
+            carType = data.carType
+        })
     end
 
     PolyZone[id] = lib.zones.poly({
@@ -85,24 +105,9 @@ function CreateGarage(data)
             if data.zoneType == 'textui' and (not data.job or Core:GetPlayerJob().name == data.job) then
                 if IsControlJustReleased(0, 38) then
                     if cache.vehicle and GetPedInVehicleSeat(cache.ped, -1) == cache.ped then
-                        -- SaveCar({data})
-                        SaveCar({
-                            name = data.name,
-                            garagetype = data.garagetype,
-                            entity = cache.vehicle,
-                            carType = data.carType
-                        })
+                        save(cache.vehicle)
                     else
-                        --  OpenGarage(data)
-                        OpenGarage({
-                            name = data.name,
-                            garagetype = data.garagetype,
-                            intocar = data.intocar,
-                            carType = data.carType,
-                            spawnpos = data.spawnpos,
-                            showPound = data.showPound,
-                            isShared = data.isShared,
-                        })
+                        open()
                     end
                 end
             end
@@ -125,16 +130,7 @@ function CreateGarage(data)
                         icon = "fa-solid fa-warehouse",
                         distance = Config.TargetDistance,
                         onSelect = function()
-                            --OpenGarage(data)
-                            OpenGarage({
-                                name = data.name,
-                                garagetype = data.garagetype,
-                                intocar = data.intocar,
-                                carType = data.carType,
-                                spawnpos = data.spawnpos,
-                                showPound = data.showPound,
-                                isShared = data.isShared,
-                            })
+                            open()
                         end
                     },
                 })
@@ -150,16 +146,7 @@ function CreateGarage(data)
                             icon = 'warehouse',
                             label = data.name,
                             onSelect = function()
-                                -- OpenGarage(data)
-                                OpenGarage({
-                                    name = data.name,
-                                    garagetype = data.garagetype,
-                                    intocar = data.intocar,
-                                    carType = data.carType,
-                                    spawnpos = data.spawnpos,
-                                    showPound = data.showPound,
-                                    isShared = data.isShared,
-                                })
+                                open()
                             end
                         },
                         {
@@ -168,13 +155,7 @@ function CreateGarage(data)
                             label = locale('TargetSaveCar'),
                             onSelect = function()
                                 if cache.vehicle and GetPedInVehicleSeat(cache.ped, -1) == cache.ped then
-                                    -- SaveCar({data})
-                                    SaveCar({
-                                        name = data.name,
-                                        garagetype = data.garagetype,
-                                        entity = cache.vehicle,
-                                        carType = data.carType
-                                    })
+                                    save(cache.entity)
                                 end
                             end
                         }
@@ -194,15 +175,7 @@ function CreateGarage(data)
                         groups = data.job,
                         distance = Config.TargetDistance,
                         onSelect = function(vehicle)
-                            -- data.entity = vehicle.entity
-                            -- SaveCar(data)
-
-                            SaveCar({
-                                name = data.name,
-                                garagetype = data.garagetype,
-                                entity = vehicle.entity,
-                                carType = data.carType
-                            })
+                            save(vehicle.entity)
                         end
                     },
                 })
@@ -228,7 +201,7 @@ function CreateGarage(data)
     ZoneData[id] = data
 
     if not data.default then
-   --     SendZones()
+        SendZones()
     end
 end
 
@@ -315,7 +288,6 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
             usePromise:resolve(coords)
         end)
     elseif data.action == 'update' then
-        print(json.encode(data.data.actioncoords))
         retval = ZonesCallBack('update', data.data)
     elseif data.action == 'delete' then
         retval = ZonesCallBack('delete', data.data, 1500)
