@@ -91,8 +91,6 @@
     "GarageCreate5": "Garage %s créé avec succès",
     "GarageCreate6": "Garage supprimé avec succès",
     "GarageCreate7": "Garage mis à jour avec succès",
-    "TextUiCreateZone": "[MB1] + Point   \n  [MB2] Supprimer le dernier point   \n  [SCROLL] Hauteur  \n  [ENTER] Enregistrer la zone  \n  [BACKSPACE] Fermer ",
-    "TextUiCoords": "[E] +Coordonnées  \n  [SCROLL] Direction  \n  [BACKSPACE] Supprimer la dernière coordonnée  \n  [G] Rien / Joueur / Véhicule  \n  [ENTER] Enregistrer les coordonnées",
     "private_addon": "",
     "private_addon_client": "",
     "toggle_blip_private": "Garages Privés",
@@ -160,5 +158,11 @@
     "private_ui18": "Donner une clé",
     "ui_name1": "Nom",
     "ui_name2": "Renommer le véhicule",
-    "ui_name3": "Changer"
+    "ui_name3": "Changer",
+    "TextUiCreateZone": "[MB1] Set Point  \n  [MB2] Delete last point  \n  [SCROLL] Height  \n  [ENTER] Save Zone  \n  [BACKSPACE] Close  \n  [W] Move Forward  \n  [S] Move Backward  \n  [A] Move Left  \n  [D] Move Right  \n  [Q] Move Down  \n  [E] Move Up",
+    "TextUiCoords": "[MB1] Set Coord  \n  [G] Switch Entity  \n  [Q] Ground  \n  [SCROLL] Direction   \n  [Up-Arrow] Height  +   \n  [Down-Arrow]  Height  -  \n  [BACKSPACE] Close  ",
+    "TextUiMultiCoords": "[MB1] Set Coord  \n  [MB2] Delete last coords  \n  [G] Switch Entity   \n  [Q] Ground  \n  [SCROLL] Direction   \n  [Up-Arrow] Height  +   \n  [Down-Arrow]  Height  -   \n  [ENTER] Save and Exit  \n  [BACKSPACE] Close  ",
+   
+    "copy_coords_singe_textui": "**Action** *%s*  \n  **[MB1]** *Set Coord*  \n  **[G]** *Switch Entity [ %s ]*   \n  **[Q]** *Ground*  \n  **[SCROLL]** *Direction*   \n  **[Up-Arrow]** *Height  +*   \n  **[Down-Arrow]**  *Height  -*  \n  **[BACKSPACE]** *Close*",
+    "copy_coords_multi_textui": "**Action** *%s*  \n  **[MB1]** *Set Coord*  \n  **[MB2]** *Delete last coords*  \n  **[G]** *Switch Entity [ %s ]*   \n  **[Q]** *Ground*  \n  \n  **[SCROLL]** *Direction*   \n  **[Up-Arrow]** *Height  +*   \n  **[Down-Arrow]**  *Height  -*   \n  **[ENTER]** *Save and Exit*  \n  **[BACKSPACE]** *Close*  \n  **Total Poits** *%s*"
 }

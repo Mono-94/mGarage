@@ -96,8 +96,6 @@
     "GarageCreate5": "Garaje %s Creado correctamente",
     "GarageCreate6": "Garaje eliminado correctamente",
     "GarageCreate7": "Garaje actualizado correctamente",
-    "TextUiCreateZone": "[MB1] Set Point  \n  [MB2] Delete last point  \n  [SCROLL] Height  \n  [ENTER] Save Zone  \n  [BACKSPACE] Close  \n  [W] Move Forward  \n  [S] Move Backward  \n  [A] Move Left  \n  [D] Move Right  \n  [Q] Move Down  \n  [E] Move Up",
-    "TextUiCoords": "[E] +Coords  \n  [SCROLL] Direccion  \n  [BACKSPACE] Eliminar ultima coord  \n  [G] Nada/Player/Vehículo  \n  [ENTER] Guardar Coords",
     "private_addon": "",
     "private_addon_client": "",
     "toggle_blip_private": "Garajes Privados",
@@ -165,5 +163,12 @@
     "private_ui18": "Dar llave",
     "ui_name1": "Nombre",
     "ui_name2": "Renombrar vehículo",
-    "ui_name3": "Cambiar"
+    "ui_name3": "Cambiar",
+
+    "TextUiCreateZone": "[MB1] Set Point  \n  [MB2] Delete last point  \n  [SCROLL] Height  \n  [ENTER] Save Zone  \n  [BACKSPACE] Close  \n  [W] Move Forward  \n  [S] Move Backward  \n  [A] Move Left  \n  [D] Move Right  \n  [Q] Move Down  \n  [E] Move Up",
+    "TextUiCoords": "[MB1] Set Coord  \n  [G] Switch Entity  \n  [Q] Ground  \n  [SCROLL] Direction   \n  [Up-Arrow] Height  +   \n  [Down-Arrow]  Height  -  \n  [BACKSPACE] Close  ",
+    "TextUiMultiCoords": "[MB1] Set Coord  \n  [MB2] Delete last coords  \n  [G] Switch Entity   \n  [Q] Ground  \n  [SCROLL] Direction   \n  [Up-Arrow] Height  +   \n  [Down-Arrow]  Height  -   \n  [ENTER] Save and Exit  \n  [BACKSPACE] Close  ",
+   
+    "copy_coords_singe_textui": "**Action** *%s*  \n  **[MB1]** *Set Coord*  \n  **[G]** *Switch Entity [ %s ]*   \n  **[Q]** *Ground*  \n  **[SCROLL]** *Direction*   \n  **[Up-Arrow]** *Height  +*   \n  **[Down-Arrow]**  *Height  -*  \n  **[BACKSPACE]** *Close*",
+    "copy_coords_multi_textui": "**Action** *%s*  \n  **[MB1]** *Set Coord*  \n  **[MB2]** *Delete last coords*  \n  **[G]** *Switch Entity [ %s ]*   \n  **[Q]** *Ground*  \n  \n  **[SCROLL]** *Direction*   \n  **[Up-Arrow]** *Height  +*   \n  **[Down-Arrow]**  *Height  -*   \n  **[ENTER]** *Save and Exit*  \n  **[BACKSPACE]** *Close*  \n  **Total Poits** *%s*"
 }
