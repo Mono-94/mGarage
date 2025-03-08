@@ -1,6 +1,6 @@
 Config                = {}
 
-Config.Debug          = true
+Config.Debug          = false
 
 -- To edit/create garages
 Config.CommandGroup = 'admin'
