@@ -3,7 +3,7 @@ local ZoneData = {}
 local PolyZone = {}
 local Blips = {}
 local DefaultGarages = require 'DefaultGarages'
-
+local targetEntity = {}
 local SendZones = function(show)
     local filteredData = {}
     for _, v in pairs(ZoneData) do
@@ -20,18 +20,18 @@ end
 
 local DeleteZone = function(id)
     if ZoneData[id].zoneType == 'target' then
-        Target:removeLocalEntity(ZoneData[id].targetEntity)
+        Target:removeLocalEntity(targetEntity[id])
     end
 
-    if DoesEntityExist(ZoneData[id].targetEntity) then
-        DeleteEntity(ZoneData[id].targetEntity)
+    if DoesEntityExist(targetEntity[id]) then
+        DeleteEntity(targetEntity[id])
     end
 
     if DoesBlipExist(Blips[id]) then
         RemoveBlip(Blips[id])
     end
 
-    Target:removeGlobalVehicle({('mGarage:SaveTarget'):format(ZoneData[id].name)})
+    Target:removeGlobalVehicle({ ('mGarage:SaveTarget'):format(ZoneData[id].name) })
 
     if PolyZone[id] then PolyZone[id]:remove() end
 
@@ -60,8 +60,6 @@ function CreateGarage(data)
         lib.print.error(('Garage [ ID %s - NAME %s ] - no Action Coords | Set new Coords'):format(data.id, data.name))
         return
     end
-
-
 
     if data.job and type(data.job) == 'string' and data.job == '' then
         data.job = false
@@ -114,15 +112,15 @@ function CreateGarage(data)
         onEnter = function()
             if data.zoneType == 'target' then
                 if data.prop then
-                    data.targetEntity = SetProp(data)
+                    targetEntity[id] = SetProp(data)
                 elseif not data.prop then
                     if not data.npchash or data.npchash == '' then
                         data.npchash = 'csb_trafficwarden'
                     end
-                    data.targetEntity = SetNPC(data)
+                    targetEntity[id] = SetNPC(data)
                 end
 
-                data.TargetId = Target:addLocalEntity(data.targetEntity, {
+                Target:addLocalEntity(targetEntity[id], {
                     {
                         groups = data.job,
                         label = data.name,
@@ -168,7 +166,7 @@ function CreateGarage(data)
             if data.garagetype ~= 'impound' and data.zoneType == 'target' and not data.rent then
                 Target:addGlobalVehicle({
                     {
-                        name = ('mGarage:SaveTarget'):format(data.name) ,
+                        name = ('mGarage:SaveTarget'):format(data.name),
                         icon = 'fa-solid fa-road',
                         label = locale('TargetSaveCar'),
                         groups = data.job,
@@ -181,12 +179,12 @@ function CreateGarage(data)
             end
         end,
         onExit = function()
-            exports.ox_target:removeGlobalVehicle({('mGarage:SaveTarget'):format(data.name)})
+            exports.ox_target:removeGlobalVehicle({ ('mGarage:SaveTarget'):format(data.name) })
 
             if data.zoneType == 'target' then
-                if DoesEntityExist(data.targetEntity) then
-                    DeleteEntity(data.targetEntity)
-                    Target:removeLocalEntity(data.targetEntity)
+                if DoesEntityExist(targetEntity[id]) then
+                    DeleteEntity(targetEntity[id])
+                    Target:removeLocalEntity(targetEntity[id])
                 end
             elseif data.zoneType == 'textui' then
                 Config.Textui.HideText()
@@ -330,8 +328,8 @@ AddEventHandler('onResourceStop', function(name)
         Config.Textui.HideText()
 
         for k, v in pairs(ZoneData) do
-            if ZoneData[k].targetEntity then
-                DeleteEntity(ZoneData[k].targetEntity)
+            if targetEntity[k] then
+                DeleteEntity(targetEntity[k])
             end
         end
     end

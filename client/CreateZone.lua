@@ -117,7 +117,6 @@ function CreateZone(polyzoneName, textui, cb)
                         CreateZone()
                     else
                         Config.Notify({ title = 'Create Zone', description = 'No points available', type = 'error', icon = nil })
-                        lib.print.warn()
                     end
                 elseif IsControlPressed(0, 194) then
                     if cb then cb(false) end

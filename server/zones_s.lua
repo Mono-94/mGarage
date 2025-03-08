@@ -66,18 +66,7 @@ lib.callback.register('mGarage:GarageZones', function(source, action, data)
         end
         return db
     elseif action == 'update' then
-        local prevData = data
-        --- prevent saving unwanted data (temporary)
-        for _, v in ipairs(prevData) do
-            v.targetEntity = nil
-            v.seats = nil
-            v.vehmodel = nil
-            v.props = nil
-            v.blipEntity = nil
-            v.entity = nil
-        end
-        print(json.encode(prevData, { indent = true }))
-        local db = MySQL.update.await(QueryZone.Update, { json.encode(prevData), data.id })
+        local db = MySQL.update.await(QueryZone.Update, { json.encode(data), data.id })
         if db then
             player.Notify({
                 title = locale('GarageCreate3'),
