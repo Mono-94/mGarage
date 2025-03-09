@@ -4,15 +4,20 @@ local query = {
     ['esx'] = {
         storeVehicle =
         'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 1, `vehicle` = ?, type = ?  WHERE TRIM(`plate`) = TRIM(?) ',
-        impoundVehicle ='UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
-        storeAllVehicles = 'UPDATE owned_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0) AND (JSON_EXTRACT(metadata, "$.private") IS NULL OR JSON_EXTRACT(metadata, "$.private") = false)',
+        impoundVehicle =
+        'UPDATE `owned_vehicles` SET `parking` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
+        storeAllVehicles =
+        'UPDATE owned_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0) AND (JSON_EXTRACT(metadata, "$.private") IS NULL OR JSON_EXTRACT(metadata, "$.private") = false)',
         selectMetadata = 'SELECT `metadata` FROM `owned_vehicles` WHERE TRIM(`plate`) = TRIM(?) LIMIT 1'
     },
 
     ['qbx'] = {
-        storeVehicle ='UPDATE `player_vehicles` SET `garage` = ?, `stored` = 1, `mods` = ?, type = ?  WHERE TRIM(`plate`) = TRIM(?) ',
-        impoundVehicle ='UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
-        storeAllVehicles = 'UPDATE player_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0) AND (JSON_EXTRACT(metadata, "$.private") IS NULL OR JSON_EXTRACT(metadata, "$.private") = false)',
+        storeVehicle =
+        'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 1, `mods` = ?, type = ?  WHERE TRIM(`plate`) = TRIM(?) ',
+        impoundVehicle =
+        'UPDATE `player_vehicles` SET `garage` = ?, `stored` = 0, `pound` = 1, `metadata` = ? WHERE TRIM(`plate`) = TRIM(?)',
+        storeAllVehicles =
+        'UPDATE player_vehicles SET stored = 1 WHERE stored = 0 AND (pound IS NULL OR pound = 0) AND (JSON_EXTRACT(metadata, "$.private") IS NULL OR JSON_EXTRACT(metadata, "$.private") = false)',
         selectMetadata = 'SELECT `metadata` FROM `player_vehicles` WHERE TRIM(`plate`) = TRIM(?) LIMIT 1'
     },
 }
@@ -438,8 +443,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
                 end
                 if metadata then
                     metadata.vehname = data.newName
-                    local updatedMetadata = json.encode(metadata)
-                    Vehicles.UpdateMetadataPlate(data.vehicle.plate, updatedMetadata)
+                    Vehicles.UpdateMetadataPlate(data.vehicle.plate, metadata)
                     retval = true
                 else
                     retval = false
@@ -462,8 +466,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
                 if metadata then
                     metadata.vehname = nil
-                    local updatedMetadata = json.encode(metadata)
-                    Vehicles.UpdateMetadataPlate(data.vehicle.plate, updatedMetadata)
+                    Vehicles.UpdateMetadataPlate(data.vehicle.plate, metadata)
                     retval = true
                 else
                     retval = false
