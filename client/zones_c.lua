@@ -111,7 +111,7 @@ function CreateGarage(data)
         inside = function()
             if data.zoneType == 'textui' and (not data.job or Core:GetPlayerJob().name == data.job) then
                 if IsControlJustReleased(0, 38) then
-                    if cache.vehicle and GetPedInVehicleSeat(cache.ped, -1) == cache.ped then
+                    if cache.vehicle and GetPedInVehicleSeat(cache.vehicle, -1) == cache.ped then
                         save(cache.vehicle)
                     else
                         open()
