@@ -615,3 +615,5 @@ function GetDefaultImpound(type)
         end
     end
 end
+
+lib.versionCheck('Mono-94/mGarage')
