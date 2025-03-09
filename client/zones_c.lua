@@ -80,6 +80,9 @@ function CreateGarage(data)
             spawnpos = data.spawnpos,
             showPound = data.showPound,
             isShared = data.isShared,
+            defaultCars = data.defaultCars,
+            job = data.job,
+            rent = data.rent,
         })
     end
 
@@ -87,8 +90,15 @@ function CreateGarage(data)
         SaveCar({
             name = data.name,
             garagetype = data.garagetype,
+            intocar = data.intocar,
+            carType = data.carType,
+            spawnpos = data.spawnpos,
+            showPound = data.showPound,
+            isShared = data.isShared,
+            defaultCars = data.defaultCars,
+            job = data.job,
+            rent = data.rent,
             entity = entity,
-            carType = data.carType
         })
     end
 

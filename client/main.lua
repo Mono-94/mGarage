@@ -56,13 +56,13 @@ function OpenGarage(data)
             local isModelValid = IsModelValid(v.model)
 
             if isModelValid then
-                --- transform old grades to new mingrade
-                if v.grades and type(v.grades) == 'table' and #v.grades >= 1 and data.job then
+                -- Transform old grades to new mingrade
+                if v.grades and type(v.grades) == 'table' and #v.grades >= 1 and type(data.job) == 'string' then
                     local maxGrade = math.max(table.unpack(v.grades))
                     v.mingrade = maxGrade
                 end
-
-                if type(v.mingrade) == 'number' and data.job then
+                
+                if type(v.mingrade) == 'number' and type(data.job) == 'string' then
                     local grade = PlayerJob.grade >= v.mingrade
                     if not grade then
                         isValid = false

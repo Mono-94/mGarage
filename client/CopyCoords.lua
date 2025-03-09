@@ -57,6 +57,8 @@ end
 
 local mCoords = {}
 
+local models = { 'baller8', 'banshee3', 'sultanrs', }
+
 function mCoords:CreateTable()
   mCoords.viewEntity = nil
   mCoords.CoordsTable = {}
@@ -68,7 +70,7 @@ function mCoords:CreateTable()
   mCoords.ActiveEntity = nil
   mCoords.switch = true
   mCoords.PedHed = 0.0
-  mCoords.carModel = 'toros'
+  mCoords.carModel = models[math.random(#models)]
   mCoords.propModel = 'prop_parkingpay'
 end
 
@@ -119,9 +121,15 @@ function CopyCoords(action, entityType, cb, options)
 
 
   if options then
-    mCoords.switch = options.switch
-    mCoords.propModel = options.propModel
-    mCoords.carModel = options.carModel
+    if type(options.switch) == 'boolean' then
+      mCoords.switch = options.switch
+    end
+    if type(options.propModel) == 'string' then
+      mCoords.propModel = options.propModel
+    end
+    if type(options.carModel) == 'string' then
+      mCoords.carModel = options.carModel
+    end
   end
 
 
@@ -262,10 +270,10 @@ function CopyCoords(action, entityType, cb, options)
             text()
           end
         else
-          cb(newCoords, toVector4Table())
-          deleteAllEntities()
           lib.hideTextUI()
+          deleteAllEntities()
           SetPedConfigFlag(mCoords.ped, 122, false)
+          cb(newCoords, toVector4Table())
           break
         end
       elseif IsControlJustReleased(0, 70) and action == 'multi' then  --  right click
@@ -273,14 +281,14 @@ function CopyCoords(action, entityType, cb, options)
       elseif IsControlJustReleased(0, 47) and mCoords.switch then     -- G
         switchEntity()
       elseif IsControlJustReleased(0, 191) and action == 'multi' then -- Enter
-        deleteAllEntities()
-        cb(mCoords.CoordsTable, toVector4Table())
         lib.hideTextUI()
+        deleteAllEntities()
         SetPedConfigFlag(mCoords.ped, 122, false)
+        cb(mCoords.CoordsTable, toVector4Table())
         break
       elseif IsControlPressed(0, 194) then -- Backspace
-        deleteAllEntities()
         lib.hideTextUI()
+        deleteAllEntities()
         SetPedConfigFlag(mCoords.ped, 122, false)
         cb(false, false)
         break
