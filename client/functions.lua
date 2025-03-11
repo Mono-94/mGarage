@@ -26,6 +26,11 @@ function ToggleMenu(toggle, action, label)
 end
 
 RegisterNuiCallback('mGarage:Close', function(data, cb)
+  if data.name == 'setVisibleTooltip' then
+    SetNuiFocus(false, false)
+    cb(true)
+    return
+  end
   ShowNui(data.name, false)
   if data.name == 'setVisibleMenu' then
     EditGarageUI = false
@@ -79,14 +84,6 @@ function DrawText3D(text, coords, z)
   end
 end
 
----@param eventName string
----@param funct function
-function RegisterSafeEvent(eventName, funct)
-  RegisterNetEvent(eventName, function(...)
-    if GetInvokingResource() ~= nil then return end
-    funct(...)
-  end)
-end
 
 function SetBlip(data)
   local name = data.name
