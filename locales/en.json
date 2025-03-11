@@ -108,7 +108,7 @@
     "private_manage4": "Manage who has access to the garage",
     "private_manage5": "Storage",
     "private_manage6": "Select garage",
-    "private_manage7": "[E] Store Vehicle",
+    "private_manage7": "**%s**  \n [E] - Guardar Vehículo",
     "private_manage8": "Buy | %s",
     "private_manage9": "### **Price:** %s $  \n ### **Parking Slots:** %s  \n  ![image](%s)",
     "private_manage10": "Payment method",
@@ -164,6 +164,8 @@
     "ui_name1": "Name",
     "ui_name2": "Rename vehicle",
     "ui_name3": "Change",
+
+    "open_garage_textui": "**%s**  \n [E] Open",
 
     "TextUiCreateZone": "[MB1] Set Point  \n  [MB2] Delete last point  \n  [SCROLL] Height  \n  [ENTER] Save Zone  \n  [BACKSPACE] Close  \n  [W] Move Forward  \n  [S] Move Backward  \n  [A] Move Left  \n  [D] Move Right  \n  [Q] Move Down  \n  [E] Move Up",
     "TextUiCoords": "[MB1] Set Coord  \n  [G] Switch Entity  \n  [Q] Ground  \n  [SCROLL] Direction   \n  [Up-Arrow] Height  +   \n  [Down-Arrow]  Height  -  \n  [BACKSPACE] Close  ",

@@ -160,6 +160,9 @@
     "ui_name1": "Nome",
     "ui_name2": "Rinomina veicolo",
     "ui_name3": "Modificare",
+
+    "open_garage_textui": "**%s**  \n [E] Open",
+
     "TextUiCreateZone": "[MB1] Set Point  \n  [MB2] Delete last point  \n  [SCROLL] Height  \n  [ENTER] Save Zone  \n  [BACKSPACE] Close  \n  [W] Move Forward  \n  [S] Move Backward  \n  [A] Move Left  \n  [D] Move Right  \n  [Q] Move Down  \n  [E] Move Up",
     "TextUiCoords": "[MB1] Set Coord  \n  [G] Switch Entity  \n  [Q] Ground  \n  [SCROLL] Direction   \n  [Up-Arrow] Height  +   \n  [Down-Arrow]  Height  -  \n  [BACKSPACE] Close  ",
     "TextUiMultiCoords": "[MB1] Set Coord  \n  [MB2] Delete last coords  \n  [G] Switch Entity   \n  [Q] Ground  \n  [SCROLL] Direction   \n  [Up-Arrow] Height  +   \n  [Down-Arrow]  Height  -   \n  [ENTER] Save and Exit  \n  [BACKSPACE] Close  ",
