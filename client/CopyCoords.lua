@@ -56,8 +56,8 @@ if Config.Debug then
 end
 
 local mCoords = {}
-
-local models = { 'baller8', 'banshee3', 'sultanrs', }
+local ent = {}
+local models = { 'baller8', 'banshee3', 'sultanrs', 'rhinehart', 'jubilee' }
 
 function mCoords:CreateTable()
   mCoords.viewEntity = nil
@@ -85,7 +85,7 @@ mCoords.setEntity = {
     lib.requestModel(mCoords.carModel)
     local entity = CreateVehicle(mCoords.carModel, 0, 0, 0, 0, false, false)
     SetEntityCollision(entity, false, true)
-    -- FreezeEntityPosition(entity, true)
+    FreezeEntityPosition(entity, true)
     return entity
   end,
   prop = function()
@@ -178,9 +178,9 @@ function CopyCoords(action, entityType, cb, options)
     if DoesEntityExist(mCoords.ActiveEntity) then
       DeleteEntity(mCoords.ActiveEntity)
     end
-    for _, v in pairs(mCoords.CoordsTable) do
-      if DoesEntityExist(v.ent) then
-        DeleteEntity(v.ent)
+    for _, v in pairs(ent) do
+      if DoesEntityExist(_) then
+        DeleteEntity(_)
       end
     end
   end
@@ -263,8 +263,10 @@ function CopyCoords(action, entityType, cb, options)
           w = mCoords.PedHed
         }
         if action == 'multi' then
-          local ent = inCoords(newCoords)
-          newCoords.ent = ent
+          local entityCreated = inCoords(newCoords)
+          if entityCreated then
+            ent[entityCreated] = entityCreated
+          end
           table.insert(mCoords.CoordsTable, newCoords)
           if options?.textui then
             text()
