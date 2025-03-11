@@ -479,7 +479,6 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
         local VehicleEntity = Vehicles.GetVehicleByPlate(data.plate)
 
         if VehicleEntity then
-            -- Obtener el valor actual y alternarlo
             local currentFav = VehicleEntity.GetMetadata('fav') or false
             local newFav = not currentFav
 
@@ -490,7 +489,6 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             if Vehicle then
                 local metadata = json.decode(Vehicle.metadata)
 
-                -- Obtener el valor actual y alternarlo
                 local currentFav = metadata.fav or false
                 metadata.fav = not currentFav
 
