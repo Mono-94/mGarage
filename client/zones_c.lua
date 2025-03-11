@@ -190,13 +190,15 @@ function CreateGarage(data)
             end
         end,
         onExit = function()
-            if ox_target then
-                exports.ox_exports.ox_target:removeGlobalVehicle({ ('mGarage:SaveTarget'):format(data.name) })
-            end
             if data.zoneType == 'target' then
                 if DoesEntityExist(targetEntity[id]) then
                     DeleteEntity(targetEntity[id])
-                    exports.ox_target:removeLocalEntity(targetEntity[id])
+                    if ox_target then
+                        exports.ox_target:removeLocalEntity(targetEntity[id])
+                    end
+                end
+                if ox_target then
+                    exports.ox_target:removeGlobalVehicle({ ('mGarage:SaveTarget'):format(data.name) })
                 end
             elseif data.zoneType == 'textui' then
                 Config.Textui.HideText()
