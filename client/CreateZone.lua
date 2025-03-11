@@ -1,158 +1,183 @@
-local isOpenCretor, Cam = false, nil
-local MAX_CAM_DISTANCE = 100
-local MinY, MaxY = -90.0, 90.0
-local MoveSpeed = 0.3
-local zoneHeight = 5.0
-local zonePoints = {}
-local currentZone, currentZoneName, currentZ = nil, nil, nil
-local NewZone = {}
+local mZone = {}
 
-local DelZone = function()
-    if currentZone then
-        currentZone:remove();
+function mZone:CreateTable()
+    self.isOpen = false
+    self.CamEntity = nil
+    self.MAX_CAM_DISTANCE = 100
+    self.MinY = -100.0
+    self.MaxY = 100.0
+    self.MoveSpeed = 0.3
+    self.zoneHeight = 5.0
+    self.zonePoints = {}
+    self.currentZone = nil
+    self.currentZoneName = nil
+    self.currentZ = nil
+    self.NewZone = {}
+    self.ped = cache.ped
+    self.textui = false
+end
+
+function mZone:DeleteCurrent()
+    if self.currentZone then
+        self.currentZone:remove()
     end
 end
 
-if Config.Debug then
-    RegisterCommand('czone', function(source, args, raw)
-        CreateZone('test', true, function(zone)
-            print(json.encode(zone, { indent = true }))
-        end)
-    end)
+function mZone:SetNewPoint()
+    if #self.zonePoints == 1 then
+        self.currentZ = self.zonePoints[1].z
+    end
+
+    self.zonePoints[#self.zonePoints] = {
+        x = self.zonePoints[#self.zonePoints].x,
+        y = self.zonePoints[#self.zonePoints].y,
+        z = self.currentZ
+    }
+
+    self.NewZone = {
+        name = self.currentZoneName,
+        points = self.zonePoints,
+        thickness = self.zoneHeight
+    }
 end
 
----Create Zone
----@param polyzoneName? string
----@param textui? boolean
----@param cb? function
-function CreateZone(polyzoneName, textui, cb)
-    local playerPed = cache.ped
+function mZone:RefreshPolyzone()
+    self:DeleteCurrent()
 
-    local function setupCamera()
-        local x, y, z = table.unpack(GetGameplayCamCoord())
-        local pitch, roll, yaw = table.unpack(GetGameplayCamRot(2))
-        local fov = GetGameplayCamFov()
+    if #self.zonePoints > 0 then
+        self:SetNewPoint()
 
-        Cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
-        SetCamCoord(Cam, x, y, z + 20.0)
-        SetCamRot(Cam, pitch, roll, yaw, 2)
-        SetCamFov(Cam, fov)
-        RenderScriptCams(true, true, 500, true, true)
-        FreezeEntityPosition(playerPed, true)
-        SetEntityAlpha(playerPed, 0, true)
+        self.currentZone = lib.zones.poly({
+            name = self.currentZoneName,
+            debugColour = vec4(51, 54, 92, 50.0),
+            points = self.zonePoints,
+            thickness = self.zoneHeight,
+            debug = true
+        })
     end
+end
 
-    local function resetCamera()
-        RenderScriptCams(false, true, 500, true, true)
-        SetCamActive(Cam, false)
-        DetachCam(Cam)
-        DestroyCam(Cam, true)
-        Cam = nil
+function mZone:SetCam()
+    local x, y, z = table.unpack(GetGameplayCamCoord())
+    local pitch, roll, yaw = table.unpack(GetGameplayCamRot(2))
+    local fov = GetGameplayCamFov()
+
+    self.CamEntity = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
+    SetCamCoord(self.CamEntity, x, y, z)
+    SetCamRot(self.CamEntity, pitch, roll, yaw, 2)
+    SetCamFov(self.CamEntity, fov)
+    RenderScriptCams(true, true, 500, true, true)
+    FreezeEntityPosition(self.ped, true)
+    SetEntityAlpha(self.ped, 0, true)
+end
+
+function mZone:ClearCam()
+    RenderScriptCams(false, true, 500, true, true)
+    SetCamActive(self.CamEntity, false)
+    DetachCam(self.CamEntity)
+    DestroyCam(self.CamEntity, true)
+    self.CamEntity = nil
+end
+
+function mZone:ToggleUI(show)
+    if not self.textui then return end
+    if show then
+        lib.showTextUI(locale('TextUiCreateZone'))
+    else
+        lib.hideTextUI()
     end
+end
 
-    local function toggleUI(show)
-        if show then
-            lib.showTextUI(locale('TextUiCreateZone'))
-        else
-            lib.hideTextUI()
+function mZone:Reset()
+    if not self.isOpen then
+        self:ToggleUI(true)
+        self:SetCam()
+    else
+        self:ToggleUI(false)
+        self:DeleteCurrent()
+        self.currentZone, self.currentZ, self.zonePoints, self.zoneHeight = nil, nil, {}, 4
+        FreezeEntityPosition(self.ped, false)
+        ResetEntityAlpha(self.ped)
+        if self.CamEntity then
+            self:ClearCam()
         end
     end
 
-    local function Reset()
-        if not isOpenCretor then
-            toggleUI(textui)
-            setupCamera()
-        else
-            toggleUI(false)
-            DelZone()
-            currentZone, currentZ, zonePoints, zoneHeight = nil, nil, {}, 4
-            FreezeEntityPosition(playerPed, false)
-            ResetEntityAlpha(playerPed)
-            if Cam then
-                resetCamera()
-            end
-        end
-        isOpenCretor = not isOpenCretor
-    end
+    self.isOpen = not self.isOpen
+end
 
+---@param name string
+---@param textui boolean
+---@param cb function
+function CreateZone(name, textui, cb)
+    mZone:CreateTable()
 
-    Reset()
+    mZone.currentZoneName = name
+    mZone.textui = textui
 
-    currentZoneName = polyzoneName
+    mZone:Reset()
 
     Citizen.CreateThread(function()
-        while isOpenCretor do
-            local hit, coords = RayCastGamePlayCamera(80.0)
+        while mZone.isOpen do
+            local hit, coords = mZone:RayCastGamePlayCamera(80.0)
             if hit then
                 DrawLine(coords.x, coords.y, coords.z, coords.x, coords.y, coords.z + 15.0, 255.0, 255.0, 255.0, 250.0)
 
                 if IsControlJustPressed(0, 69) then
-                    table.insert(zonePoints, coords)
-                    refreshPolyzone()
+                    table.insert(mZone.zonePoints, coords)
+                    mZone:RefreshPolyzone()
                 elseif IsControlJustPressed(0, 70) then
-                    if #zonePoints > 0 then
-                        table.remove(zonePoints, #zonePoints)
-                        refreshPolyzone()
+                    if #mZone.zonePoints > 0 then
+                        table.remove(mZone.zonePoints, #mZone.zonePoints)
+                        mZone:RefreshPolyzone()
                     end
-                elseif IsControlPressed(0, 334) and zoneHeight > 4 then
-                    zoneHeight = zoneHeight - 1
-                    refreshPolyzone()
+                elseif IsControlPressed(0, 334) and mZone.zoneHeight > 4 then
+                    mZone.zoneHeight = mZone.zoneHeight - 1
+                    mZone:RefreshPolyzone()
                 elseif IsControlPressed(0, 335) then
-                    zoneHeight = zoneHeight + 1
-                    refreshPolyzone()
+                    mZone.zoneHeight = mZone.zoneHeight + 1
+                    mZone:RefreshPolyzone()
                 elseif IsControlJustPressed(0, 191) then
-                    if #zonePoints > 0 then
-                        if #zonePoints == 1 then
-                            currentZ = zonePoints[1].z
-                        end
-                        zonePoints[#zonePoints] = {
-                            x = zonePoints[#zonePoints].x,
-                            y = zonePoints[#zonePoints].y,
-                            z =
-                                currentZ
-                        }
-                        NewZone = { name = currentZoneName, points = json.encode(zonePoints), thickness = zoneHeight, debug = true }
-
-                        if cb then cb(NewZone) end
-                        CreateZone()
+                    if #mZone.zonePoints > 0 then
+                        mZone:Reset()
+                        if cb then cb(mZone.NewZone) end
+                        break
                     else
                         Config.Notify({ title = 'Create Zone', description = 'No points available', type = 'error', icon = nil })
                     end
                 elseif IsControlPressed(0, 194) then
                     if cb then cb(false) end
-                    CreateZone()
+                    mZone:Reset()
+                    break
                 end
             end
 
-            for i, point in ipairs(zonePoints) do
+            for i, point in ipairs(mZone.zonePoints) do
                 DrawText3D(("Point: ~g~%s"):format(i), point)
             end
 
-            camControls()
+            mZone:CamControls()
 
             Citizen.Wait(0)
         end
     end)
 end
 
-exports('CreateZone', CreateZone)
-
-function RayCastGamePlayCamera(distance)
-    local playerPed = cache.ped
-    local cameraRotation = GetCamRot(Cam, 2)
-    local cameraCoord = GetCamCoord(Cam)
-    local direction = RotationToDirection(cameraRotation)
+function mZone:RayCastGamePlayCamera(distance)
+    local cameraRotation = GetCamRot(self.CamEntity, 2)
+    local cameraCoord = GetCamCoord(self.CamEntity)
+    local direction = self:RotationToDirection(cameraRotation)
     local destination = {
         x = cameraCoord.x + direction.x * distance,
         y = cameraCoord.y + direction.y * distance,
         z = cameraCoord.z + direction.z * distance
     }
     local _, hits, coords, _, entity = GetShapeTestResult(StartShapeTestRay(cameraCoord.x, cameraCoord.y, cameraCoord.z,
-        destination.x, destination.y, destination.z, -1, playerPed, 0))
+        destination.x, destination.y, destination.z, -1, self.ped, 0))
     return hits, coords, entity
 end
 
-function RotationToDirection(rotation)
+function mZone:RotationToDirection(rotation)
     local adjustedRotation = {
         x = (math.pi / 180) * rotation.x,
         y = (math.pi / 180) * rotation.y,
@@ -163,60 +188,43 @@ function RotationToDirection(rotation)
         y = math.cos(adjustedRotation.z) * math.abs(math.cos(adjustedRotation.x)),
         z = math.sin(adjustedRotation.x)
     }
+
     return direction
 end
 
-function refreshPolyzone()
-    DelZone()
-
-    if #zonePoints > 0 then
-        if #zonePoints == 1 then
-            currentZ = zonePoints[1].z
-        end
-        zonePoints[#zonePoints] = vector3(zonePoints[#zonePoints].x, zonePoints[#zonePoints].y, currentZ)
-        currentZone = lib.zones.poly({
-            name = currentZoneName,
-            debugColour = vec4(51, 54, 92, 50.0),
-            points = zonePoints,
-            thickness = zoneHeight,
-            debug = true
-        })
-    end
+function mZone:CamControls()
+    self:RotateCamInputs()
+    self:MoveCamInputs()
 end
 
-function camControls()
-    rotateCamInputs()
-    moveCamInputs()
-end
-
-function rotateCamInputs()
+function mZone:RotateCamInputs()
     local newX
     local rAxisX = GetControlNormal(0, 220)
     local rAxisY = GetControlNormal(0, 221)
-    local rotation = GetCamRot(Cam, 2)
+    local rotation = GetCamRot(self.CamEntity, 2)
     local yValue = rAxisY * 5
     local newZ = rotation.z + (rAxisX * -10)
     local newXval = rotation.x - yValue
-    if (newXval >= MinY) and (newXval <= MaxY) then
+    if (newXval >= self.MinY) and (newXval <= self.MaxY) then
         newX = newXval
     else
         newX = rotation.x
     end
     if newX and newZ then
-        SetCamRot(Cam, newX, rotation.y, newZ, 2)
+        SetCamRot(self.CamEntity, newX, rotation.y, newZ, 2)
     end
 end
 
-function moveCamInputs()
-    local x, y, z = table.unpack(GetCamCoord(Cam))
-    local pitch, roll, yaw = table.unpack(GetCamRot(Cam, 2))
+function mZone:MoveCamInputs()
+    local x, y, z = table.unpack(GetCamCoord(self.CamEntity))
+    local pitch, roll, yaw = table.unpack(GetCamRot(self.CamEntity, 2))
 
-    local dx = math.sin(-yaw * math.pi / 180) * MoveSpeed
-    local dy = math.cos(-yaw * math.pi / 180) * MoveSpeed
-    local dz = math.tan(pitch * math.pi / 180) * MoveSpeed
+    local dx = math.sin(-yaw * math.pi / 180) * self.MoveSpeed
+    local dy = math.cos(-yaw * math.pi / 180) * self.MoveSpeed
+    local dz = math.tan(pitch * math.pi / 180) * self.MoveSpeed
 
-    local dx2 = math.sin(math.floor(yaw + 90.0) % 360 * -1.0 * math.pi / 180) * MoveSpeed
-    local dy2 = math.cos(math.floor(yaw + 90.0) % 360 * -1.0 * math.pi / 180) * MoveSpeed
+    local dx2 = math.sin(math.floor(yaw + 90.0) % 360 * -1.0 * math.pi / 180) * self.MoveSpeed
+    local dy2 = math.cos(math.floor(yaw + 90.0) % 360 * -1.0 * math.pi / 180) * self.MoveSpeed
 
     if IsControlPressed(0, 32) then
         x = x + dx
@@ -231,15 +239,23 @@ function moveCamInputs()
         x = x + dx2
         y = y + dy2
     elseif IsControlPressed(0, 46) then
-        z = z + MoveSpeed
+        z = z + self.MoveSpeed
     elseif IsControlPressed(0, 44) then
-        z = z - MoveSpeed
+        z = z - self.MoveSpeed
     end
 
-
-    local playerPed = cache.ped
-    local playercoords = GetEntityCoords(playerPed)
-    if GetDistanceBetweenCoords(playercoords - vector3(x, y, z), true) <= MAX_CAM_DISTANCE then
-        SetCamCoord(Cam, x, y, z)
+    local playercoords = GetEntityCoords(self.ped)
+    if GetDistanceBetweenCoords(playercoords - vector3(x, y, z), true) <= self.MAX_CAM_DISTANCE then
+        SetCamCoord(self.CamEntity, x, y, z)
     end
+end
+
+exports('CreateZone', CreateZone)
+
+if Config.Debug then
+    RegisterCommand('czone', function(source, args, raw)
+        CreateZone('test', true, function(zone)
+            print(json.encode(zone, { indent = true }))
+        end)
+    end)
 end
