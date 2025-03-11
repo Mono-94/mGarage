@@ -72,3 +72,14 @@ Config.Textui = {
         lib.hideTextUI()
     end
 }
+
+
+
+---@param eventName string
+---@param funct function
+function RegisterSafeEvent(eventName, funct)
+    RegisterNetEvent(eventName, function(...)
+      if GetInvokingResource() ~= nil then return end
+      funct(...)
+    end)
+  end
