@@ -61,7 +61,7 @@ function OpenGarage(data)
                     local maxGrade = math.max(table.unpack(v.grades))
                     v.mingrade = maxGrade
                 end
-                
+
                 if type(v.mingrade) == 'number' and type(data.job) == 'string' then
                     local grade = PlayerJob.grade >= v.mingrade
                     if not grade then
@@ -72,7 +72,7 @@ function OpenGarage(data)
                 end
             else
                 lib.print.warn(('vehicle model %s is not valid at Garage Name %s'):format(v.model:upper(),
-                    data.name:upper()))
+                data.name:upper()))
                 isValid = false
             end
 

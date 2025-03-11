@@ -1,9 +1,11 @@
-local Target = exports.ox_target
 local ZoneData = {}
 local PolyZone = {}
 local Blips = {}
 local DefaultGarages = require 'DefaultGarages'
+local ox_target = GetResourceState("ox_target") == "started"
 local targetEntity = {}
+
+
 local SendZones = function(show)
     local filteredData = {}
     for _, v in pairs(ZoneData) do
@@ -17,10 +19,9 @@ local SendZones = function(show)
     if show then ShowNui('setVisibleMenu', true) end
 end
 
-
 local DeleteZone = function(id)
-    if ZoneData[id].zoneType == 'target' then
-        Target:removeLocalEntity(targetEntity[id])
+    if ZoneData[id].zoneType == 'target' and ox_target then
+        exports.ox_target:removeLocalEntity(targetEntity[id])
     end
 
     if DoesEntityExist(targetEntity[id]) then
@@ -30,9 +31,9 @@ local DeleteZone = function(id)
     if DoesBlipExist(Blips[id]) then
         RemoveBlip(Blips[id])
     end
-
-    Target:removeGlobalVehicle({ ('mGarage:SaveTarget'):format(ZoneData[id].name) })
-
+    if ox_target then
+        exports.ox_target:removeGlobalVehicle({ ('mGarage:SaveTarget'):format(ZoneData[id].name) })
+    end
     if PolyZone[id] then PolyZone[id]:remove() end
 
     ZoneData[id] = nil
@@ -129,24 +130,25 @@ function CreateGarage(data)
                     end
                     targetEntity[id] = SetNPC(data)
                 end
-
-                Target:addLocalEntity(targetEntity[id], {
-                    {
-                        groups = data.job,
-                        label = data.name,
-                        icon = "fa-solid fa-warehouse",
-                        distance = Config.TargetDistance,
-                        onSelect = function()
-                            open()
-                        end
-                    },
-                })
+                if ox_target then
+                    exports.ox_target:addLocalEntity(targetEntity[id], {
+                        {
+                            groups = data.job,
+                            label = data.name,
+                            icon = "fa-solid fa-warehouse",
+                            distance = Config.TargetDistance,
+                            onSelect = function()
+                                open()
+                            end
+                        },
+                    })
+                end
             elseif data.zoneType == 'textui' then
                 if not data.job or Core:GetPlayerJob().name == data.job then
-                    Config.Textui.Showtext(data.name)
+                    Config.Textui.Showtext(locale('open_garage_textui', data.name), { icon = 'warehouse' })
                 end
             elseif data.zoneType == 'radial' then
-                local Action = function()
+                if not data.job or Core:GetPlayerJob().name == data.job then
                     lib.addRadialItem({
                         {
                             id = 'garage_access',
@@ -168,33 +170,33 @@ function CreateGarage(data)
                         }
                     })
                 end
-                if not data.job or Core:GetPlayerJob().name == data.job then
-                    Action()
-                end
             end
 
             if data.garagetype ~= 'impound' and data.zoneType == 'target' and not data.rent then
-                Target:addGlobalVehicle({
-                    {
-                        name = ('mGarage:SaveTarget'):format(data.name),
-                        icon = 'fa-solid fa-road',
-                        label = locale('TargetSaveCar'),
-                        groups = data.job,
-                        distance = Config.TargetDistance,
-                        onSelect = function(vehicle)
-                            save(vehicle.entity)
-                        end
-                    },
-                })
+                if ox_target then
+                    exports.ox_target:addGlobalVehicle({
+                        {
+                            name = ('mGarage:SaveTarget'):format(data.name),
+                            icon = 'fa-solid fa-road',
+                            label = locale('TargetSaveCar'),
+                            groups = data.job,
+                            distance = Config.TargetDistance,
+                            onSelect = function(vehicle)
+                                save(vehicle.entity)
+                            end
+                        },
+                    })
+                end
             end
         end,
         onExit = function()
-            exports.ox_target:removeGlobalVehicle({ ('mGarage:SaveTarget'):format(data.name) })
-
+            if ox_target then
+                exports.ox_exports.ox_target:removeGlobalVehicle({ ('mGarage:SaveTarget'):format(data.name) })
+            end
             if data.zoneType == 'target' then
                 if DoesEntityExist(targetEntity[id]) then
                     DeleteEntity(targetEntity[id])
-                    Target:removeLocalEntity(targetEntity[id])
+                    exports.ox_target:removeLocalEntity(targetEntity[id])
                 end
             elseif data.zoneType == 'textui' then
                 Config.Textui.HideText()
@@ -265,30 +267,23 @@ RegisterNuiCallback('mGarage:adm', function(data, cb)
         retval = ZonesCallBack('create', data.data)
     elseif data.action == 'zone' then
         ToggleMenu(true, 'zone')
-
         usePromise = promise:new()
-
-        CreateZone('mGarage:ExitZone_' .. #ZoneData + 1, false, function(zoone)
-            retval = zoone
-            usePromise:resolve(zoone)
+        CreateZone('mGarage:ExitZone_' .. #ZoneData + 1, false, function(zone)
+            retval = zone
+            usePromise:resolve(zone)
             ToggleMenu(false)
         end)
     elseif data.action == 'coords' then
         ToggleMenu(true, 'singlecoords')
-
         usePromise = promise:new()
-
         CopyCoords('single', 'ped', function(coords)
             ToggleMenu(false)
-            print(json.encode(coords), type(coords))
             retval = coords
             usePromise:resolve(coords)
         end)
     elseif data.action == 'spawn_coords' then
         ToggleMenu(true, 'multicoords')
-
         usePromise = promise:new()
-
         CopyCoords('multi', 'car', function(coords)
             ToggleMenu(false)
             retval = coords
@@ -350,7 +345,7 @@ end)
 ---@return integer|table
 function GetGaragesData(count)
     local garagesdata <const> = ZoneData
-    local Garages = { impound = {}, garage = {}, custom = {}, totalGarges = 0, all = {} }
+    local Garages = { impound = {}, garage = {}, custom = {}, all = {}, totalGarges = 0, }
     for k, v in pairs(garagesdata) do
         if v ~= nil then
             Garages.totalGarges = Garages.totalGarges + 1
