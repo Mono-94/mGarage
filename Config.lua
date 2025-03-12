@@ -3,7 +3,7 @@ Config                = {}
 Config.Debug          = false
 
 -- To edit/create garages
-Config.CommandGroup = 'admin'
+Config.CommandGroup   = 'admin'
 
 -- Start defaultGarages.lua
 Config.DefaultGarages = true
@@ -14,14 +14,11 @@ Config.TargetDistance = 10.0
 
 
 Config.BlipDefault          = {
-    sprite = 50,
-    color = 0,
-    size = 0.5,
     stackBlips = true,
-    impound = 'Impound',
-    garage = 'Garage',
-    custom = 'Garage',
-    rent = 'Rent a Car',
+    impound = { label = 'Impound', sprite = 473, color = 17, size = 0.5 },
+    garage = { label = 'Garage', sprite = 50, color = 2, size = 0.5 },
+    custom = { label = 'Custom Garage', sprite = 50, color = 0, size = 0.5 },
+    rent = { label = 'Rent A Car', sprite = 474, color = 0, size = 0.5 },
 }
 
 Config.PedAnims             = {
@@ -79,7 +76,7 @@ Config.Textui = {
 ---@param funct function
 function RegisterSafeEvent(eventName, funct)
     RegisterNetEvent(eventName, function(...)
-      if GetInvokingResource() ~= nil then return end
-      funct(...)
+        if GetInvokingResource() ~= nil then return end
+        funct(...)
     end)
-  end
+end

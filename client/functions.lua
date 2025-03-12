@@ -84,20 +84,24 @@ function DrawText3D(text, coords, z)
   end
 end
 
-
 function SetBlip(data)
-  local name = data.name
+  local blip = {}
   if Config.BlipDefault.stackBlips then
-    name = data.rent and Config.BlipDefault.rent or Config.BlipDefault[data.garagetype]
+    blip = data.rent and Config.BlipDefault.rent or Config.BlipDefault[data.garagetype]
+  else
+    blip.label = data.name
+    blip.sprite = data.blipsprite
+    blip.color = data.blipcolor
   end
+
   local entity = AddBlipForCoord(data.actioncoords.x, data.actioncoords.y, data.actioncoords.z)
-  SetBlipSprite(entity, data.blipsprite or Config.BlipDefault.sprite)
+  SetBlipSprite(entity, blip.sprite)
   SetBlipDisplay(entity, 4)
-  SetBlipScale(entity, Config.BlipDefault.size)
-  SetBlipColour(entity, data.blipcolor or Config.BlipDefault.color)
+  SetBlipScale(entity, blip.size or 0.5) 
+  SetBlipColour(entity, blip.color)
   SetBlipAsShortRange(entity, true)
   BeginTextCommandSetBlipName("STRING")
-  AddTextComponentString(name)
+  AddTextComponentString(blip.label)
   EndTextCommandSetBlipName(entity)
   return entity
 end
