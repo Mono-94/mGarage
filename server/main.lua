@@ -126,14 +126,19 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
             end
 
             if data.garagetype == 'custom' and metadata.customGarage and data.name == metadata.customGarage then
-                if data.job and not job.name == Vehicle.job or not data.job == Vehicle.job then return false end
+                if data.job and not job.name == Vehicle.job or not data.job == Vehicle.job then
+                    return false
+                end
                 if metadata and metadata.customGarage and data.name == metadata.customGarage then
                     if Vehicles.Config.ItemKeys then
                         Vehicles.ItemCarKeys(source, 'delete', Vehicle.plate)
                     end
                     local left = LeftCar(entity, data.seats)
 
-                    if left then Citizen.Wait(2000) end
+                    if left then
+                        Citizen.Wait(2000)
+                    end
+
                     return Vehicle.DeleteVehicle(false)
                 end
             elseif data.garagetype == 'custom' and not metadata.customGarage then
@@ -360,6 +365,7 @@ lib.callback.register('mGarage:Interact', function(source, action, data, vehicle
 
         local plate = Vehicles.GeneratePlate()
         local platePrefix = data.garage.platePrefix
+
 
         if platePrefix and #platePrefix > 0 then
             if #platePrefix < 4 then
