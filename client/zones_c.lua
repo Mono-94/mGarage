@@ -84,6 +84,7 @@ function CreateGarage(data)
             defaultCars = data.defaultCars,
             job = data.job,
             rent = data.rent,
+            platePrefix = data.platePrefix,
         })
     end
 
@@ -100,6 +101,7 @@ function CreateGarage(data)
             job = data.job,
             rent = data.rent,
             entity = entity,
+            platePrefix = data.platePrefix,
         })
     end
 
